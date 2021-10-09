@@ -28,7 +28,6 @@ public class OpenMenuAction implements Action {
 		if (menu != null) {
 			menu.openCheckingPermission(player);
 		} else {
-			//TODO not sure if from server or null
 			Helper.serverToPlayerMessage(Errors.User.configurationError("couldn't find the menu \"" + menuName + "\""), player);
 		}
 	}

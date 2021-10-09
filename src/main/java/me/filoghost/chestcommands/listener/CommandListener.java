@@ -42,9 +42,9 @@ public class CommandListener {
 
 		if (menu == null) {
 			throw WRONG_NAME_EXCEPTION.create(name);
-		} else {
-			menu.openCheckingPermission(player);
+		} else if (menu.openCheckingPermission(player)) {
+			return 1;
 		}
-		return 0;
+		return -1;
 	}   
 }

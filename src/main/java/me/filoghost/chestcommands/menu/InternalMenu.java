@@ -71,11 +71,13 @@ public class InternalMenu extends BaseMenu {
         return ChestCommands.getInstance();
     }
 
-    public void openCheckingPermission(ServerPlayerEntity player) {
+    public boolean openCheckingPermission(ServerPlayerEntity player) {
         if (player.hasPermission(openPermission)) {
             open(player);
+            return true;
         } else {
             sendNoOpenPermissionMessage(player);
+            return false;
         }
     }
 

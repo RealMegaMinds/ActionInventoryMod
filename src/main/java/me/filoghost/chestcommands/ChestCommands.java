@@ -36,6 +36,7 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.event.server.ServerTickCallback;
 import net.fabricmc.fabric.api.event.world.WorldTickCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.world.ServerTickScheduler;
 import net.minecraft.util.WorldSavePath;
@@ -76,13 +77,13 @@ public class ChestCommands implements ModInitializer {
 		UseBlockCallback.EVENT.register(InventoryListener::onBlockUse);
 		AttackBlockCallback.EVENT.register(InventoryListener::onBlockAttack);
 		InventoryEvents.BEFORE_SLOT_CLICK.register(InventoryListener::onInventoryClick);
+		ServerPlayConnectionEvents.JOIN.register(JoinListener::onJoin);
 	}
 
 	protected void onCheckedEnable() {
 
 
 
-		Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
 		Bukkit.getPluginManager().registerEvents(new SignListener(), this);
 
 		new CommandHandler("chestcommands").register(this);
