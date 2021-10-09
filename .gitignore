@@ -7,7 +7,7 @@ classes/
 
 # eclipse
 
-*.launch
+###*.launch
 
 # idea
 
@@ -18,11 +18,11 @@ classes/
 
 # vscode
 
-.settings/
+###.settings/
 .vscode/
 bin/
 .classpath
-.project
+###.project
 
 # macos
 
