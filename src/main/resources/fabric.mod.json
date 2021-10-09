@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "testmod",
+  "version": "${version}",
+  "name": "Test Mod",
+  "description": "This is just a test mod for 1.17",
+  "authors": [
+    "Hoid2"
+  ],
+  "contributors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/testmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "megaminds.testmod.TestMod"
+    ],
+    "client": [],
+    "server": []
+  },
+  "mixins": [
+    "testmod.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.7",
+    "fabric": "*"
+  }
+}
