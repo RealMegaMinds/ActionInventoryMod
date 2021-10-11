@@ -2,9 +2,20 @@ package megaminds.testmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.client.util.TextCollector;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.registry.Registry;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,11 +32,10 @@ public class TestMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		log(Level.INFO, "Initializing");
+		info("Initializing");
+
 		InventoryEvents.BEFORE_SLOT_CLICK.register((packet, player)->{
 			info("bsc");
-			packet = new EditableClickSlotC2SPacket(packet).button(2).actionType(SlotActionType.CLONE).asPacket();
-			player.currentScreenHandler.nextRevision();
 			return TypedActionResult.pass(packet);
 		});
 		InventoryEvents.AFTER_SLOT_CLICK.register((packet, player)->{

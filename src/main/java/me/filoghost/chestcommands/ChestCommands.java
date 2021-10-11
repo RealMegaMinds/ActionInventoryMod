@@ -34,16 +34,18 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.event.server.ServerTickCallback;
-import net.fabricmc.fabric.api.event.world.WorldTickCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.world.ServerTickScheduler;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSaveHandler;
-
-import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +54,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class ChestCommands implements ModInitializer {
-	public static final String CHAT_PREFIX = ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + "ChestCommands" + ChatColor.DARK_GREEN + "] " + ChatColor.GREEN;
+	private static final Text CHAT_PREFIX = new LiteralText("[").setStyle(Style.EMPTY.withColor(Formatting.DARK_GREEN)).append(new LiteralText("ChestCommands").setStyle(Style.EMPTY.withColor(Formatting.GREEN)).append(new LiteralText("]").setStyle(Style.EMPTY.withColor(Formatting.DARK_GREEN))));
 
 	private static Path dataFolderPath;
 
@@ -82,8 +84,8 @@ public class ChestCommands implements ModInitializer {
 
 	protected void onCheckedEnable() {
 
-
-
+		
+		
 		Bukkit.getPluginManager().registerEvents(new SignListener(), this);
 
 		new CommandHandler("chestcommands").register(this);
@@ -176,5 +178,9 @@ public class ChestCommands implements ModInitializer {
 
 	public static ErrorCollector getLastLoadErrors() {
 		return lastLoadErrors;
+	}
+	
+	public static MutableText getChatPrefix() {
+		return CHAT_PREFIX.shallowCopy();
 	}
 }

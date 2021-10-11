@@ -21,7 +21,10 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -29,7 +32,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-import org.bukkit.ChatColor;
 import org.bukkit.event.block.Action;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -103,6 +105,6 @@ public class InventoryListener {
 
 	private static void handleIconClickException(ServerPlayerEntity clicker, Menu menu, Throwable throwable) {
 		Log.severe("Encountered an exception while handling a click inside the menu \"" + Errors.formatPath(((InternalMenu) menu).getSourceFile()) + "\"", throwable);
-		Helper.serverToPlayerMessage(ChatColor.RED + "An internal error occurred when you clicked on the item.", clicker);
+		Helper.serverToPlayerMessage(new LiteralText("An internal error occurred when you clicked on the item.").setStyle(Style.EMPTY.withColor(Formatting.RED)), clicker);
 	}
 }
