@@ -11,33 +11,23 @@ import me.filoghost.chestcommands.menu.InternalMenu;
 import me.filoghost.chestcommands.menu.MenuManager;
 import me.filoghost.chestcommands.util.Utils;
 import megaminds.testmod.Helper;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SignBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;
+import net.minecraft.server.filter.TextStream.Message;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.Tag;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
-import org.bukkit.event.block.Action;
+import java.util.List;
 
 public class SignListener {
 
@@ -47,12 +37,11 @@ public class SignListener {
 	private static final String SIGN_CREATION_TRIGGER = "[menu]";
 
 	private static final TextColor VALID_SIGN_COLOR = TextColor.fromFormatting(Formatting.DARK_BLUE);
-	
-	private static boolean isValidSignHeader(Text header) {
-		return VALID_SIGN_COLOR.equals(header.getStyle().getColor()) && isValidTrigger(header);
-	}
-	
-	public static ActionResult onSignClick(ServerPlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+
+	public static ActionResult onSignClick(PlayerEntity inPlayer, World world, Hand hand, BlockHitResult hitResult) {
+		if (world.isClient) return ActionResult.PASS;
+		ServerPlayerEntity player = (ServerPlayerEntity) inPlayer;
+		
 		BlockEntity block = world.getBlockEntity(hitResult.getBlockPos());
 		if (block instanceof SignBlockEntity) {
 			SignBlockEntity sign = (SignBlockEntity) block;
@@ -69,53 +58,54 @@ public class SignListener {
 		}
 		return ActionResult.PASS;
 	}
-	
-	public static void onSignChange() {
-		//TODO this
-	}
 
-	public void onCreateMenuSign(SignChangeEvent event) {
-		Player player = event.getPlayer();
-
-		if (isCreatingMenuSign(event.getLine(HEADER_LINE)) && canCreateMenuSign(player)) {
-			String menuFileName = event.getLine(FILENAME_LINE).trim();
-
-			if (menuFileName.isEmpty()) {
-				event.setCancelled(true);
-				player.sendMessage(ChatColor.RED + "You must write a menu name in the second line.");
-				return;
-			}
-
-			menuFileName = Utils.addYamlExtension(menuFileName);
-
-			InternalMenu menu = MenuManager.getMenuByFileName(menuFileName);
-			if (menu == null) {
-				event.setCancelled(true);
-				player.sendMessage(new LiteralText("Menu \"" + menuFileName + "\" was not found.").setStyle(Style.EMPTY.withColor(Formatting.RED)));
-				return;
-			}
-
-			event.setLine(HEADER_LINE, VALID_SIGN_COLOR + event.getLine(HEADER_LINE));
-			player.sendMessage(new LiteralText("Successfully created a sign for the menu " + menuFileName + ".").setStyle(Style.EMPTY.withColor(Formatting.GREEN)));
-		}
-	}
-
-
-
-	public static void onSignChangeMonitor(SignBlockEntity sign, ServerPlayerEntity player) {
-		// Prevent players without permissions from creating menu signs
+	public static void onSignChange(UpdateSignC2SPacket packet, List<Message> messages, ServerPlayerEntity player) {
+		SignBlockEntity sign = (SignBlockEntity) player.getServerWorld().getBlockEntity(packet.getPos());
 		Text header = sign.getTextOnRow(HEADER_LINE, false);
-		if (isValidSignHeader(header) && !canCreateMenuSign(player)) {
-			sign.setTextOnRow(HEADER_LINE, header.shallowCopy().setStyle(header.getStyle().withColor((Formatting)null)));
+		
+		if (isValidTrigger(header)) {
+			if (canCreateMenuSign(player)) {
+				String menuFileName = sign.getTextOnRow(FILENAME_LINE, false).asString().strip();
+
+				if (menuFileName.isEmpty()) {
+					Helper.serverToPlayerMessage(new LiteralText("You must write a menu name in the second line.").setStyle(Style.EMPTY.withColor(Formatting.RED)), player);
+					return;
+				}
+
+				menuFileName = Utils.addYamlExtension(menuFileName);
+
+				InternalMenu menu = MenuManager.getMenuByFileName(menuFileName);
+				if (menu == null) {
+					Helper.serverToPlayerMessage(new LiteralText("Menu \"" + menuFileName + "\" was not found.").setStyle(Style.EMPTY.withColor(Formatting.RED)), player);
+					return;
+				}
+
+				sign.setTextOnRow(HEADER_LINE, getValidHeader(), sign.getTextOnRow(HEADER_LINE, true));
+				Helper.serverToPlayerMessage(new LiteralText("Successfully created a sign for the menu " + menuFileName + ".").setStyle(Style.EMPTY.withColor(Formatting.GREEN)), player);
+			} else if (isValidSignColor(header)) {
+				// Prevent players without permission from creating menu signs
+				sign.setTextOnRow(HEADER_LINE, header.shallowCopy().setStyle(header.getStyle().withColor((Formatting)null)));
+			}
 		}
+	}
+	
+	private static Text getValidHeader() {
+		return new LiteralText(SIGN_CREATION_TRIGGER).setStyle(Style.EMPTY.withColor(VALID_SIGN_COLOR));
+	}
+
+	private static boolean isValidSignColor(Text header) {
+		return VALID_SIGN_COLOR.equals(header.getStyle().getColor());
 	}
 
 	private static boolean isValidTrigger(Text headerLine) {
 		return headerLine.asString().equalsIgnoreCase(SIGN_CREATION_TRIGGER);
 	}
 
+	private static boolean isValidSignHeader(Text header) {
+		return isValidSignColor(header) && isValidTrigger(header);
+	}
+
 	private static boolean canCreateMenuSign(ServerPlayerEntity player) {
 		return player.hasPermissionLevel(Permissions.SIGN_CREATE);
 	}
-
 }

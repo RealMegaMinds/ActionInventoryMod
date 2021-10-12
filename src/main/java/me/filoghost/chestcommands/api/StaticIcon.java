@@ -6,7 +6,8 @@
 package me.filoghost.chestcommands.api;
 
 import me.filoghost.chestcommands.api.internal.BackendAPI;
-import org.bukkit.inventory.ItemStack;
+import net.minecraft.item.ItemStack;
+
 import org.jetbrains.annotations.NotNull;
 
 /**

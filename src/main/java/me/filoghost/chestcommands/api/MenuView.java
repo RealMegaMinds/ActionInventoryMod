@@ -5,10 +5,9 @@
  */
 package me.filoghost.chestcommands.api;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * A menu view is a rendering of a menu and its icons, made of an {@link Inventory} and {@link ItemStack}s, which can be
@@ -48,7 +47,7 @@ public interface MenuView {
      * @return the player
      * @since 1
      */
-    @NotNull Player getViewer();
+    @NotNull ServerPlayerEntity getViewer();
 
     /**
      * Returns the menu that generated this view.

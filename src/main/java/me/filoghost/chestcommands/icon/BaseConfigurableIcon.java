@@ -8,24 +8,27 @@ package me.filoghost.chestcommands.icon;
 import me.filoghost.chestcommands.api.Icon;
 import me.filoghost.chestcommands.placeholder.PlaceholderString;
 import me.filoghost.chestcommands.placeholder.PlaceholderStringList;
-import me.filoghost.chestcommands.util.nbt.parser.MojangsonParseException;
-import me.filoghost.chestcommands.util.nbt.parser.MojangsonParser;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.collection.CollectionUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import net.minecraft.block.entity.BannerPattern;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.BannerItem;
+import net.minecraft.item.DyeItem;
+import net.minecraft.item.DyeableItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.SkullItem;
+import net.minecraft.item.ItemStack.TooltipSection;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.Formatting;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,295 +37,296 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class BaseConfigurableIcon implements Icon {
 
-    private Material material;
-    private int amount;
-    private short durability;
+	private Item material;
+	private int amount;
+	private short durability;
 
-    private String nbtData;
-    private PlaceholderString name;
-    private PlaceholderStringList lore;
-    private Map<Enchantment, Integer> enchantments;
-    private Color leatherColor;
-    private PlaceholderString skullOwner;
-    private DyeColor bannerColor;
-    private List<Pattern> bannerPatterns;
-    private boolean placeholdersEnabled;
+	private NbtCompound nbtData;
+	private PlaceholderString name;
+	private PlaceholderStringList lore;
+	private Map<Enchantment, Integer> enchantments;
+	private DyeColor leatherColor;
+	private PlaceholderString skullOwner;
+	private Map<BannerPattern, DyeColor> bannerPatterns;
+	private boolean placeholdersEnabled;
 
-    private ItemStack cachedRendering; // Cache the rendered item when possible and if state hasn't changed
+	private ItemStack cachedRendering; // Cache the rendered item when possible and if state hasn't changed
 
-    public BaseConfigurableIcon(Material material) {
-        this.material = material;
-        this.amount = 1;
-    }
+	public BaseConfigurableIcon(Item material) {
+		this.material = material;
+		this.amount = 1;
+	}
 
-    protected boolean shouldCacheRendering() {
-        if (placeholdersEnabled && hasDynamicPlaceholders()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+	protected boolean shouldCacheRendering() {
+		if (placeholdersEnabled && hasDynamicPlaceholders()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-    private boolean hasDynamicPlaceholders() {
-        return (name != null && name.hasDynamicPlaceholders())
-                || (lore != null && lore.hasDynamicPlaceholders())
-                || (skullOwner != null && skullOwner.hasDynamicPlaceholders());
-    }
+	private boolean hasDynamicPlaceholders() {
+		return (name != null && name.hasDynamicPlaceholders())
+				|| (lore != null && lore.hasDynamicPlaceholders())
+				|| (skullOwner != null && skullOwner.hasDynamicPlaceholders());
+	}
 
-    public void setMaterial(@NotNull Material material) {
-        this.material = material;
-        cachedRendering = null;
-    }
+	public void setMaterial(@NotNull Item material) {
+		this.material = material;
+		cachedRendering = null;
+	}
 
-    public @NotNull Material getMaterial() {
-        return material;
-    }
+	public @NotNull Item getMaterial() {
+		return material;
+	}
 
-    public void setAmount(int amount) {
-        Preconditions.checkArgument(amount > 0, "amount must be greater than 0");
-        this.amount = Math.min(amount, 127);
-        cachedRendering = null;
-    }
+	public void setAmount(int amount) {
+		Preconditions.checkArgument(amount > 0, "amount must be greater than 0");
+		this.amount = Math.min(amount, 127);
+		cachedRendering = null;
+	}
 
-    public int getAmount() {
-        return amount;
-    }
+	public int getAmount() {
+		return amount;
+	}
 
-    public void setDurability(short durability) {
-        Preconditions.checkArgument(durability >= 0, "durability must be 0 or greater");
-        this.durability = durability;
-        cachedRendering = null;
-    }
+	public void setDurability(short durability) {
+		Preconditions.checkArgument(durability >= 0, "durability must be 0 or greater");
+		this.durability = durability;
+		cachedRendering = null;
+	}
 
-    public short getDurability() {
-        return durability;
-    }
+	public short getDurability() {
+		return durability;
+	}
 
-    public void setNBTData(@Nullable String nbtData) {
-        if (nbtData != null) {
-            try {
-                MojangsonParser.parse(nbtData);
-            } catch (MojangsonParseException e) {
-                throw new IllegalArgumentException("invalid nbtData", e);
-            }
-        }
-        this.nbtData = nbtData;
-        cachedRendering = null;
-    }
+	public void setNBTData(@Nullable NbtCompound nbtData) {
+		this.nbtData = nbtData;
+		cachedRendering = null;
+	}
 
-    public @Nullable String getNBTData() {
-        return nbtData;
-    }
+	public @Nullable NbtCompound getNBTData() {
+		return nbtData;
+	}
 
-    public void setName(@Nullable String name) {
-        this.name = PlaceholderString.of(name);
-        cachedRendering = null;
-    }
+	public void setName(@Nullable String name) {
+		this.name = PlaceholderString.of(name);
+		cachedRendering = null;
+	}
 
-    public @Nullable String getName() {
-        if (name != null) {
-            return name.getOriginalValue();
-        } else {
-            return null;
-        }
-    }
+	public @Nullable String getName() {
+		if (name != null) {
+			return name.getOriginalValue();
+		} else {
+			return null;
+		}
+	}
 
-    public void setLore(@Nullable String... lore) {
-        setLore(lore != null ? Arrays.asList(lore) : null);
-    }
+	public void setLore(@Nullable String... lore) {
+		setLore(lore != null ? Arrays.asList(lore) : null);
+	}
 
-    public void setLore(@Nullable List<String> lore) {
-        if (lore != null) {
-            this.lore = new PlaceholderStringList(CollectionUtils.toArrayList(lore, element -> {
-                return element != null ? element : "";
-            }));
-        } else {
-            this.lore = null;
-        }
-        cachedRendering = null;
-    }
+	public void setLore(@Nullable List<String> lore) {
+		if (lore != null) {
+			this.lore = new PlaceholderStringList(CollectionUtils.toArrayList(lore, element -> {
+				return element != null ? element : "";
+			}));
+		} else {
+			this.lore = null;
+		}
+		cachedRendering = null;
+	}
 
-    public @Nullable List<String> getLore() {
-        if (lore != null) {
-            return new ArrayList<>(lore.getOriginalValue());
-        } else {
-            return null;
-        }
-    }
+	public @Nullable List<String> getLore() {
+		if (lore != null) {
+			return new ArrayList<>(lore.getOriginalValue());
+		} else {
+			return null;
+		}
+	}
 
-    public void setEnchantments(@Nullable Map<Enchantment, Integer> enchantments) {
-        this.enchantments = CollectionUtils.newHashMap(enchantments);
-        cachedRendering = null;
-    }
+	public void setEnchantments(@Nullable Map<Enchantment, Integer> enchantments) {
+		this.enchantments = CollectionUtils.newHashMap(enchantments);
+		cachedRendering = null;
+	}
 
-    public @Nullable Map<Enchantment, Integer> getEnchantments() {
-        return CollectionUtils.newHashMap(enchantments);
-    }
+	public @Nullable Map<Enchantment, Integer> getEnchantments() {
+		return CollectionUtils.newHashMap(enchantments);
+	}
 
-    public void addEnchantment(@NotNull Enchantment enchantment) {
-        addEnchantment(enchantment, 1);
-    }
+	public void addEnchantment(@NotNull Enchantment enchantment) {
+		addEnchantment(enchantment, 1);
+	}
 
-    public void addEnchantment(@NotNull Enchantment enchantment, int level) {
-        if (enchantments == null) {
-            enchantments = new HashMap<>();
-        }
-        enchantments.put(enchantment, level);
-        cachedRendering = null;
-    }
+	public void addEnchantment(@NotNull Enchantment enchantment, int level) {
+		if (enchantments == null) {
+			enchantments = new HashMap<>();
+		}
+		enchantments.put(enchantment, level);
+		cachedRendering = null;
+	}
 
-    public void removeEnchantment(@NotNull Enchantment enchantment) {
-        if (enchantments == null) {
-            return;
-        }
-        enchantments.remove(enchantment);
-        cachedRendering = null;
-    }
+	public void removeEnchantment(@NotNull Enchantment enchantment) {
+		if (enchantments == null) {
+			return;
+		}
+		enchantments.remove(enchantment);
+		cachedRendering = null;
+	}
 
-    public @Nullable Color getLeatherColor() {
-        return leatherColor;
-    }
+	public @Nullable DyeColor getLeatherColor() {
+		return leatherColor;
+	}
 
-    public void setLeatherColor(@Nullable Color leatherColor) {
-        this.leatherColor = leatherColor;
-        cachedRendering = null;
-    }
+	public void setLeatherColor(@Nullable DyeColor leatherColor) {
+		this.leatherColor = leatherColor;
+		cachedRendering = null;
+	}
 
-    public @Nullable String getSkullOwner() {
-        if (skullOwner != null) {
-            return skullOwner.getOriginalValue();
-        } else {
-            return null;
-        }
-    }
+	public @Nullable String getSkullOwner() {
+		if (skullOwner != null) {
+			return skullOwner.getOriginalValue();
+		} else {
+			return null;
+		}
+	}
 
-    public void setSkullOwner(@Nullable String skullOwner) {
-        this.skullOwner = PlaceholderString.of(skullOwner);
-        cachedRendering = null;
-    }
+	public void setSkullOwner(@Nullable String skullOwner) {
+		this.skullOwner = PlaceholderString.of(skullOwner);
+		cachedRendering = null;
+	}
 
-    public @Nullable DyeColor getBannerColor() {
-        return bannerColor;
-    }
+	public @Nullable Map<BannerPattern, DyeColor> getBannerPatterns() {
+		if (bannerPatterns==null) {
+			return null;
+		} else {
+			return new HashMap<BannerPattern, DyeColor>(bannerPatterns);
+		}
+	}
 
-    public void setBannerColor(@Nullable DyeColor bannerColor) {
-        this.bannerColor = bannerColor;
-        cachedRendering = null;
-    }
+	public void setBannerPatterns(@Nullable Map<BannerPattern, DyeColor> bannerPatterns) {
+		if (bannerPatterns==null) {
+			this.bannerPatterns = null;
+		} else {
+			this.bannerPatterns = new HashMap<BannerPattern, DyeColor>(bannerPatterns);
+		}
+		cachedRendering = null;
+	}
 
-    public @Nullable List<Pattern> getBannerPatterns() {
-        return CollectionUtils.newArrayList(bannerPatterns);
-    }
+	public boolean isPlaceholdersEnabled() {
+		return placeholdersEnabled;
+	}
 
-    public void setBannerPatterns(@Nullable Pattern... bannerPatterns) {
-        setBannerPatterns(bannerPatterns != null ? Arrays.asList(bannerPatterns) : null);
-    }
+	public void setPlaceholdersEnabled(boolean placeholdersEnabled) {
+		this.placeholdersEnabled = placeholdersEnabled;
+		cachedRendering = null;
+	}
 
-    public void setBannerPatterns(@Nullable List<Pattern> bannerPatterns) {
-        this.bannerPatterns = CollectionUtils.newArrayList(bannerPatterns);
-        cachedRendering = null;
-    }
+	public @Nullable Text renderName(ServerPlayerEntity viewer) {
+		if (name == null) {
+			return null;
+		}
+		if (!placeholdersEnabled) {
+			return new LiteralText(name.getOriginalValue());
+		}
 
-    public boolean isPlaceholdersEnabled() {
-        return placeholdersEnabled;
-    }
+		String name = this.name.getValue(viewer);
 
-    public void setPlaceholdersEnabled(boolean placeholdersEnabled) {
-        this.placeholdersEnabled = placeholdersEnabled;
-        cachedRendering = null;
-    }
+		if (name.isEmpty()) {
+			// Add a color to display the name empty
+			return new LiteralText("").setStyle(Style.EMPTY.withColor(Formatting.WHITE));
+		} else {
+			return new LiteralText(name);
+		}
+	}
 
-    public @Nullable String renderName(Player viewer) {
-        if (name == null) {
-            return null;
-        }
-        if (!placeholdersEnabled) {
-            return name.getOriginalValue();
-        }
+	public @Nullable NbtList renderLore(ServerPlayerEntity viewer) {
+		if (lore == null) {
+			return null;
+		}
+		List<String> list;
+		if (!placeholdersEnabled) {
+			list = lore.getOriginalValue();
+		} else {
+			list = lore.getValue(viewer);
+		}
+		NbtList nbtList = new NbtList();
+		nbtList.addAll(list.stream().map(s->new LiteralText(s)).map(t->NbtString.of(Text.Serializer.toJson(t))).collect(Collectors.toList()));
+		return nbtList;
+	}
 
-        String name = this.name.getValue(viewer);
+	@Override
+	public ItemStack render(@NotNull ServerPlayerEntity viewer) {
+		if (shouldCacheRendering() && cachedRendering != null) {
+			// Performance: return a cached item
+			return cachedRendering;
+		}
 
-        if (name.isEmpty()) {
-            // Add a color to display the name empty
-            return ChatColor.WHITE.toString();
-        } else {
-            return name;
-        }
-    }
+		ItemStack itemStack = new ItemStack(material, amount);
+		itemStack.setDamage(durability);
 
-    public @Nullable List<String> renderLore(Player viewer) {
-        if (lore == null) {
-            return null;
-        }
-        if (!placeholdersEnabled) {
-            return lore.getOriginalValue();
-        }
+		// First try to apply NBT data
+		if (nbtData != null) {
+			itemStack.setNbt(nbtData);
+		}
 
-        return lore.getValue(viewer);
-    }
+		// Then apply data from config nodes, overwriting NBT data if there are conflicting values
+		NbtCompound nbt = itemStack.getOrCreateNbt();
+		
+		itemStack.setCustomName(renderName(viewer));
+		
+		NbtList lore = renderLore(viewer);
+		if (lore != null) {
+			nbt.getCompound(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, lore);
+		}
+		
+		Item item = itemStack.getItem();
+		if (leatherColor != null && item instanceof DyeableItem) {
+			DyeableItem.blendAndSetColor(itemStack, List.of(DyeItem.byColor(leatherColor)));
+		}
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public ItemStack render(@NotNull Player viewer) {
-        if (shouldCacheRendering() && cachedRendering != null) {
-            // Performance: return a cached item
-            return cachedRendering;
-        }
+		if (skullOwner != null && item instanceof SkullItem) {
+			String skullOwner = this.skullOwner.getValue(viewer);
+			nbt.putString(SkullItem.SKULL_OWNER_KEY, skullOwner);
+		}
 
-        ItemStack itemStack = new ItemStack(material, amount, durability);
+		if (item instanceof BannerItem) {
+			NbtCompound bannerNbt = (NbtCompound) Objects.requireNonNullElse(nbt.get("BlockEntityTag"), nbt.put("BlockEntityTag", new NbtCompound()));
+			if (bannerPatterns != null) {
+				NbtList list = new NbtList();
+				bannerPatterns.forEach((pattern, color)->{
+					//TODO might need to do null check
+					NbtCompound compound = new NbtCompound();
+					compound.putInt("Color", color.getId());
+					compound.putString("Pattern", pattern.getId());
+					list.add(compound);
+				});
+				bannerNbt.put("Patterns", list);
+			}
 
-        // First try to apply NBT data
-        if (nbtData != null) {
-            Bukkit.getUnsafe().modifyItemStack(itemStack, nbtData);
-        }
+			// Hide all text details (damage, enchantments, potions, etc,)
+			if (!nbt.contains("HideFlags", 99)||nbt.getInt("HideFlags")==0) {
+				TooltipSection[] vals = TooltipSection.values();
+				for (int i = 0; i < vals.length; i++) {
+					itemStack.addHideFlag(vals[i]);
+				}
+			}
+		}
 
-        // Then apply data from config nodes, overwriting NBT data if there are conflicting values
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        if (itemMeta != null) {
-            itemMeta.setDisplayName(renderName(viewer));
-            itemMeta.setLore(renderLore(viewer));
-
-            if (leatherColor != null && itemMeta instanceof LeatherArmorMeta) {
-                ((LeatherArmorMeta) itemMeta).setColor(leatherColor);
-            }
-
-            if (skullOwner != null && itemMeta instanceof SkullMeta) {
-                String skullOwner = this.skullOwner.getValue(viewer);
-                ((SkullMeta) itemMeta).setOwner(skullOwner);
-            }
-
-            if (itemMeta instanceof BannerMeta) {
-                BannerMeta bannerMeta = (BannerMeta) itemMeta;
-                if (bannerColor != null) {
-                    bannerMeta.setBaseColor(bannerColor);
-                }
-                if (bannerPatterns != null) {
-                    ((BannerMeta) itemMeta).setPatterns(bannerPatterns);
-                }
-            }
-
-            // Hide all text details (damage, enchantments, potions, etc,)
-            if (itemMeta.getItemFlags().isEmpty()) {
-                itemMeta.addItemFlags(ItemFlag.values());
-            }
-
-            itemStack.setItemMeta(itemMeta);
-        }
-
-        if (enchantments != null) {
-            enchantments.forEach(itemStack::addUnsafeEnchantment);
-        }
+		if (enchantments != null) {
+			enchantments.forEach(itemStack::addEnchantment);
+		}
 
 
-        if (shouldCacheRendering()) {
-            cachedRendering = itemStack;
-        }
+		if (shouldCacheRendering()) {
+			cachedRendering = itemStack;
+		}
 
-        return itemStack;
-    }
-
+		return itemStack;
+	}
 }

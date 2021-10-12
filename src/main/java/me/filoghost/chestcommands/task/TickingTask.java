@@ -15,6 +15,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class TickingTask implements Runnable {
 
     private long currentTick;
+    private MinecraftServer server;
+    
+    public TickingTask(MinecraftServer server) {
+    	this.server = server;
+	}
 
     @Override
     public void run() {
@@ -25,7 +30,6 @@ public class TickingTask implements Runnable {
     }
 
     private void updateMenus() {
-    	MinecraftServer server = null;	//TODO need to get server here
         for (String name : server.getPlayerNames()) {
         	ServerPlayerEntity player = server.getPlayerManager().getPlayer(name);
             DefaultMenuView menuView = MenuManager.getOpenMenuView(player);
@@ -41,5 +45,4 @@ public class TickingTask implements Runnable {
             }
         }
     }
-
 }

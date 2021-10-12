@@ -5,8 +5,9 @@
  */
 package me.filoghost.chestcommands.api;
 
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * Callback to handle a player clicking on an icon.
@@ -23,6 +24,6 @@ public interface ClickHandler {
      * @param clicker  the player that clicked an icon (identical to {@link MenuView#getViewer()})
      * @since 1
      */
-    void onClick(@NotNull MenuView menuView, @NotNull Player clicker);
+    void onClick(@NotNull MenuView menuView, @NotNull ServerPlayerEntity clicker);
 
 }

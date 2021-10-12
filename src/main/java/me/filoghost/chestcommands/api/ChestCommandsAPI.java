@@ -6,16 +6,15 @@
 package me.filoghost.chestcommands.api;
 
 import me.filoghost.chestcommands.api.internal.BackendAPI;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import net.minecraft.server.network.ServerPlayerEntity;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
  * The main entry point for the Chest Commands API.
  * <p>
- * To create a menu, start by looking at {@link Menu#create(Plugin, String, int)} and {@link
- * ConfigurableIcon#create(Material)}.
+ * To create a menu, start by looking at {@link Menu#create(String, int)} and {@link
+ * ConfigurableIcon#create(Item)}.
  *
  * @since 1
  */
@@ -76,10 +75,9 @@ public class ChestCommandsAPI {
      * @see PlaceholderReplacer#getReplacement(Player, String)
      * @since 1
      */
-    public static void registerPlaceholder(@NotNull Plugin plugin,
-                                           @NotNull String identifier,
+    public static void registerPlaceholder(@NotNull String identifier,
                                            @NotNull PlaceholderReplacer placeholderReplacer) {
-        BackendAPI.getImplementation().registerPlaceholder(plugin, identifier, placeholderReplacer);
+        BackendAPI.getImplementation().registerPlaceholder(identifier, placeholderReplacer);
     }
 
     /**
@@ -92,8 +90,8 @@ public class ChestCommandsAPI {
      * @throws IllegalArgumentException if the identifier contains invalid characters, is too short or too long
      * @since 1
      */
-    public static boolean unregisterPlaceholder(@NotNull Plugin plugin, @NotNull String identifier) {
-        return BackendAPI.getImplementation().unregisterPlaceholder(plugin, identifier);
+    public static boolean unregisterPlaceholder(@NotNull String identifier) {
+        return BackendAPI.getImplementation().unregisterPlaceholder(identifier);
     }
 
     /**
@@ -119,7 +117,7 @@ public class ChestCommandsAPI {
      * @return true if the menu was found and opened successfully, false otherwise
      * @since 1
      */
-    public static boolean openInternalMenu(@NotNull Player player, @NotNull String menuFileName) {
+    public static boolean openInternalMenu(@NotNull ServerPlayerEntity player, @NotNull String menuFileName) {
         return BackendAPI.getImplementation().openInternalMenu(player, menuFileName);
     }
 

@@ -5,10 +5,11 @@
  */
 package me.filoghost.chestcommands.api;
 
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 /**
  * Callback to provide a placeholder replacement.
@@ -36,6 +37,6 @@ public interface PlaceholderReplacer {
      * @see ChestCommandsAPI#registerPlaceholder(Plugin, String, PlaceholderReplacer)
      * @since 1
      */
-    @Nullable String getReplacement(@NotNull Player player, @Nullable String argument);
+    @Nullable Text getReplacement(@NotNull ServerPlayerEntity player, @Nullable Text argument);
 
 }

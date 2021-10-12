@@ -17,10 +17,10 @@ import me.filoghost.chestcommands.menu.InternalMenu;
 import me.filoghost.chestcommands.menu.MenuManager;
 import me.filoghost.chestcommands.placeholder.PlaceholderManager;
 import me.filoghost.fcommons.Preconditions;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+
 import org.jetbrains.annotations.NotNull;
 
 public class DefaultBackendAPI extends BackendAPI {
@@ -33,7 +33,7 @@ public class DefaultBackendAPI extends BackendAPI {
     }
 
     @Override
-    public boolean openInternalMenu(@NotNull Player player, @NotNull String menuFileName) {
+    public boolean openInternalMenu(@NotNull ServerPlayerEntity player, @NotNull String menuFileName) {
         Preconditions.notNull(player, "player");
         Preconditions.notNull(menuFileName, "menuFileName");
 
@@ -48,13 +48,13 @@ public class DefaultBackendAPI extends BackendAPI {
     }
 
     @Override
-    public @NotNull ConfigurableIcon createConfigurableIcon(@NotNull Material material) {
+    public @NotNull ConfigurableIcon createConfigurableIcon(@NotNull Item material) {
         return new APIConfigurableIcon(material);
     }
 
     @Override
-    public @NotNull Menu createMenu(@NotNull Plugin plugin, @NotNull String title, int rows) {
-        return new APIMenu(plugin, title, rows);
+    public @NotNull Menu createMenu(@NotNull String title, int rows) {
+        return new APIMenu(title, rows);
     }
 
     @Override
@@ -63,15 +63,14 @@ public class DefaultBackendAPI extends BackendAPI {
     }
 
     @Override
-    public void registerPlaceholder(@NotNull Plugin plugin,
-                                    @NotNull String identifier,
+    public void registerPlaceholder(@NotNull String identifier,
                                     @NotNull PlaceholderReplacer placeholderReplacer) {
-        PlaceholderManager.registerPluginPlaceholder(plugin, identifier, placeholderReplacer);
+        PlaceholderManager.registerPluginPlaceholder(identifier, placeholderReplacer);
     }
 
     @Override
-    public boolean unregisterPlaceholder(@NotNull Plugin plugin, @NotNull String identifier) {
-        return PlaceholderManager.unregisterPluginPlaceholder(plugin, identifier);
+    public boolean unregisterPlaceholder(@NotNull String identifier) {
+        return PlaceholderManager.unregisterPluginPlaceholder(identifier);
     }
 
 }

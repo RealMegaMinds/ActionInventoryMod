@@ -14,7 +14,12 @@ import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigSyntaxException;
 import me.filoghost.fcommons.logging.ErrorCollector;
 import me.filoghost.fcommons.logging.ErrorLog;
-import org.bukkit.ChatColor;
+import megaminds.testmod.Helper;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +28,11 @@ public class PrintableErrorCollector extends ErrorCollector {
 
 
     @Override
-    public void logToConsole() {
-        StringBuilder output = new StringBuilder();
+    public void logToConsole(MinecraftServer server) {
+        LiteralText output = new LiteralText("");
 
         if (errors.size() > 0) {
-            output.append(ChestCommands.CHAT_PREFIX).append(ChatColor.RED).append("Encountered ").append(errors.size()).append(" error(s) on load:\n");
-            output.append(" \n");
+            output.append(ChestCommands.getChatPrefix()).append(new LiteralText("Encountered "+errors.size()+" error(s) on load:\n").setStyle(Style.EMPTY.withColor(Formatting.RED)));
 
             int index = 1;
             for (ErrorLog error : errors) {
@@ -38,8 +42,7 @@ public class PrintableErrorCollector extends ErrorCollector {
             }
         }
 
-        //TODO Is there a way to get a server to use here
-        System.out.println(output.toString());
+        Helper.nullToServerMessage(output, server);
     }
 
     private ErrorPrintInfo getErrorPrintInfo(int index, ErrorLog error) {
@@ -67,24 +70,22 @@ public class PrintableErrorCollector extends ErrorCollector {
         }
     }
 
-    private static void printError(StringBuilder output, ErrorPrintInfo error) {
-        output.append(ChatColor.YELLOW).append(error.getIndex()).append(") ");
-        output.append(ChatColor.WHITE).append(MessagePartJoiner.join(error.getMessage()));
+    private static void printError(MutableText output, ErrorPrintInfo error) {
+        output.append(new LiteralText(error.getIndex()+") ").setStyle(Style.EMPTY.withColor(Formatting.YELLOW)));
+        output.append(new LiteralText(MessagePartJoiner.join(error.getMessage())).setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
 
         if (error.getDetails() != null) {
-            output.append(". Details:\n");
-            output.append(ChatColor.YELLOW).append(error.getDetails()).append("\n");
+            output.append(new LiteralText(". Details:\n").setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
+            output.append(new LiteralText(error.getDetails()).append("\n").setStyle(Style.EMPTY.withColor(Formatting.YELLOW)));
         } else {
-            output.append(".\n");
+            output.append(new LiteralText(".\n").setStyle(Style.EMPTY.withColor(Formatting.WHITE)));
         }
         if (error.getCause() != null) {
-            output.append(ChatColor.DARK_GRAY);
-            output.append("--------[ Exception details ]--------\n");
-            output.append(ExceptionUtils.getStackTraceOutput(error.getCause()));
-            output.append("-------------------------------------\n");
+            output.append(new LiteralText("--------[ Exception details ]--------\n"
+            								+ExceptionUtils.getStackTraceOutput(error.getCause())
+            								+"-------------------------------------\n")
+            				.setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY)));
         }
-        output.append(" \n");
-        output.append(ChatColor.RESET);
+        output.append("\n");
     }
-
 }

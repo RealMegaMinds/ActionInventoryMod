@@ -6,12 +6,11 @@
 package me.filoghost.chestcommands.api;
 
 import me.filoghost.chestcommands.api.internal.BackendAPI;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemStack;
+import net.minecraft.block.entity.BannerPattern;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.Item;
+import net.minecraft.util.DyeColor;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +31,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @return the created icon
      * @since 1
      */
-    static @NotNull ConfigurableIcon create(@NotNull Material material) {
+    static @NotNull ConfigurableIcon create(@NotNull Item material) {
         return BackendAPI.getImplementation().createConfigurableIcon(material);
     }
 
@@ -43,7 +42,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @see ItemStack#setType(Material)
      * @since 1
      */
-    void setMaterial(@NotNull Material material);
+    void setMaterial(@NotNull Item material);
 
     /**
      * Returns the material of the displayed item.
@@ -52,7 +51,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @see ItemStack#getType()
      * @since 1
      */
-    @NotNull Material getMaterial();
+    @NotNull Item getMaterial();
 
     /**
      * Sets the amount of the displayed item.
@@ -203,7 +202,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @param leatherColor the new leather color, null to remove
      * @since 1
      */
-    void setLeatherColor(@Nullable Color leatherColor);
+    void setLeatherColor(@Nullable DyeColor leatherColor);
 
     /**
      * Returns the leather color of the displayed item.
@@ -212,7 +211,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @see ConfigurableIcon#setLeatherColor(Color)
      * @since 1
      */
-    @Nullable Color getLeatherColor();
+    @Nullable DyeColor getLeatherColor();
 
     /**
      * Sets the skull owner of the displayed player head.
@@ -260,7 +259,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @param bannerPatterns the new banner patterns list, null to remove
      * @since 1
      */
-    void setBannerPatterns(@Nullable List<Pattern> bannerPatterns);
+    void setBannerPatterns(@Nullable List<BannerPattern> bannerPatterns);
 
     /**
      * Sets the patterns of the displayed banner.
@@ -269,7 +268,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @see ConfigurableIcon#setBannerPatterns(Pattern...)
      * @since 1
      */
-    void setBannerPatterns(@Nullable Pattern... bannerPatterns);
+    void setBannerPatterns(@Nullable BannerPattern... bannerPatterns);
 
     /**
      * Returns the patterns of the displayed banner.
@@ -278,7 +277,7 @@ public interface ConfigurableIcon extends ClickableIcon {
      * @see ConfigurableIcon#setBannerPatterns(List)
      * @since 1
      */
-    @Nullable List<Pattern> getBannerPatterns();
+    @Nullable List<BannerPattern> getBannerPatterns();
 
     /**
      * Sets if placeholders should be enabled.

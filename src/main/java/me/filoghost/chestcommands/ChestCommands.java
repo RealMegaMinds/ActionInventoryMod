@@ -6,10 +6,8 @@
 package me.filoghost.chestcommands;
 
 import me.filoghost.chestcommands.api.internal.BackendAPI;
-import me.filoghost.chestcommands.command.CommandHandler;
 import me.filoghost.chestcommands.config.ConfigManager;
 import me.filoghost.chestcommands.config.CustomPlaceholders;
-import me.filoghost.chestcommands.config.Settings;
 import me.filoghost.chestcommands.legacy.UpgradeExecutorException;
 import me.filoghost.chestcommands.legacy.UpgradesExecutor;
 import me.filoghost.chestcommands.listener.CommandListener;
@@ -24,30 +22,22 @@ import me.filoghost.chestcommands.placeholder.PlaceholderManager;
 import me.filoghost.chestcommands.task.TickingTask;
 import me.filoghost.fcommons.config.ConfigLoader;
 import me.filoghost.fcommons.logging.ErrorCollector;
-import me.filoghost.fcommons.logging.Log;
-import me.filoghost.fcommons.reflection.ReflectUtils;
+import megaminds.testmod.Helper;
 import megaminds.testmod.callbacks.InventoryEvents;
+import megaminds.testmod.callbacks.SignFinishCallback;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.world.ServerTickScheduler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldSaveHandler;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,6 +62,17 @@ public class ChestCommands implements ModInitializer {
 			placeholders = new CustomPlaceholders();
 
 			BackendAPI.setImplementation(new DefaultBackendAPI());
+			
+			ErrorCollector errorCollector = load();
+			if (errorCollector.hasErrors()) {
+				errorCollector.logToConsole(server);
+				Helper.nullToServerMessage(getChatPrefix().append(new LiteralText("Encountered " + errorCollector.getErrorsCount() + " error(s) on load. "
+						+ "Check previous console logs or run \"/chestcommands errors\" to see them again.").setStyle(Style.EMPTY.withColor(Formatting.RED))), server);
+			}
+			
+			
+			
+			server.addServerGuiTickable(()->new TickingTask(server));
 		});
 		
 		CommandRegistrationCallback.EVENT.register(CommandListener::register);
@@ -80,42 +81,12 @@ public class ChestCommands implements ModInitializer {
 		AttackBlockCallback.EVENT.register(InventoryListener::onBlockAttack);
 		InventoryEvents.BEFORE_SLOT_CLICK.register(InventoryListener::onInventoryClick);
 		ServerPlayConnectionEvents.JOIN.register(JoinListener::onJoin);
+		UseBlockCallback.EVENT.register(SignListener::onSignClick);
+		SignFinishCallback.EVENT.register(SignListener::onSignChange);
 	}
 
 	protected void onCheckedEnable() {
-
-		
-		
-		Bukkit.getPluginManager().registerEvents(new SignListener(), this);
-
-		new CommandHandler("chestcommands").register(this);
-
-		ErrorCollector errorCollector = load();
-
-		if (errorCollector.hasErrors()) {
-			errorCollector.logToConsole();
-			Bukkit.getScheduler().runTaskLater(this, () -> {
-				Bukkit.getConsoleSender().sendMessage(
-						ChestCommands.CHAT_PREFIX + ChatColor.RED + "Encountered " + errorCollector.getErrorsCount() + " error(s) on load. "
-								+ "Check previous console logs or run \"/chestcommands errors\" to see them again.");
-			}, 10L);
-		}
-
-		if (Settings.get().update_notifications) {
-			UpdateChecker.run(this, 56919, (String newVersion) -> {
-				ChestCommands.newVersion = newVersion;
-
-				Log.info("Found a new version: " + newVersion + " (yours: v" + getDescription().getVersion() + ")");
-				Log.info("Download the update on Bukkit Dev:");
-				Log.info("https://dev.bukkit.org/projects/chest-commands");
-			});
-		}
-
-		// Start bStats metrics
-		int pluginID = 3658;
-		new MetricsLite(this, pluginID);
-
-		Bukkit.getScheduler().runTaskTimer(this, new TickingTask(), 1L, 1L);
+//		new CommandHandler("chestcommands").register(this);
 	}
 
 	public void onDisable() {

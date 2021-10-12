@@ -2,6 +2,7 @@ package megaminds.testmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.client.util.TextCollector;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;

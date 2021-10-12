@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import megaminds.testmod.callbacks.InventoryEvents;
+import megaminds.testmod.callbacks.SignFinishCallback;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;
 import net.minecraft.server.filter.TextStream.Message;
@@ -40,6 +41,6 @@ public class ServerPlayNetworkHandlerMixin {
 	 */
 	@Inject(at = @At(value = "INVOKE", target = "net/minecraft/block/entity/SignBlockEntity.setTextOnRow(ILnet/minecraft/text/Text;)V", shift = Shift.AFTER), method = "net/minecraft/server/network/ServerPlayNetworkHandler.onSignUpdate(Lnet/minecraft/network/packet/c2s/play/UpdateSignC2SPacket;Ljava/util/List;)V")
 	private void afterSignUpdate(UpdateSignC2SPacket packet, List<Message> signText, CallbackInfo info) {
-		//TODO create callback for this add and add a thing for signlistener to it
+		SignFinishCallback.EVENT.invoker().onFinish(packet, signText, player);
 	}
 }

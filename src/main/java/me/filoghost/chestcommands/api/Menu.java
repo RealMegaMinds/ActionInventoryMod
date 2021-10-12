@@ -6,8 +6,8 @@
 package me.filoghost.chestcommands.api;
 
 import me.filoghost.chestcommands.api.internal.BackendAPI;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import net.minecraft.server.network.ServerPlayerEntity;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,8 +34,8 @@ public interface Menu {
      * @return the created menu
      * @since 1
      */
-    static @NotNull Menu create(@NotNull Plugin plugin, @NotNull String title, int rows) {
-        return BackendAPI.getImplementation().createMenu(plugin, title, rows);
+    static @NotNull Menu create(@NotNull String title, int rows) {
+        return BackendAPI.getImplementation().createMenu(title, rows);
     }
 
     /**
@@ -72,7 +72,7 @@ public interface Menu {
      * @return the newly created view for the player
      * @since 1
      */
-    @NotNull MenuView open(@NotNull Player player);
+    @NotNull MenuView open(@NotNull ServerPlayerEntity player);
 
     /**
      * Refreshes all the menu views currently open and visible by players, reflecting the changes in the icons of this
@@ -110,13 +110,4 @@ public interface Menu {
      * @since 1
      */
     @NotNull String getTitle();
-
-    /**
-     * Returns the plugin that created the menu.
-     *
-     * @return the plugin that created the menu
-     * @since 1
-     */
-    Plugin getPlugin();
-
 }

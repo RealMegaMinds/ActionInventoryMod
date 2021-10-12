@@ -5,9 +5,10 @@
  */
 package me.filoghost.chestcommands.api;
 
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * Common interface extended by other interfaces, represents a simplified {@link Icon} with a settable click handler.
@@ -45,7 +46,7 @@ public interface ClickableIcon extends Icon {
      * @since 1
      */
     @Override
-    default void onClick(@NotNull MenuView menuView, @NotNull Player clicker) {
+    default void onClick(@NotNull MenuView menuView, @NotNull ServerPlayerEntity clicker) {
         if (getClickHandler() != null) {
             getClickHandler().onClick(menuView, clicker);
         }

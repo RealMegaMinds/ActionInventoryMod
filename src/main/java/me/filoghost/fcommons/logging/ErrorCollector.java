@@ -8,6 +8,8 @@ package me.filoghost.fcommons.logging;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.MinecraftServer;
+
 /**
  * This is a class to collect all the errors found while loading a plugin.
  */
@@ -31,6 +33,6 @@ public abstract class ErrorCollector {
         return errors.size() > 0;
     }
 
-    public abstract void logToConsole();
+    public abstract void logToConsole(MinecraftServer server);
 
 }
