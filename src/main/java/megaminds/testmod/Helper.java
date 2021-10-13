@@ -1,10 +1,7 @@
 package megaminds.testmod;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
@@ -14,67 +11,60 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
 public class Helper {
-	/**
-	 * if toAll:
-	 * True - if fromServer
-	 * 			True - server to all
-	 * 			False - if from==null
-	 * 					True - nil to all
-	 * 					False - player to all
-	 * 
-	 * False - if fromServer
-	 * 			True - server to player
-	 * 			False - if from==null
-	 * 					True - nil to player
-	 * 					False - player to player
-	 */
-	public static void sendMessage(@Nullable ServerPlayerEntity from, Text message, @NotNull ServerPlayerEntity to, boolean fromServer, boolean toAll) {
-		Objects.requireNonNull(to);
-		
-		MessageType type 	= 	fromServer ? MessageType.SYSTEM : 	MessageType.CHAT;
-		UUID fromUuid 		= 	fromServer ? Util.NIL_UUID		:	getOrNil(from);
-		if (toAll) {
-			to.getServer().getPlayerManager().broadcastChatMessage(message, type, fromUuid);
-		} else {
-			to.sendMessage(message, type, fromUuid);
-		}
+	public static void multiMessage(ServerPlayerEntity player, Text message, List<UUID> to, boolean fromServer) {
+		MessageType type = getType(fromServer);
+		UUID from = getOrNil(player, fromServer);
+		to.forEach(uuid -> {
+			player.getServer().getPlayerManager().getPlayer(uuid).sendMessage(message, type, from);
+		});
 	}
 	
-	public static void sendMessage(@NotNull ServerPlayerEntity from, Text message, @NotNull UUID to, boolean fromServer) {
-		Objects.requireNonNull(from);
-		Objects.requireNonNull(to);
-		
-		MessageType type 	= 	fromServer ? MessageType.SYSTEM : 	MessageType.CHAT;
-		UUID fromUuid 		= 	fromServer ? Util.NIL_UUID		:	getOrNil(from);
-		from.getServer().getPlayerManager().broadcastChatMessage(message, type, fromUuid);
+	public static void multiMessage(ServerPlayerEntity player, String message, List<UUID> to, boolean fromServer) {
+		multiMessage(player, new LiteralText(message), to, fromServer);
 	}
 	
-	public static void sendMessage(@Nullable ServerPlayerEntity from, String message, @NotNull ServerPlayerEntity to, boolean fromServer, boolean toAll) {
-		sendMessage(from, new LiteralText(message), to, fromServer, toAll);
+	public static void singleMessage(ServerPlayerEntity player, Text message, UUID to, boolean fromServer) {
+		player.getServer().getPlayerManager().getPlayer(to).sendMessage(message, getType(fromServer), getOrNil(player, fromServer));
 	}
 	
-	public static void logMessage(@NotNull ServerPlayerEntity from, Text message, boolean useNil) {
-		Objects.requireNonNull(from);
-		from.getServer().sendSystemMessage(message, useNil ? Util.NIL_UUID : from.getUuid());
+	public static void singleMessage(ServerPlayerEntity player, String message, UUID to, boolean fromServer) {
+		singleMessage(player, new LiteralText(message), to, fromServer);
 	}
 	
-	public static void logMessage(@NotNull ServerPlayerEntity from, String message, boolean useNil) {
-		logMessage(from, new LiteralText(message), useNil);
+	public static void toPlayerMessage(ServerPlayerEntity player, Text message, boolean fromServer) {
+		player.sendMessage(message, getType(fromServer), Util.NIL_UUID);
 	}
 	
-	private static UUID getOrNil(UUID uuid) {
-		return uuid==null?Util.NIL_UUID:uuid;
+	public static void toPlayerMessage(ServerPlayerEntity player, String message, boolean fromServer) {
+		toPlayerMessage(player, new LiteralText(message), fromServer);
 	}
 	
-	private static UUID getOrNil(ServerPlayerEntity player) {
-		return getOrNil(player.getUuid());
+	public static void broadcastMessage(ServerPlayerEntity player, Text message, boolean fromServer) {
+		player.getServer().getPlayerManager().broadcastChatMessage(message, getType(fromServer), getOrNil(player, fromServer));
 	}
 	
-	public static int playerCommand(ServerPlayerEntity from, String command) {
-    	return from.getServer().getCommandManager().execute(from.getCommandSource(), command);
+	public static void broadcastMessage(ServerPlayerEntity player, String message, boolean fromServer) {
+		broadcastMessage(player, new LiteralText(message), fromServer);
 	}
 	
-	public static int serverCommand(MinecraftServer from, String command) {
-    	return from.getCommandManager().execute(from.getCommandSource(), command);
+	public static void logMessage(ServerPlayerEntity player, Text message, boolean fromPlayer) {
+		player.getServer().sendSystemMessage(message, getOrNil(player, !fromPlayer));
+	}
+	
+	public static void logMessage(ServerPlayerEntity player, String message, boolean fromPlayer) {
+		logMessage(player, new LiteralText(message), fromPlayer);
+	}
+
+	private static MessageType getType(boolean fromServer) {
+		return fromServer ? MessageType.SYSTEM : MessageType.CHAT;
+	}
+	
+	private static UUID getOrNil(ServerPlayerEntity player, boolean fromServer) {
+		return fromServer ? Util.NIL_UUID : player.getUuid();
+	}
+	
+	public static int executeCommand(ServerPlayerEntity player, String command, boolean fromServer) {
+		MinecraftServer server = player.getServer();
+    	return server.getCommandManager().execute(fromServer ? server.getCommandSource() : player.getCommandSource(), command);
 	}
 }
