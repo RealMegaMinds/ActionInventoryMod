@@ -1,87 +1,65 @@
 package megaminds.testmod.inventory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
+import megaminds.testmod.inventory.ActionInventoryManager.OpenType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.Direction;
 
-public class ActionInventory implements Inventory, NamedScreenHandlerFactory {
-	private static final Map<String, ActionInventory> ALL_INVENTORIES = new HashMap<>();	//TODO probably should initialize this from files
+//might need to be by player
+public abstract class ActionInventory implements Inventory, NamedScreenHandlerFactory {
+	private final String name;
+	private final int rows;
+	private final ImmutableList<OpenType> acceptedTypes;
+	private final ImmutableList<InventoryItem> items;
 	
-	public static final ActionInventory getInventory(String name) {
-		return ALL_INVENTORIES.get(name);
+	private ActionInventory(String name, List<OpenType> acceptedTypes, int rows, List<InventoryItem> items) {
+		this.name = name;
+		this.rows = rows;
+		this.acceptedTypes = ImmutableList.copyOf(acceptedTypes);
+		this.items = ImmutableList.copyOf(items);
 	}
-
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public ItemStack getStack(int slot) {
-		// TODO Auto-generated method stub
+	
+	public static ActionInventory getNewInventory(String name) {
+		if (ActionInventoryManager.getInventory(name)!=null) {
+			return null;//new ActionInventory(name);
+		}
 		return null;
 	}
+	
+	public boolean accepts(OpenType type) {
+		return acceptedTypes.contains(type);
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public abstract boolean shouldOpen(ServerPlayerEntity player, BlockState state, BlockEntity entity, Direction dir);
+	
+	public abstract boolean shouldOpen(ServerPlayerEntity player, ItemStack stack);
 
+	public abstract boolean onClicked(ServerPlayerEntity player, int slot);
+	
 	@Override
-	public ItemStack removeStack(int slot, int amount) {
-		// TODO Auto-generated method stub
-		return null;
+	public void onOpen(PlayerEntity player) {
+		if (player.world.isClient) return;
+		ActionInventoryManager.onOpen((ServerPlayerEntity) player, this);
 	}
 
 	@Override
-	public ItemStack removeStack(int slot) {
-		// TODO Auto-generated method stub
-		return null;
+	public void onClose(PlayerEntity player) {
+		if (player.world.isClient) return;
+		ActionInventoryManager.onClose((ServerPlayerEntity) player, this);
 	}
-
-	@Override
-	public void setStack(int slot, ItemStack stack) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void markDirty() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean canPlayerUse(PlayerEntity player) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Text getDisplayName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
+	//many things can be defaulted
 }

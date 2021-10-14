@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import megaminds.testmod.Helper;
+import megaminds.testmod.MessageHelper;
 import megaminds.testmod.actions.Action;
 import megaminds.testmod.inventory.requirements.Requirement;
 import net.minecraft.item.ItemStack;
@@ -26,7 +26,7 @@ public class InventoryItem {
 	public ItemStack asItemStack(ServerPlayerEntity player) {
 		for (Requirement r : requirements) {
 			if (r.isViewRequirement() && !r.tryPay(player)) {
-				Helper.toPlayerMessage(player, r.getError(), true);
+				MessageHelper.toPlayerMessage(player, r.getError(), true);
 				return ItemStack.EMPTY;
 			}
 		}
@@ -36,7 +36,7 @@ public class InventoryItem {
 	public void onClick(ServerPlayerEntity player) {
 		requirements.forEach(r -> {
 			if (!r.isViewRequirement() && !r.tryPay(player)) {
-				Helper.toPlayerMessage(player, r.getError(), true);
+				MessageHelper.toPlayerMessage(player, r.getError(), true);
 				return;
 			}
 		});
