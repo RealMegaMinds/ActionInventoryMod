@@ -1,5 +1,4 @@
-Maybe have a custom nbtstring called "menu" that goes on blocks and items.
-If an block/item is clicked/used and has "menu" then the name in menu is used.
-(Make sure to put in custom subtag not main tag)
-
-Might need to make everything serializable/toString/toJson/toNbt
+TODO
+- finish adding ArgTypes in OpenRequirements
+- finsh other parts of OpenRequirements
+- create jsonserializer for everything

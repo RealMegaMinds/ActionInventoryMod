@@ -34,12 +34,10 @@ menu-settings:
   open-actions:
 //	clickType	onWhat	argType	arg
 {
-click-type:	//options[attack, use]	//depends on opentype
 openType:		//options[block, item, entity, command, invClick]	//required
-argType:		//options[name, tag, nbt, pos, type]	//required
+click-type:		//options[attack, use]	//depends on opentype
+argType:[]		//options[name, tag, nbt, pos, type]	//required based on openType
 arg:			//always a string	//required
-
-//maybe command is true/false
 }
 
   - 'attack:	block:	name: 		'
@@ -54,7 +52,6 @@ arg:			//always a string	//required
   - 'use:		block:	enbt: 		'
 
   - 'use:		item:	name: 		'
-//byPos, byBlock, byTag, byEType, byENbt
 
 //icon stuff
   ITEM_STACK: "in json format (i think)"
