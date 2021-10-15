@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tag.BlockTags;
 
 import static megaminds.testmod.inventory.OpenRequirement.OpenType.*;
 import static megaminds.testmod.inventory.OpenRequirement.ClickType.*;
@@ -104,7 +105,7 @@ public class OpenRequirement {
 			System.err.println("OpenType: "+ITEM+" doesn't support ClickType: "+clickR);
 			return null;
 		}
-		
+
 		if (openR==SIGN) {
 			return new OpenRequirement(openR, clickR, null, arg);
 		}
@@ -167,9 +168,9 @@ public class OpenRequirement {
 		}
 	}
 	private static boolean checkBlock(OpenRequirement req, ClickType type, Object argument) {
-		//SUPPORTS: REAL_NAME, TAG, NBT, POS, TYPE
 		switch (req.argType) {
 		case REAL_NAME:
+		case TAG:
 			Block b;
 			if (argument instanceof Block) {
 				b = (Block) argument;
@@ -181,15 +182,15 @@ public class OpenRequirement {
 				argumentError(req.openType, Block.class, BlockState.class, BlockEntity.class);
 				return false;
 			}
-			return req.arg.equalsIgnoreCase(b.getName().asString());
-			
+			String arg = req.argType==REAL_NAME ? b.getName().asString() : null;
+			return req.arg.equalsIgnoreCase(arg);
+
 			//TODO finish cases
-		case TAG:
 		case NBT:
 		case POS:
 		case TYPE:
-			default:
-				break;
+		default:
+			break;
 		}
 		return false;
 	}
