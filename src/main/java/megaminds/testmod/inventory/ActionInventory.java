@@ -18,7 +18,7 @@ import net.minecraft.util.math.Direction;
 public abstract class ActionInventory implements Inventory, NamedScreenHandlerFactory {
 	private final String name;
 	private final int rows;
-	private final ImmutableList<OpenType> acceptedTypes;
+	private final OpenRequirement openRequirement;
 	private final ImmutableList<InventoryItem> items;
 	
 	private ActionInventory(String name, List<OpenType> acceptedTypes, int rows, List<InventoryItem> items) {
@@ -35,8 +35,8 @@ public abstract class ActionInventory implements Inventory, NamedScreenHandlerFa
 		return null;
 	}
 	
-	public boolean accepts(OpenType type) {
-		return acceptedTypes.contains(type);
+	public OpenRequirement getOpenRequirement() {
+		return openRequirement;
 	}
 	
 	public String getName() {

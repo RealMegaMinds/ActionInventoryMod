@@ -5,7 +5,9 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.util.TextCollector;
@@ -31,8 +33,9 @@ import org.apache.logging.log4j.Logger;
 
 import megaminds.testmod.callbacks.InventoryEvents;
 import megaminds.testmod.callbacks.SignFinishCallback;
-import megaminds.testmod.commands.CommandListener;
+import megaminds.testmod.commands.Commands;
 import megaminds.testmod.listeners.BlockListener;
+import megaminds.testmod.listeners.EntityListener;
 import megaminds.testmod.listeners.InventoryListener;
 import megaminds.testmod.listeners.ItemListener;
 import megaminds.testmod.listeners.SignListener;
@@ -54,13 +57,16 @@ public class TestMod implements ModInitializer {
 			dataFolder = server.getSavePath(WorldSavePath.ROOT).resolve(MOD_NAME);
 			server.addServerGuiTickable(()->new TickingTask(server));
 		});
-		CommandRegistrationCallback.EVENT.register(CommandListener::register);
+		CommandRegistrationCallback.EVENT.register(Commands::register);
 		UseItemCallback.EVENT.register(ItemListener::onItemUse);
 		SignFinishCallback.EVENT.register(SignListener::onSignChange);
-		UseBlockCallback.EVENT.register(SignListener::onSignClick);
+		UseBlockCallback.EVENT.register(SignListener::onSignUse);
 		UseBlockCallback.EVENT.register(BlockListener::onBlockUse);
 		AttackBlockCallback.EVENT.register(BlockListener::onBlockAttack);
+		AttackBlockCallback.EVENT.register(SignListener::onSignAttack);
 		InventoryEvents.BEFORE_SLOT_CLICK.register(InventoryListener::onInventoryClick);
+		UseEntityCallback.EVENT.register(EntityListener::onEntityUse);
+		AttackEntityCallback.EVENT.register(EntityListener::onEntityAttack);
 		
 		
 			//OLD STUFF

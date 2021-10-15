@@ -6,13 +6,15 @@ import java.util.Optional;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 
 import static megaminds.testmod.inventory.OpenRequirement.OpenType.*;
 import static megaminds.testmod.inventory.OpenRequirement.ClickType.*;
 import static megaminds.testmod.inventory.OpenRequirement.ArgType.*;
 
 public class OpenRequirement {
-	public static enum OpenType {BLOCK, ITEM, ENTITY, COMMAND, INV_CLICK;
+	public static enum OpenType {BLOCK, ITEM, ENTITY, COMMAND, INV_CLICK, SIGN;
 		public static Optional<OpenType> optionalValueOf(String value){
 			try {
 				return Optional.of(valueOf(value));
@@ -30,7 +32,8 @@ public class OpenRequirement {
 			}
 		}
 	}
-	public static enum ArgType {NAME, TAG, NBT, POS, TYPE;
+
+	public static enum ArgType {CUSTOM_NAME, REAL_NAME, TAG, NBT, POS, TYPE, UUID, TEAM;
 		public static Optional<ArgType> optionalValueOf(String value){
 			try {
 				return Optional.of(valueOf(value));
@@ -52,14 +55,19 @@ public class OpenRequirement {
 		this.arg = arg;
 	}
 
-	public static boolean check(OpenRequirement req, ClickType clickType, Object argument) {
-		switch (req.openType) {
+	public static boolean check(OpenRequirement req, OpenType type, ClickType clickType, Object argument) {
+		if (req.openType!=type) {
+			return false;
+		}
+		switch (type) {
 		case BLOCK:
 			return checkBlock(req, clickType, argument);
 		case ITEM:
 			return checkItem(req, clickType, argument);
 		case ENTITY:
 			return checkEntity(req, clickType, argument);
+		case SIGN:
+			return clickType.equals(clickType) && "true".equals(req.arg);
 		case COMMAND:
 		case INV_CLICK:
 			return "true".equals(req.arg);
@@ -96,6 +104,10 @@ public class OpenRequirement {
 			System.err.println("OpenType: "+ITEM+" doesn't support ClickType: "+clickR);
 			return null;
 		}
+		
+		if (openR==SIGN) {
+			return new OpenRequirement(openR, clickR, null, arg);
+		}
 
 		Optional<ArgType> argT = ArgType.optionalValueOf(enumFormat(argType));
 		if (argT.isEmpty()) {
@@ -103,17 +115,16 @@ public class OpenRequirement {
 		}
 
 		ArgType argR = argT.get();
-		//TODO finish adding ArgTypes and putting them below
 		boolean allowed = false;
 		switch (openR) {
 		case BLOCK:
-			allowed = isOneOf(argR, NAME, TAG, NBT, POS, TYPE);
+			allowed = isOneOf(argR, REAL_NAME, TAG, NBT, POS, TYPE);
 			break;
 		case ENTITY:
-			allowed = isOneOf(argR, NAME, TAG, NBT, POS, TYPE);	//check
+			allowed = isOneOf(argR, CUSTOM_NAME, REAL_NAME, TAG, NBT, POS, TYPE, TEAM, UUID);
 			break;
 		case ITEM:
-			allowed = isOneOf(argR, NAME, TAG, NBT, TYPE); //check
+			allowed = isOneOf(argR, CUSTOM_NAME, REAL_NAME, TAG, NBT);
 			break;
 		default:
 			break;
@@ -136,16 +147,29 @@ public class OpenRequirement {
 	}
 
 	private static boolean checkItem(OpenRequirement req, ClickType type, Object argument) {
-		//TODO finish
-		return false;
+		if (argument instanceof ItemStack) {
+			//SUPPORTS: CUSTOM_NAME, REAL_NAME, TAG, NBT
+			//TODO finish
+			return false;
+		} else {
+			argumentError(req.openType, ItemStack.class);
+			return false;
+		}
 	}
 	private static boolean checkEntity(OpenRequirement req, ClickType type, Object argument) {
-		//TODO finish
-		return false;
+		//SUPPORTS: CUSTOM_NAME, REAL_NAME, TAG, NBT, POS, TYPE, TEAM, UUID
+		if (argument instanceof ItemStack) {
+			//TODO finish
+			return false;
+		} else {
+			argumentError(req.openType, Entity.class);
+			return false;
+		}
 	}
 	private static boolean checkBlock(OpenRequirement req, ClickType type, Object argument) {
+		//SUPPORTS: REAL_NAME, TAG, NBT, POS, TYPE
 		switch (req.argType) {
-		case NAME:
+		case REAL_NAME:
 			Block b;
 			if (argument instanceof Block) {
 				b = (Block) argument;
@@ -164,6 +188,8 @@ public class OpenRequirement {
 		case NBT:
 		case POS:
 		case TYPE:
+			default:
+				break;
 		}
 		return false;
 	}

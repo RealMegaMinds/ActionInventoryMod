@@ -4,6 +4,9 @@ import megaminds.testmod.FileUtils;
 import megaminds.testmod.MessageHelper;
 import megaminds.testmod.inventory.ActionInventory;
 import megaminds.testmod.inventory.ActionInventoryManager;
+import megaminds.testmod.inventory.OpenRequirement;
+import megaminds.testmod.inventory.OpenRequirement.ClickType;
+import megaminds.testmod.inventory.OpenRequirement.OpenType;
 import megaminds.testmod.permissions.Permissions;
 import megaminds.testmod.permissions.Permissions.Perm;
 import net.minecraft.block.entity.BlockEntity;
@@ -20,6 +23,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -33,19 +38,30 @@ public class SignListener {
 
 	private static final TextColor VALID_SIGN_COLOR = TextColor.fromFormatting(Formatting.DARK_BLUE);
 
-	public static ActionResult onSignClick(PlayerEntity inPlayer, World world, Hand hand, BlockHitResult hitResult) {
+	public static ActionResult onSignAttack(PlayerEntity player, World world, Hand hand, BlockPos pos, Direction dir) {
+		return onSignClick(player, world, pos, ClickType.ATTACK);
+	}
+	public static ActionResult onSignUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+		return onSignClick(player, world, hitResult.getBlockPos(), ClickType.USE);
+	}
+	private static ActionResult onSignClick(PlayerEntity inPlayer, World world, BlockPos pos, ClickType click) {
 		if (world.isClient) return ActionResult.PASS;
 		
 		ServerPlayerEntity player = (ServerPlayerEntity) inPlayer;
-		BlockEntity block = world.getBlockEntity(hitResult.getBlockPos());
+		BlockEntity block = world.getBlockEntity(pos);
 		if (block!=null && block instanceof SignBlockEntity) {
 			SignBlockEntity sign = (SignBlockEntity) block;
 			if (isValidSignHeader(sign.getTextOnRow(HEADER_LINE, false))) {
 				String invName = FileUtils.stripExtension(sign.getTextOnRow(NAME_LINE, false).asString().trim());
-				if (ActionInventoryManager.open(invName, player)) {
+				ActionInventory inv = ActionInventoryManager.getInventory(invName);
+				if (inv==null) {
+					MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
+					return ActionResult.FAIL;
+				} else if (OpenRequirement.check(inv.getOpenRequirement(), OpenType.SIGN, click, null)) {
+					ActionInventoryManager.open(inv, player);
 					return ActionResult.SUCCESS;
 				} else {
-					MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
+					MessageHelper.toPlayerMessage(player, MessageHelper.toError("Cannot Open Action Inventory Called: "+invName), true);
 					return ActionResult.FAIL;
 				}
 			}
