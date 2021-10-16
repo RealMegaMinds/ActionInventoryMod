@@ -8,7 +8,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.ItemTags;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.Registry;
 
 import static megaminds.testmod.inventory.OpenRequirement.OpenType.*;
 import static megaminds.testmod.inventory.OpenRequirement.ClickType.*;
@@ -57,18 +63,17 @@ public class OpenRequirement {
 	}
 
 	public static boolean check(OpenRequirement req, OpenType type, ClickType clickType, Object argument) {
-		if (req.openType!=type) {
+		if (req.openType!=type || clickType!=req.clickType) {
 			return false;
 		}
 		switch (type) {
 		case BLOCK:
-			return checkBlock(req, clickType, argument);
+			return checkBlock(req, argument);
 		case ITEM:
-			return checkItem(req, clickType, argument);
+			return checkItem(req, argument);
 		case ENTITY:
-			return checkEntity(req, clickType, argument);
+			return checkEntity(req, argument);
 		case SIGN:
-			return clickType.equals(clickType) && "true".equals(req.arg);
 		case COMMAND:
 		case INV_CLICK:
 			return "true".equals(req.arg);
@@ -147,17 +152,27 @@ public class OpenRequirement {
 		return s.toUpperCase().strip().replace(' ', '_');
 	}
 
-	private static boolean checkItem(OpenRequirement req, ClickType type, Object argument) {
+	private static boolean checkItem(OpenRequirement req, Object argument) {
 		if (argument instanceof ItemStack) {
-			//SUPPORTS: CUSTOM_NAME, REAL_NAME, TAG, NBT
-			//TODO finish
-			return false;
+			ItemStack i = (ItemStack) argument;
+			switch (req.argType) {
+			case CUSTOM_NAME:
+				return req.getArg().equals(i.getName().asString());
+			case REAL_NAME:
+				return req.getArg().equals(i.getItem().getName().asString());
+			case TAG:
+				return ItemTags.getTagGroup().getTagsFor(i.getItem()).stream().anyMatch(t->t.equals(new Identifier(req.arg)));
+			case NBT:
+				return i.getOrCreateNbt().contains(req.arg);
+			default:
+				return false;
+			}
 		} else {
 			argumentError(req.openType, ItemStack.class);
 			return false;
 		}
 	}
-	private static boolean checkEntity(OpenRequirement req, ClickType type, Object argument) {
+	private static boolean checkEntity(OpenRequirement req, Object argument) {
 		//SUPPORTS: CUSTOM_NAME, REAL_NAME, TAG, NBT, POS, TYPE, TEAM, UUID
 		if (argument instanceof ItemStack) {
 			//TODO finish
@@ -167,7 +182,8 @@ public class OpenRequirement {
 			return false;
 		}
 	}
-	private static boolean checkBlock(OpenRequirement req, ClickType type, Object argument) {
+
+	private static boolean checkBlock(OpenRequirement req, Object argument) {
 		switch (req.argType) {
 		case REAL_NAME:
 		case TAG:
@@ -182,17 +198,25 @@ public class OpenRequirement {
 				argumentError(req.openType, Block.class, BlockState.class, BlockEntity.class);
 				return false;
 			}
-			String arg = req.argType==REAL_NAME ? b.getName().asString() : null;
-			return req.arg.equalsIgnoreCase(arg);
-
-			//TODO finish cases
+			return req.argType==REAL_NAME ? req.arg.equalsIgnoreCase(b.getName().asString()) : BlockTags.getTagGroup().getTagsFor(b).stream().anyMatch(i->i.equals(new Identifier(req.arg)));
 		case NBT:
 		case POS:
 		case TYPE:
+			if (!(argument instanceof BlockEntity)) {
+				argumentError(req.openType, BlockEntity.class);
+				return false;
+			}
+			BlockEntity e = (BlockEntity)argument;
+			return req.argType==NBT ? e.writeNbt(new NbtCompound()).contains(req.arg) : req.argType==POS ? checkPos(req.arg, e.getPos()) : e.getType().equals(Registry.BLOCK_ENTITY_TYPE.get(new Identifier(req.arg)));
 		default:
 			break;
 		}
 		return false;
+	}
+	
+	private static boolean checkPos(String s, Vec3i pos) {
+		String[] arr = s.split(":");
+		return (pos.getX()+"").equals(arr[0]) && (pos.getY()+"").equals(arr[1]) && (pos.getZ()+"").equals(arr[2]);
 	}
 
 	private static void argumentError(OpenType type, Class<?>... arr) {
