@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.OpenChecker.ClickType;
+import megaminds.testmod.inventory.OpenChecker.OpenType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ActionInventoryManager {
@@ -22,11 +22,11 @@ public class ActionInventoryManager {
 	}
 	
 	public static Stream<String> getOpenInventoryNames() {
-		return ALL_INVENTORIES.values().stream().filter(i->OpenRequirement.check(i.getOpenRequirement(), OpenType.COMMAND, null, null)).map(i->i.getName());
+		return ALL_INVENTORIES.values().stream().filter(i->i.getOpenChecker().check(OpenType.COMMAND, null, null)).map(i->i.getName());
 	}
 	
 	public static boolean notify(ServerPlayerEntity player, OpenType open, ClickType click, Object arg) {
-		return ALL_INVENTORIES.values().stream().anyMatch(i -> OpenRequirement.check(i.getOpenRequirement(), open, click, arg) && open(i, player));
+		return ALL_INVENTORIES.values().stream().anyMatch(i -> i.getOpenChecker().check(open, click, arg) && open(i, player));
 	}
 	
 	public static boolean open(String inventory, ServerPlayerEntity player) {

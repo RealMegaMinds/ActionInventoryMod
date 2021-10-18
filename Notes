@@ -1,4 +1,3 @@
 TODO
-- finish adding ArgTypes in OpenRequirements
-- finsh other parts of OpenRequirements
+- serializer for inventory item
 - create jsonserializer for everything

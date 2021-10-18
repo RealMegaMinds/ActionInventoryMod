@@ -1,8 +1,8 @@
 package megaminds.testmod.listeners;
 
 import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.OpenChecker.ClickType;
+import megaminds.testmod.inventory.OpenChecker.OpenType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

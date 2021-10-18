@@ -20,8 +20,8 @@ import megaminds.testmod.MessageHelper;
 import megaminds.testmod.TestMod;
 import megaminds.testmod.inventory.ActionInventory;
 import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.OpenChecker;
+import megaminds.testmod.inventory.OpenChecker.OpenType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -49,7 +49,7 @@ public class Commands {
 		ActionInventory inv = ActionInventoryManager.getInventory(name);
 		if (inv==null) {
 			throw WRONG_NAME_EXCEPTION.create(name);
-		} else if (OpenRequirement.check(inv.getOpenRequirement(), OpenType.COMMAND, null, null)) {
+		} else if (OpenChecker.check(inv.getOpenChecker(), OpenType.COMMAND, null, null)) {
 			ActionInventoryManager.open(inv, player);
 			return 1;
 		} else {

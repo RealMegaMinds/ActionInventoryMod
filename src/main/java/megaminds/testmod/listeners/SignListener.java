@@ -4,9 +4,9 @@ import megaminds.testmod.FileUtils;
 import megaminds.testmod.MessageHelper;
 import megaminds.testmod.inventory.ActionInventory;
 import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement;
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.OpenChecker;
+import megaminds.testmod.inventory.OpenChecker.ClickType;
+import megaminds.testmod.inventory.OpenChecker.OpenType;
 import megaminds.testmod.permissions.Permissions;
 import megaminds.testmod.permissions.Permissions.Perm;
 import net.minecraft.block.entity.BlockEntity;
@@ -57,7 +57,7 @@ public class SignListener {
 				if (inv==null) {
 					MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
 					return ActionResult.FAIL;
-				} else if (OpenRequirement.check(inv.getOpenRequirement(), OpenType.SIGN, click, null)) {
+				} else if (OpenChecker.check(inv.getOpenChecker(), OpenType.SIGN, click, null)) {
 					ActionInventoryManager.open(inv, player);
 					return ActionResult.SUCCESS;
 				} else {
