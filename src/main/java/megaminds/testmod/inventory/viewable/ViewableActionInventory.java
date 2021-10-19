@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 
+import megaminds.testmod.ClickChecker;
 import megaminds.testmod.inventory.storable.StoredActionInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -15,21 +16,35 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-public class ViewableActionInventory implements Inventory, NamedScreenHandlerFactory {
+public class ViewableActionInventory implements Inventory, NamedScreenHandlerFactory, ClickChecker {
 	private final StoredActionInventory internalInventory;
 	private final int size;
 	private final ImmutableList<ItemStack> stacks;
 
-	public ViewableActionInventory(StoredActionInventory inv) {
+	private ViewableActionInventory(StoredActionInventory inv) {
 		this.internalInventory = inv;
 		this.size = inv.rows * 9;
 		this.stacks = ImmutableList.copyOf(inv.items.stream().map(item->ItemStack.fromNbt(item.itemStack)).toArray(ItemStack[]::new));
 		ViewableManager.onCreate(inv.name, this);
 	}
-
+	
+	public static ViewableActionInventory create(StoredActionInventory inv) {
+		if (inv==null) return null;
+		return new ViewableActionInventory(inv);
+	}
+	
+	@Override
+	public boolean onClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+		if (!player.world.isClient) {
+			//TODO fill in here
+		}
+		return true;
+	}
+	
 	@Override
 	public void clear() {}
 
@@ -89,6 +104,9 @@ public class ViewableActionInventory implements Inventory, NamedScreenHandlerFac
 
 	@Override
 	public boolean canPlayerUse(PlayerEntity player) {
+		if (player instanceof ServerPlayerEntity) {
+			
+		}
 		return true;
 	}
 

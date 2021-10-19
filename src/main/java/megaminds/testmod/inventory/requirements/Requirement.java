@@ -1,6 +1,7 @@
 package megaminds.testmod.inventory.requirements;
 
 import megaminds.testmod.inventory.InventoryItem;
+import megaminds.testmod.inventory.storable.StoredRequirement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -8,6 +9,11 @@ import net.minecraft.text.Text;
  * A {@link Requirement} may be a cost or just a permission check
  */
 public interface Requirement {
+	/**
+	 * @return
+	 * The actual requirement that the player is checked against
+	 */
+	StoredRequirement getStoredRequirement();
 	/**
 	 * @return
 	 * True - player has paid the whole cost

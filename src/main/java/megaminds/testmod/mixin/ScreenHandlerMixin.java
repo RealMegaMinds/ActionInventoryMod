@@ -7,27 +7,35 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import megaminds.testmod.InventoryClickCallback;
+import megaminds.testmod.ClickChecker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.ActionResult;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 
 @Mixin(ScreenHandler.class)
-public class InventoryClickMixin {
-	@Shadow
-	@Final
-	public DefaultedList<Slot> slots;
+public abstract class ScreenHandlerMixin {
 	@Shadow
 	@Final
 	public static int EMPTY_SPACE_SLOT_INDEX;
 
-	@Inject(method = "internalOnSlotClick(IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V", at = @At("HEAD"), cancellable = true)
+	@Shadow
+	@Final
+	public DefaultedList<Slot> slots;
+	
+	@Shadow
+	protected abstract int nextRevision();
+	
+	@Inject(at = @At(value = "HEAD"), method = "internalOnSlotClick(IILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V", cancellable = true)
 	private void onClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player, CallbackInfo info) {
-		ActionResult result = InventoryClickCallback.EVENT.invoker().doClick(slotIndex!=EMPTY_SPACE_SLOT_INDEX ? slots.get(slotIndex) : null, button, actionType, player);
-		if (result == ActionResult.FAIL) {
+		if (player.world.isClient || slotIndex == EMPTY_SPACE_SLOT_INDEX) return;
+		Slot s = slots.get(slotIndex);
+		if (s==null || s.inventory==null) return;
+		
+		if (((ClickChecker)(Object) s.inventory).onClick(s.getIndex(), button, actionType, (ServerPlayerEntity)player)) {
+			nextRevision();
 			info.cancel();
 		}
 	}

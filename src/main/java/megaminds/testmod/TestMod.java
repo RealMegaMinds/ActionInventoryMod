@@ -2,29 +2,28 @@ package megaminds.testmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.client.util.TextCollector;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.GenericContainerScreenHandler;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.ClickEvent;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.util.registry.Registry;
-
 import java.nio.file.Path;
 
 import org.apache.logging.log4j.Level;
@@ -34,6 +33,8 @@ import org.apache.logging.log4j.Logger;
 import megaminds.testmod.callbacks.InventoryEvents;
 import megaminds.testmod.callbacks.SignFinishCallback;
 import megaminds.testmod.commands.Commands;
+import megaminds.testmod.inventory.viewable.ViewableActionInventory;
+import megaminds.testmod.inventory.viewable.ViewableManager;
 import megaminds.testmod.listeners.BlockListener;
 import megaminds.testmod.listeners.EntityListener;
 import megaminds.testmod.listeners.InventoryListener;
@@ -49,60 +50,46 @@ public class TestMod implements ModInitializer {
 	
 	public static Path dataFolder;
 
+	static class Fact implements NamedScreenHandlerFactory{
+		Inventory inv;
+		public Fact(Inventory inv) {
+			this.inv = inv;
+		}
+		@Override
+		public ScreenHandler createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+			return GenericContainerScreenHandler.createGeneric9x3(i, playerInventory, inv);
+		}
+
+		@Override
+		public Text getDisplayName() {
+			return new LiteralText(MOD_NAME);
+		}
+	}
 	@Override
 	public void onInitialize() {
 		info("Initializing");
+				
+		//NEWER STUFF
+//		ServerWorldEvents.LOAD.register((server, world)->{
+//			ViewableManager.load(server.getSavePath(WorldSavePath.ROOT));
+//		});
+		
+		
 		//NEW STUFF
-		ServerWorldEvents.LOAD.register((server, world)->{
-			dataFolder = server.getSavePath(WorldSavePath.ROOT).resolve(MOD_NAME);
-			server.addServerGuiTickable(()->new TickingTask(server));
-		});
-		CommandRegistrationCallback.EVENT.register(Commands::register);
-		UseItemCallback.EVENT.register(ItemListener::onItemUse);
-		SignFinishCallback.EVENT.register(SignListener::onSignChange);
-		UseBlockCallback.EVENT.register(SignListener::onSignUse);
-		UseBlockCallback.EVENT.register(BlockListener::onBlockUse);
-		AttackBlockCallback.EVENT.register(BlockListener::onBlockAttack);
-		AttackBlockCallback.EVENT.register(SignListener::onSignAttack);
-		InventoryEvents.BEFORE_SLOT_CLICK.register(InventoryListener::onInventoryClick);
-		UseEntityCallback.EVENT.register(EntityListener::onEntityUse);
-		AttackEntityCallback.EVENT.register(EntityListener::onEntityAttack);
-		
-		
-			//OLD STUFF
-//		InventoryEvents.BEFORE_SLOT_CLICK.register((packet, player)->{
-//			return TypedActionResult.pass(packet);
+//		ServerWorldEvents.LOAD.register((server, world)->{
+//			dataFolder = server.getSavePath(WorldSavePath.ROOT).resolve(MOD_NAME);
 //		});
-//		InventoryEvents.AFTER_SLOT_CLICK.register((packet, player)->{
-//			return ActionResult.PASS;
-//		});
-//						
-//		InventoryClickCallback.EVENT.register((slot, button, slotActionType, player)->{
-//			if (slot==null || player.world.isClient) return ActionResult.PASS;
-//			info(slot.getStack().toString());
-//			if (slot.inventory == player.getInventory()) {
-//				
-//			} else {
-//				if (slot.inventory instanceof CommandInventory) {
-//					
-//				}
-//			}
-//			return ActionResult.FAIL;
-//		});
-//		
-//		
-//		UseItemCallback.EVENT.register((player, world, hand)->{
-//			if (!world.isClient && hand==Hand.MAIN_HAND && player.isCreativeLevelTwoOp()) {
-//				NamedScreenHandlerFactory factory = CommandInventory.get(player.getMainHandStack());
-//				if (factory==null) {
-//					return TypedActionResult.fail(ItemStack.EMPTY);
-//				}
-//				((ServerPlayerEntity)player).openHandledScreen(factory);
-//			}
-//			return TypedActionResult.pass(ItemStack.EMPTY);
-//		});
-//
-//		new CommandInventory(new LiteralText("Super Power List"), new ItemStack(Items.BLAZE_ROD), new ItemStack(Items.ACACIA_BOAT), new ItemStack(Items.BIRCH_DOOR));
+//		CommandRegistrationCallback.EVENT.register(Commands::register);
+//		UseItemCallback.EVENT.register(ItemListener::onItemUse);
+//		SignFinishCallback.EVENT.register(SignListener::onSignChange);
+//		UseBlockCallback.EVENT.register(SignListener::onSignUse);
+//		UseBlockCallback.EVENT.register(BlockListener::onBlockUse);
+//		AttackBlockCallback.EVENT.register(BlockListener::onBlockAttack);
+//		AttackBlockCallback.EVENT.register(SignListener::onSignAttack);
+//		InventoryEvents.BEFORE_SLOT_CLICK.register(InventoryListener::onInventoryClick);
+//		UseEntityCallback.EVENT.register(EntityListener::onEntityUse);
+//		AttackEntityCallback.EVENT.register(EntityListener::onEntityAttack);
+				
 		info("Initialized");
 	}
 	

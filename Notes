@@ -1,3 +1,8 @@
 TODO
+- insert a call to onClick into ScreenHandler onClick method (above method determines whether the regular screenhandler method should continue)
+   - (can cast inventory to object then to ClickChecker) 
+- add mixins to mixin file
+
+
 - serializer for inventory item
 - create jsonserializer for everything
