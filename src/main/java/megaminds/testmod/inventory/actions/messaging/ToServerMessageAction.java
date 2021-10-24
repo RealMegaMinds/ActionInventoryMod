@@ -8,24 +8,20 @@ import net.minecraft.text.Text;
 /**
  * Logs a message to the server
  */
-public class ToServerMessageAction implements Action {
-	private final Text message;
-	private final boolean fromPlayer;
-	
-	/**
-	 * @param message
-	 * The message to send
-	 * @param fromPlayer
-	 * True - the message is from the player
-	 * False - the message is from nil
-	 */
-	public ToServerMessageAction(Text message, boolean fromPlayer) {
-		this.message = message;
-		this.fromPlayer = fromPlayer;
-	}
+public class ToServerMessageAction extends Action {
+	/**The message to send*/
+	private Text message;
+	/**True - the message is from the player
+	 * False - the message is from nil*/
+	private boolean fromPlayer;
 	
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.logMessage(player, message, fromPlayer);
+	}
+
+	@Override
+	protected Type getTypeInternal() {
+		return Type.ServerMessage;
 	}
 }

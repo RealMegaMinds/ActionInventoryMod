@@ -2,7 +2,7 @@
   "required": true,
   "package": "megaminds.testmod.mixin",
   "compatibilityLevel": "JAVA_16",
-  "mixins": ["InventoryMixin", "ServerPlayNetworkHandlerMixin", "ScreenHandlerMixin"],
+  "mixins": ["ServerPlayNetworkHandlerMixin"],
   "client": [],
   "server": [],
   "injectors": {

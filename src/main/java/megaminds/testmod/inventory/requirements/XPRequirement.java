@@ -1,55 +1,40 @@
 package megaminds.testmod.inventory.requirements;
 
-import megaminds.testmod.inventory.storable.StoredRequirement;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
-public class XPRequirement implements Requirement {
-
-	@Override
-	public StoredRequirement getStoredRequirement() {
-		return null;
-	}
+public class XPRequirement extends Requirement {
+	private int requiredCost;
+	private boolean consumes;
+	private boolean allowPartial;
+	private boolean resets;
 
 	@Override
-	public boolean hasPaidFull(ServerPlayerEntity player) {
-		// TODO Auto-generated method stub
+	public boolean pay(ServerPlayerEntity player) {
+		int paid = (int) RequirementStorageManager.getPayment(this, player, 0);
+		if (paid >= requiredCost) return true;
+
+		int level = player.experienceLevel;
+		if (paid+level >= requiredCost) {
+			if (consumes) {
+				player.addExperience(-(requiredCost-paid));
+			}
+			return true;
+		} else if (allowPartial && consumes) {
+			player.addExperience(-level);
+			RequirementStorageManager.setPayment(this, player, paid+level);
+		}
 		return false;
 	}
 
 	@Override
-	public boolean acceptsPartialCost() {
-		// TODO Auto-generated method stub
-		return false;
+	protected Type getTypeInternal() {
+		return Type.XP;
 	}
 
 	@Override
-	public boolean hasFullCost(ServerPlayerEntity player) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean takeCost(ServerPlayerEntity player) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isViewRequirement() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Text getError() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void afterClick(ServerPlayerEntity player) {
-		// TODO Auto-generated method stub
-		
+	public void afterSuccess(ServerPlayerEntity player) {
+		if (resets) {
+			RequirementStorageManager.removePayment(this, player);
+		}
 	}
 }

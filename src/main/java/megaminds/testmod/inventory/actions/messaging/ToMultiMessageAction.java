@@ -11,28 +11,22 @@ import net.minecraft.text.MutableText;
 /**
  * Sends a message to multiple players
  */
-public class ToMultiMessageAction implements Action {
-	private final MutableText msg;
-	private final List<UUID> to;
-	private final boolean fromServer;
+public class ToMultiMessageAction extends Action {
+	/**The message to send*/
+	private MutableText msg;
+	/**The users to send the message to*/
+	private List<UUID> to;
+	/**True - send a system message<br>
+	 * False - the player is the sender*/
+	private boolean fromServer;
 	
-	/**
-	 * @param msg
-	 * The message to send
-	 * @param to
-	 * The users to send the message to
-	 * @param fromServer
-	 * True - send a system message
-	 * False - the player is the sender
-	 */
-	public ToMultiMessageAction(MutableText msg, List<UUID> to, boolean fromServer) {
-		this.msg = msg;
-		this.to = to;
-		this.fromServer = fromServer;
-	}
-
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.multiMessage(player, msg, to, fromServer);
+	}
+
+	@Override
+	protected Type getTypeInternal() {
+		return Type.MultiMessage;
 	}
 }
