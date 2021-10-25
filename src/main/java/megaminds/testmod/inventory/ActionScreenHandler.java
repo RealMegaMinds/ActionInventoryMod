@@ -59,7 +59,7 @@ public class ActionScreenHandler extends ScreenHandler {
 
 	@Override
 	public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
-		Slot s = getSlot(slotIndex);
+		Slot s = slotIndex==EMPTY_SPACE_SLOT_INDEX ? null : getSlot(slotIndex);
 		if (s instanceof ActionItemSlot) {
 			((ActionItemSlot)s).onClick();
 		}

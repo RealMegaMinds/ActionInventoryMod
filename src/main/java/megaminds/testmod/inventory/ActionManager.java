@@ -32,7 +32,6 @@ public class ActionManager {
 	
 	public static void onCreate(ActionInventory inv) {
 		if (inv==null) return;
-		System.out.println(inv);
 		allInventories.put(inv.getName(), inv);
 	}
 	public static void onOpen(ServerPlayerEntity p, ActionInventory inv) {

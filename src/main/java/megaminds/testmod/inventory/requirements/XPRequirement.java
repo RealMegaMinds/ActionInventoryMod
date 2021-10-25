@@ -16,11 +16,13 @@ public class XPRequirement extends Requirement {
 		int level = player.experienceLevel;
 		if (paid+level >= requiredCost) {
 			if (consumes) {
-				player.addExperience(-(requiredCost-paid));
+				int toPay = requiredCost - paid;
+				player.setExperienceLevel(level-toPay);
+				RequirementStorageManager.setPayment(this, player, paid+toPay);
 			}
 			return true;
 		} else if (allowPartial && consumes) {
-			player.addExperience(-level);
+			player.setExperienceLevel(0);
 			RequirementStorageManager.setPayment(this, player, paid+level);
 		}
 		return false;

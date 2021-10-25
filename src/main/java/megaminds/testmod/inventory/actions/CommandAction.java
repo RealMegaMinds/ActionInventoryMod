@@ -26,18 +26,18 @@ public class CommandAction extends Action {
 	
 	@Override
 	public void execute(ServerPlayerEntity player) {
-		if (makeTempOp) {
+		if (makeTempOp && !fromServer) {
 			PlayerManager manager = player.server.getPlayerManager();
 			GameProfile profile = player.getGameProfile();
 			if (manager.isOperator(profile)) {
-				MessageHelper.executeCommand(player, command, fromServer);
+				MessageHelper.executeCommand(player, command, false);
 			} else {
 				manager.addToOperators(profile);
-				MessageHelper.executeCommand(player, command, fromServer);
+				MessageHelper.executeCommand(player, command, false);
 				manager.removeFromOperators(profile);
 			}
 		} else {
-			MessageHelper.executeCommand(player, command, fromServer);
+			MessageHelper.executeCommand(player, command, true);
 		}
 	}
 

@@ -14,6 +14,7 @@ public class ActionItem {
 	private List<Action> actions;
 	private List<Requirement> requirements;
 	private ItemStack representation;
+	private boolean canView;
 	
 	public int getSlot() {
 		return slot;
@@ -28,7 +29,7 @@ public class ActionItem {
 				canView = false;
 			}
 		}
-		
+		this.canView = canView;
 		if (!canView) {
 			return ItemStack.EMPTY;
 		}
@@ -42,7 +43,7 @@ public class ActionItem {
 	}
 	
 	public void onClick(ServerPlayerEntity player) {
-		if (requirements==null || actions==null) return;
+		if (!canView || requirements==null || actions==null) return;
 		
 		boolean canUse = true;
 		for (Requirement r : requirements) {

@@ -2,14 +2,13 @@ package megaminds.testmod;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.util.WorldSavePath;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,13 +31,17 @@ public class TestMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		info("Initializing");
-		ServerWorldEvents.LOAD.register((server, world)->{
+		
+		ServerLifecycleEvents.SERVER_STARTED.register((server)->{
 			ActionManager.onStartUp(server.getSavePath(WorldSavePath.ROOT));
 		});
-		ServerWorldEvents.UNLOAD.register((server, world)->{
+		ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, manager)->{
+			ActionManager.onShutDown(server.getSavePath(WorldSavePath.ROOT));
+			ActionManager.onStartUp(server.getSavePath(WorldSavePath.ROOT));
+		});
+		ServerLifecycleEvents.SERVER_STOPPING.register((server)->{
 			ActionManager.onShutDown(server.getSavePath(WorldSavePath.ROOT));
 		});
-		
 		
 		CommandRegistrationCallback.EVENT.register(Commands::register);
 		UseItemCallback.EVENT.register(ItemListener::onItemUse);

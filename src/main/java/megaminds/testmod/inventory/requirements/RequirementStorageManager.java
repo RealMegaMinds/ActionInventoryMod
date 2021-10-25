@@ -18,7 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class RequirementStorageManager {
 	private static final String fileName = "Paid Requirements.ser";
-	private static Map<Requirement, Map<UUID, Object>> paidRequirements = new HashMap<>();
+	private static Map<Requirement, Map<UUID, Object>> paidRequirements;
 	
 	public static Object getPayment(Requirement req, ServerPlayerEntity player, Object defaultObj) {
 		Map<UUID, Object> map = paidRequirements.get(req);
@@ -39,20 +39,28 @@ public class RequirementStorageManager {
 			boolean created = f.createNewFile();
 			if (!created && f.isDirectory()) {
 				TestMod.log(Level.WARN, f+" must be a file not a folder");
+				if (paidRequirements==null) paidRequirements = new HashMap<>();
 				return;
 			}
 		} catch (IOException e) {
 			TestMod.log(Level.WARN, "Failed to create a file for paidRequirements");
+			if (paidRequirements==null) paidRequirements = new HashMap<>();
 			return;
 		}
 		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
 			paidRequirements = (Map<Requirement, Map<UUID, Object>>) in.readObject();
 		} catch (IOException | ClassNotFoundException | ClassCastException e) {
 			TestMod.log(Level.WARN, "Unable to read paidRequirements.");
+			if (paidRequirements==null) paidRequirements = new HashMap<>();
+			return;
 		}
+		if (paidRequirements==null) paidRequirements = new HashMap<>();
+		TestMod.info("Loaded Stored Paid Requirements");
 	}
 	
 	public static void onShutdown(Path inventoryFolder) {
+		if (paidRequirements==null) return;
+
 		File f = new File(inventoryFolder.toFile(), fileName);
 		try {
 			boolean created = f.createNewFile();
@@ -68,6 +76,8 @@ public class RequirementStorageManager {
 			out.writeObject(paidRequirements);
 		} catch (IOException e) {
 			TestMod.log(Level.WARN, "Unable to save paidRequirements");
+			return;
 		}
+		TestMod.info("Saved Paid Requirements");
 	}
 }
