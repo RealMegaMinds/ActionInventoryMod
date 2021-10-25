@@ -16,26 +16,20 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import megaminds.testmod.MessageHelper;
 import megaminds.testmod.TestMod;
-import megaminds.testmod.inventory.ActionInventory;
-import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.ActionManager;
+import megaminds.testmod.inventory.openers.Opener.What;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
 public class Commands {
-	private static final DynamicCommandExceptionType WRONG_NAME_EXCEPTION = new DynamicCommandExceptionType(a->{
-		return new LiteralText("No Action Inventory Called: "+a.toString());
-	});
 	private static final DynamicCommandExceptionType CANT_OPEN_EXCEPTION = new DynamicCommandExceptionType(a->{
-		return new LiteralText("Cannot Open Action Inventory Called: "+a.toString());
+		return new LiteralText("Cannot Open Action Inventory: "+a.toString());
 	});
 	private static final SuggestionProvider<ServerCommandSource> SUGGESTER = (context, builder)->{
-		return CommandSource.suggestMatching(ActionInventoryManager.getOpenInventoryNames(), builder);
+		return CommandSource.suggestMatching(ActionManager.getCommandInventoryNames(), builder);
 	};
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean isDedicated) {
@@ -46,11 +40,7 @@ public class Commands {
 		ServerPlayerEntity player = context.getSource().getPlayer();
 		String name = getString(context, "name");
 		
-		ActionInventory inv = ActionInventoryManager.getInventory(name);
-		if (inv==null) {
-			throw WRONG_NAME_EXCEPTION.create(name);
-		} else if (OpenRequirement.check(inv.getOpenRequirement(), OpenType.COMMAND, null, null)) {
-			ActionInventoryManager.open(inv, player);
+		if (ActionManager.notify(ActionManager.getInventory(name), player, null, What.Command, null)) {
 			return 1;
 		} else {
 			throw CANT_OPEN_EXCEPTION.create(name);

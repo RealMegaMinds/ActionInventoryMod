@@ -1,8 +1,8 @@
 package megaminds.testmod.listeners;
 
-import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.ActionManager;
+import megaminds.testmod.inventory.openers.Opener.ClickType;
+import megaminds.testmod.inventory.openers.Opener.What;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,7 +23,7 @@ public class EntityListener {
 	private static ActionResult onEntityClick(PlayerEntity player, World world, Entity entity, EntityHitResult hitResult, ClickType click) {
 		if (!world.isClient) {
 			if (entity!=null) {
-				if (ActionInventoryManager.notify((ServerPlayerEntity) player, OpenType.ENTITY, click, entity)) {
+				if (ActionManager.notify((ServerPlayerEntity) player, click, What.Entity, entity)) {
 					return ActionResult.SUCCESS;
 				}
 			}

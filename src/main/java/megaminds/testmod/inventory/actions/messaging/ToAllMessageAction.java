@@ -8,24 +8,20 @@ import net.minecraft.text.MutableText;
 /**
  * Broadcasts a message to all players
  */
-public class ToAllMessageAction implements Action {
-	private final MutableText msg;
-	private final boolean fromServer;
-
-	/**
-	 * @param msg
-	 * The message to send
-	 * @param fromServer
-	 * True - send a system message
-	 * False - the player is the sender
-	 */
-	public ToAllMessageAction(MutableText msg, boolean fromServer) {
-		this.msg = msg;
-		this.fromServer = fromServer;
-	}
+public class ToAllMessageAction extends Action {
+	/**The message to send*/
+	private MutableText msg;
+	/**True - send a system message<br>
+	 * False - the player is the sender*/
+	private boolean fromServer;
 
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.broadcastMessage(player, msg, fromServer);
+	}
+
+	@Override
+	protected Type getTypeInternal() {
+		return Type.AllMessage;
 	}
 }

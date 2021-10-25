@@ -3,12 +3,9 @@ package megaminds.testmod.listeners;
 import megaminds.testmod.FileUtils;
 import megaminds.testmod.MessageHelper;
 import megaminds.testmod.inventory.ActionInventory;
-import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement;
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
-import megaminds.testmod.permissions.Permissions;
-import megaminds.testmod.permissions.Permissions.Perm;
+import megaminds.testmod.inventory.ActionManager;
+import megaminds.testmod.inventory.openers.Opener.ClickType;
+import megaminds.testmod.inventory.openers.Opener.What;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -53,12 +50,11 @@ public class SignListener {
 			SignBlockEntity sign = (SignBlockEntity) block;
 			if (isValidSignHeader(sign.getTextOnRow(HEADER_LINE, false))) {
 				String invName = FileUtils.stripExtension(sign.getTextOnRow(NAME_LINE, false).asString().trim());
-				ActionInventory inv = ActionInventoryManager.getInventory(invName);
+				ActionInventory inv = ActionManager.getInventory(invName);
 				if (inv==null) {
 					MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
 					return ActionResult.FAIL;
-				} else if (OpenRequirement.check(inv.getOpenRequirement(), OpenType.SIGN, click, null)) {
-					ActionInventoryManager.open(inv, player);
+				} else if (ActionManager.notify(inv, player, click, What.Sign, null)) {
 					return ActionResult.SUCCESS;
 				} else {
 					MessageHelper.toPlayerMessage(player, MessageHelper.toError("Cannot Open Action Inventory Called: "+invName), true);
@@ -74,7 +70,7 @@ public class SignListener {
 		Text header = sign.getTextOnRow(HEADER_LINE, false);
 		
 		if (isValidTrigger(header)) {
-			if (Permissions.hasPermission(player, Perm.CREATE_INV)) {
+			if (player.hasPermissionLevel(4)) {
 				String invName = sign.getTextOnRow(NAME_LINE, false).asString().strip();
 
 				if (invName.isEmpty()) {
@@ -84,7 +80,7 @@ public class SignListener {
 
 				invName = FileUtils.stripExtension(invName);
 
-				ActionInventory menu = ActionInventoryManager.getInventory(invName);
+				ActionInventory menu = ActionManager.getInventory(invName);
 				if (menu == null) {
 					MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
 					return;
@@ -93,7 +89,7 @@ public class SignListener {
 				sign.setTextOnRow(HEADER_LINE, getValidHeader(), sign.getTextOnRow(HEADER_LINE, true));
 				MessageHelper.toPlayerMessage(player, MessageHelper.toSuccess("Sign Created For: "+invName), true);
 			} else if (isValidSignColor(header)) {
-				// Prevent players without permission from creating menu signs
+				// Prevent players without permission from creating ActionInventory signs
 				sign.setTextOnRow(HEADER_LINE, header.shallowCopy().setStyle(header.getStyle().withColor((Formatting)null)));
 			}
 		}

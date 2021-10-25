@@ -1,8 +1,8 @@
 package megaminds.testmod.listeners;
 
-import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.ActionManager;
+import megaminds.testmod.inventory.openers.Opener.ClickType;
+import megaminds.testmod.inventory.openers.Opener.What;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,13 +29,13 @@ public class BlockListener {
 			boolean opened = false;
 			
 			BlockState s = world.getBlockState(pos);
-			if (s!=null&&!s.isAir()) {
-				opened = ActionInventoryManager.notify(p, OpenType.BLOCK, click, s);
+			if (s!=null&&!s.isAir()&&s.getBlock()!=null) {
+				opened = ActionManager.notify(p, click, What.Block, s.getBlock());
 			}
 			
 			BlockEntity e = world.getBlockEntity(pos);
 			if (!opened && e!=null) {
-				opened = ActionInventoryManager.notify(p, OpenType.BLOCK, click, e);
+				opened = ActionManager.notify(p, click, What.BlockEntity, e);
 			}
 			
 			if (opened) {

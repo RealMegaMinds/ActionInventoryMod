@@ -1,8 +1,8 @@
 package megaminds.testmod.listeners;
 
-import megaminds.testmod.inventory.ActionInventoryManager;
-import megaminds.testmod.inventory.OpenRequirement.ClickType;
-import megaminds.testmod.inventory.OpenRequirement.OpenType;
+import megaminds.testmod.inventory.ActionManager;
+import megaminds.testmod.inventory.openers.Opener.ClickType;
+import megaminds.testmod.inventory.openers.Opener.What;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,7 +15,7 @@ public class ItemListener {
 		if (!world.isClient) {
 			ItemStack stack = player.getStackInHand(hand);
 			if (stack!=null && !stack.isEmpty()) {
-				if (ActionInventoryManager.notify((ServerPlayerEntity) player, OpenType.ITEM, ClickType.USE, stack.copy())) {
+				if (ActionManager.notify((ServerPlayerEntity) player, ClickType.USE, What.ItemStack, stack.copy())) {
 					return TypedActionResult.success(ItemStack.EMPTY);
 				}
 			}
