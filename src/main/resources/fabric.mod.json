@@ -1,26 +1,26 @@
 {
   "schemaVersion": 1,
-  "id": "testmod",
+  "id": "actioninventory",
   "version": "${version}",
-  "name": "Test Mod",
-  "description": "This is just a test mod for 1.17",
+  "name": "Action Inventory Mod",
+  "description": "Allows the creation of special inventories that do special things when items are clicked.",
   "authors": [
     "Hoid2"
   ],
   "contributors": [],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/testmod/icon.png",
+  "icon": "assets/actioninventory/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "megaminds.testmod.TestMod"
+      "megaminds.actioninventory.ActionInventoryMod"
     ],
     "client": [],
     "server": []
   },
   "mixins": [
-    "testmod.mixins.json"
+    "actioninventory.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.11.7",
