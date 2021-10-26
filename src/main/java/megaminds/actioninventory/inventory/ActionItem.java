@@ -15,7 +15,6 @@ public class ActionItem {
 	private List<Action> actions;
 	private List<Requirement> requirements;
 	private ItemStack representation;
-	private boolean canView;
 	
 	public int getSlot() {
 		return slot;
@@ -24,14 +23,7 @@ public class ActionItem {
 	public ItemStack getRepresentation(ServerPlayerEntity player) {
 		if (representation==null || requirements==null) return ItemStack.EMPTY;
 		
-		boolean canView = true;
-		for (Requirement r : requirements) {
-			if (r.getWhen()==When.VIEW && !r.pay(player)) {
-				canView = false;
-			}
-		}
-		this.canView = canView;
-		if (!canView) {
+		if (!canView(player)) {
 			return ItemStack.EMPTY;
 		}
 		
@@ -43,8 +35,17 @@ public class ActionItem {
 		return representation;
 	}
 	
+	private boolean canView(ServerPlayerEntity player) {
+		for (Requirement r : requirements) {
+			if (r.getWhen()==When.VIEW && !r.pay(player)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void onClick(ServerPlayerEntity player) {
-		if (!canView || requirements==null || actions==null) return;
+		if (!canView(player) || requirements==null || actions==null) return;
 		
 		boolean canUse = true;
 		for (Requirement r : requirements) {
