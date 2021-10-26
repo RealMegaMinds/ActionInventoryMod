@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Level;
 import com.google.gson.JsonSyntaxException;
 
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.MessageHelper;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;
 import megaminds.actioninventory.inventory.requirements.RequirementStorageManager;
@@ -27,7 +28,7 @@ public class ActionManager {
 	}
 	
 	public static Stream<String> getCommandInventoryNames() {
-		return allInventories.values().stream().filter(i->i.canOpen(null, What.Command, null)).map(i->i.getName());
+		return allInventories.values().stream().filter(i->i.allowsCommand()).map(i->i.getName());
 	}
 	
 	public static void onCreate(ActionInventory inv) {
@@ -39,6 +40,45 @@ public class ActionManager {
 	}
 	public static void onClose(ServerPlayerEntity p, ActionInventory inv) {
 		openInventories.remove(p, inv);
+	}
+	
+	public static boolean onCommand(ServerPlayerEntity player, String invName) {
+		ActionInventory inv = getInventory(invName);
+		if (inv==null) {
+			MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
+		} else if (!inv.allowsCommand()) {
+			MessageHelper.toPlayerMessage(player, MessageHelper.toError("Action Inventory "+invName+" cannot be opened by commands."), true);
+		} else {
+			open(inv, player);
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean onSign(ServerPlayerEntity player, String invName) {
+		ActionInventory inv = getInventory(invName);
+		if (inv==null) {
+			MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
+		} else if (!inv.allowsSign()) {
+			MessageHelper.toPlayerMessage(player, MessageHelper.toError("Action Inventory "+invName+" cannot be opened by signs."), true);
+		} else {
+			open(inv, player);
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean onAction(ServerPlayerEntity player, String invName) {
+		ActionInventory inv = getInventory(invName);
+		if (inv==null) {
+			MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
+		} else if (!inv.allowsAction()) {
+			MessageHelper.toPlayerMessage(player, MessageHelper.toError("Action Inventory "+invName+" cannot be opened by actions."), true);
+		} else {
+			open(inv, player);
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean notify(ServerPlayerEntity player, ClickType click, What what, Object arg) {
@@ -53,12 +93,18 @@ public class ActionManager {
 	public static boolean notify(ActionInventory inv, ServerPlayerEntity player, ClickType click, What what, Object arg) {
 		if (inv==null) {
 			ActionInventoryMod.log(Level.WARN, "Internal Error: Inventory cannot be null");
+			return false;
 		}
-		if (inv!=null && inv.canOpen(click, what, arg)) {
-			player.openHandledScreen(new ActionScreenHandlerFactory(inv));
+		if (inv.canOpen(click, what, arg)) {
+			open(inv, player);
 			return true;
 		}
 		return false;
+	}
+	
+	public static void open(ActionInventory inventory, ServerPlayerEntity player) {
+		if (inventory==null) return;
+		player.openHandledScreen(new ActionScreenHandlerFactory(inventory));
 	}
 	
 	public static void onShutDown(Path worldFolder) {

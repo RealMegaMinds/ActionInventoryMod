@@ -19,6 +19,9 @@ public class ActionInventory implements Inventory {
 	private List<Opener> openers;
 	private Text displayName;
 	private String name;
+	private boolean disableCommand;
+	private boolean disableAction;
+	private boolean disableSign;
 
 	public ActionItem getActionItem(int slot) {
 		if (items==null) return ActionItem.EMPTY;
@@ -28,6 +31,18 @@ public class ActionInventory implements Inventory {
 			}
 		}
 		return ActionItem.EMPTY;
+	}
+	
+	public boolean allowsCommand() {
+		return !disableCommand;
+	}
+
+	public boolean allowsSign() {
+		return !disableSign;
+	}
+
+	public boolean allowsAction() {
+		return !disableAction;
 	}
 
 	public String getName() {

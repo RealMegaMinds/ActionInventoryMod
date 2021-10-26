@@ -18,7 +18,6 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.inventory.ActionManager;
-import megaminds.actioninventory.inventory.openers.Opener.What;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -40,7 +39,7 @@ public class Commands {
 		ServerPlayerEntity player = context.getSource().getPlayer();
 		String name = getString(context, "name");
 		
-		if (ActionManager.notify(ActionManager.getInventory(name), player, null, What.Command, null)) {
+		if (ActionManager.onCommand(player, name)) {
 			return 1;
 		} else {
 			throw CANT_OPEN_EXCEPTION.create(name);
