@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -15,6 +16,7 @@ import com.google.gson.JsonSerializer;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.util.UUIDTypeAdapter;
 
+import megaminds.actioninventory.ExcludeAnnotationExclusionStrategy;
 import megaminds.actioninventory.inventory.actions.Action;
 import megaminds.actioninventory.inventory.actions.ActionSerializer;
 import megaminds.actioninventory.inventory.openers.Opener;
@@ -30,6 +32,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.LowercaseEnumTypeAdapterFactory;
+import net.minecraft.util.math.Vec3i;
 
 public class ActionJsonHelper {
 	public static final Gson GSON;
@@ -70,6 +73,19 @@ public class ActionJsonHelper {
 		}
 	}
 	
+	public static class Vec3iSerializer implements JsonSerializer<Vec3i>, JsonDeserializer<Vec3i> {
+		@Override
+		public Vec3i deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			JsonArray arr = json.getAsJsonArray();
+			return new Vec3i(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+		}
+
+		@Override
+		public JsonElement serialize(Vec3i src, Type typeOfSrc, JsonSerializationContext context) {
+			return context.serialize(new int[] {src.getX(), src.getY(), src.getZ()});
+		}
+	}
+	
 	static {
 		GSON = new GsonBuilder()
 				.setPrettyPrinting()
@@ -84,6 +100,9 @@ public class ActionJsonHelper {
 				.registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
 				.registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
 				.registerTypeHierarchyAdapter(NbtElement.class, new NbtSerializer())
+				.registerTypeHierarchyAdapter(Vec3i.class, new Vec3iSerializer())
+				.addDeserializationExclusionStrategy(ExcludeAnnotationExclusionStrategy.DeserializeStrategy)
+				.addSerializationExclusionStrategy(ExcludeAnnotationExclusionStrategy.SerializeStrategy)
 				.create();
 	}
 }
