@@ -23,6 +23,7 @@ import megaminds.actioninventory.inventory.requirements.Requirement;
 import megaminds.actioninventory.inventory.requirements.RequirementSerializer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.visitor.StringNbtWriter;
 import net.minecraft.text.Style;
@@ -44,16 +45,28 @@ public class ActionJsonHelper {
 	public static class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack> {
 		@Override
 		public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			return ItemStack.fromNbt(context.deserialize(json, NbtCompound.class));
+		}
+
+		@Override
+		public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
+			return context.serialize(src.writeNbt(new NbtCompound()), NbtCompound.class);
+		}
+	}
+	
+	public static class NbtSerializer implements JsonSerializer<NbtElement>, JsonDeserializer<NbtElement> {
+		@Override
+		public NbtElement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 			try {
-				return ItemStack.fromNbt(StringNbtReader.parse(json.getAsString()));
+				return StringNbtReader.parse(json.getAsString());
 			} catch (CommandSyntaxException e) {
 				throw new JsonParseException(e);
 			}
 		}
 
 		@Override
-		public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
-			return new JsonPrimitive(new StringNbtWriter().apply(src.writeNbt(new NbtCompound())));
+		public JsonElement serialize(NbtElement src, Type typeOfSrc, JsonSerializationContext context) {
+			return new JsonPrimitive(new StringNbtWriter().apply(src));
 		}
 	}
 	
@@ -70,6 +83,7 @@ public class ActionJsonHelper {
 				.registerTypeHierarchyAdapter(Style.class, new Style.Serializer())
 				.registerTypeAdapterFactory(new LowercaseEnumTypeAdapterFactory())
 				.registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
+				.registerTypeHierarchyAdapter(NbtElement.class, new NbtSerializer())
 				.create();
 	}
 }
