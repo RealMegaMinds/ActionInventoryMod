@@ -4,8 +4,8 @@ public class BooleanOpener extends Opener {
 	private boolean isAllowed;
 
 	@Override
-	public boolean canOpen(Object o, ClickType click, What when) {
-		return isValidWhat(when)&&isAllowed;
+	public boolean canOpen(Object o, ClickType click, What what) {
+		return isValidWhat(what)&&isAllowed&& (what==What.Sign?isValidClick(click):true);
 	}
 
 	@Override

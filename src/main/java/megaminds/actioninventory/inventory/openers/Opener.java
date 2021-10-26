@@ -5,7 +5,7 @@ import megaminds.actioninventory.inventory.openers.Opener.Type;
 
 public abstract class Opener extends Typed<Type> {
 	public enum Type {
-		NAME(NameOpener.class), TAG(TagOpener.class), NBT(NbtOpener.class), POS(PosOpener.class), TYPE(TypeOpener.class), UUID(UUIDOpener.class), TEAM(TeamOpener.class), BOOLEAN(BooleanOpener.class), SIGN(SignOpener.class);
+		NAME(NameOpener.class), TAG(TagOpener.class), NBT(NbtOpener.class), POS(PosOpener.class), TYPE(TypeOpener.class), UUID(UUIDOpener.class), TEAM(TeamOpener.class), BOOLEAN(BooleanOpener.class);
 		public final Class<? extends Opener> clazz;
 		private Type(Class<? extends Opener> clazz) {
 			this.clazz = clazz;
