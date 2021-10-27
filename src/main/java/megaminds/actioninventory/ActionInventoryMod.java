@@ -13,9 +13,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import megaminds.actioninventory.callbacks.SignFinishCallback;
 import megaminds.actioninventory.commands.Commands;
-import megaminds.actioninventory.inventory.ActionManager;
+import megaminds.actioninventory.inventory.helpers.ActionManager;
 import megaminds.actioninventory.listeners.BlockListener;
 import megaminds.actioninventory.listeners.EntityListener;
 import megaminds.actioninventory.listeners.ItemListener;
@@ -45,13 +44,13 @@ public class ActionInventoryMod implements ModInitializer {
 		
 		CommandRegistrationCallback.EVENT.register(Commands::register);
 		UseItemCallback.EVENT.register(ItemListener::onItemUse);
-		SignFinishCallback.EVENT.register(SignListener::onSignChange);
-		UseBlockCallback.EVENT.register(SignListener::onSignUse);
+		UseBlockCallback.EVENT.register(SignListener::onSignBlockUse);
 		UseBlockCallback.EVENT.register(BlockListener::onBlockUse);
 		AttackBlockCallback.EVENT.register(BlockListener::onBlockAttack);
-		AttackBlockCallback.EVENT.register(SignListener::onSignAttack);
+		AttackBlockCallback.EVENT.register(SignListener::onSignBlockAttack);
 		UseEntityCallback.EVENT.register(EntityListener::onEntityUse);
 		AttackEntityCallback.EVENT.register(EntityListener::onEntityAttack);
+		
 				
 		info("Initialized");
 	}
@@ -61,6 +60,7 @@ public class ActionInventoryMod implements ModInitializer {
 	}
 
 	public static void log(Level level, String message){
-		LOGGER.log(level, "["+MOD_NAME+"] " + message);
+		LOGGER.log(level, message);
+//		LOGGER.log(level, "["+MOD_NAME+"] " + message);
 	}
 }
