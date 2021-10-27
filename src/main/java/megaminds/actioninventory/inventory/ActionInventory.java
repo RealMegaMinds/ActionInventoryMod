@@ -56,7 +56,7 @@ public class ActionInventory implements Inventory {
 
 	public boolean canOpen(ClickType click, What what, Object arg) {
 		for (Opener o : openers) {
-			if (o.canOpen(o, click, what)) {
+			if (o.canOpen(arg, click, what)) {
 				return true;
 			}
 		}
