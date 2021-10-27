@@ -3,7 +3,7 @@
   "id": "actioninventory",
   "version": "${version}",
   "name": "Action Inventory Mod",
-  "description": "Allows the creation of special inventories that do special things when items are clicked.",
+  "description": "Allows the creation of special inventories that do things when items are clicked.",
   "authors": [
     "Hoid2"
   ],
@@ -19,9 +19,6 @@
     "client": [],
     "server": []
   },
-  "mixins": [
-    "actioninventory.mixins.json"
-  ],
   "depends": {
     "fabricloader": ">=0.11.7",
     "fabric": "*"
