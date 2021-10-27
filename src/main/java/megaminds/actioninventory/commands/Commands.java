@@ -17,7 +17,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.inventory.ActionManager;
+import megaminds.actioninventory.inventory.helpers.ActionManager;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -31,8 +31,10 @@ public class Commands {
 		return CommandSource.suggestMatching(ActionManager.getCommandInventoryNames(), builder);
 	};
 	
+	public static final String COMMAND_START = ActionInventoryMod.MOD_ID;
+
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean isDedicated) {
-		dispatcher.register(literal(ActionInventoryMod.MOD_ID).then(argument("name", string()).suggests(SUGGESTER).executes(Commands::execute)));
+		dispatcher.register(literal(COMMAND_START).then(argument("name", string()).suggests(SUGGESTER).executes(Commands::execute)));
 	}
 
 	private static int execute(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

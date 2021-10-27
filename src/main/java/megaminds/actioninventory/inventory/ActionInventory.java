@@ -3,6 +3,7 @@ package megaminds.actioninventory.inventory;
 import java.util.List;
 import java.util.Set;
 
+import megaminds.actioninventory.inventory.helpers.ActionManager;
 import megaminds.actioninventory.inventory.openers.Opener;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;

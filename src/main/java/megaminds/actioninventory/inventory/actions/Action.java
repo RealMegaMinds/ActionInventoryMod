@@ -1,12 +1,12 @@
 package megaminds.actioninventory.inventory.actions;
 
-import megaminds.actioninventory.inventory.Typed;
 import megaminds.actioninventory.inventory.actions.Action.Type;
 import megaminds.actioninventory.inventory.actions.messaging.ToAllMessageAction;
 import megaminds.actioninventory.inventory.actions.messaging.ToMultiMessageAction;
 import megaminds.actioninventory.inventory.actions.messaging.ToPlayerMessageAction;
 import megaminds.actioninventory.inventory.actions.messaging.ToServerMessageAction;
 import megaminds.actioninventory.inventory.actions.messaging.ToSingleMessageAction;
+import megaminds.actioninventory.inventory.helpers.Typed;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**

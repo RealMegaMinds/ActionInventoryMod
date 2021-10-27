@@ -1,4 +1,4 @@
-package megaminds.actioninventory.inventory;
+package megaminds.actioninventory.inventory.helpers;
 
 public abstract class Typed<T extends Enum<T>> {
 	private final T type = getTypeInternal();

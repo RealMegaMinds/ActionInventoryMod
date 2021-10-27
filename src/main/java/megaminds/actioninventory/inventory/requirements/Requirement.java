@@ -1,6 +1,6 @@
 package megaminds.actioninventory.inventory.requirements;
 
-import megaminds.actioninventory.inventory.Typed;
+import megaminds.actioninventory.inventory.helpers.Typed;
 import megaminds.actioninventory.inventory.requirements.Requirement.Type;
 import net.minecraft.server.network.ServerPlayerEntity;
 

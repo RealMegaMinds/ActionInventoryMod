@@ -1,6 +1,6 @@
 package megaminds.actioninventory.inventory.openers;
 
-import megaminds.actioninventory.inventory.Typed;
+import megaminds.actioninventory.inventory.helpers.Typed;
 import megaminds.actioninventory.inventory.openers.Opener.Type;
 
 public abstract class Opener extends Typed<Type> {

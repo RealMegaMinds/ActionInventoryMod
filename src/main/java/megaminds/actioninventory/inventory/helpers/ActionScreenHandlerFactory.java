@@ -1,5 +1,6 @@
-package megaminds.actioninventory.inventory;
+package megaminds.actioninventory.inventory.helpers;
 
+import megaminds.actioninventory.inventory.ActionInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.NamedScreenHandlerFactory;

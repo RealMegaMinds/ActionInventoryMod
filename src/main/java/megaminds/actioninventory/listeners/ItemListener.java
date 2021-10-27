@@ -1,6 +1,6 @@
 package megaminds.actioninventory.listeners;
 
-import megaminds.actioninventory.inventory.ActionManager;
+import megaminds.actioninventory.inventory.helpers.ActionManager;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;
 import net.minecraft.entity.player.PlayerEntity;

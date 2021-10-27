@@ -1,4 +1,4 @@
-package megaminds.actioninventory.inventory;
+package megaminds.actioninventory.inventory.helpers;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +13,7 @@ import com.google.gson.JsonSyntaxException;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.MessageHelper;
+import megaminds.actioninventory.inventory.ActionInventory;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;
 import megaminds.actioninventory.inventory.requirements.RequirementStorageManager;

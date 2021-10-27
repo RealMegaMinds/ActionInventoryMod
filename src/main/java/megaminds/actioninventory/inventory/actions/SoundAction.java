@@ -1,14 +1,15 @@
 package megaminds.actioninventory.inventory.actions;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 /**
  * This plays a sound
  */
 public class SoundAction extends Action {
 	/** The sound to play*/
-	private SoundEvent sound;
+	private Identifier sound;
 	/** The pitch of the sound*/
 	private float pitch;
 	/** The volume of the sound*/
@@ -16,7 +17,7 @@ public class SoundAction extends Action {
 
 	@Override
 	public void execute(ServerPlayerEntity player) {
-		player.playSound(sound, volume, pitch);
+		player.playSound(Registry.SOUND_EVENT.get(sound), volume, pitch);
 	}
 	@Override
 	protected Type getTypeInternal() {

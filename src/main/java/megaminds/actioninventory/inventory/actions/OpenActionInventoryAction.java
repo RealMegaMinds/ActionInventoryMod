@@ -1,7 +1,7 @@
 package megaminds.actioninventory.inventory.actions;
 
 import megaminds.actioninventory.inventory.ActionInventory;
-import megaminds.actioninventory.inventory.ActionManager;
+import megaminds.actioninventory.inventory.helpers.ActionManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
