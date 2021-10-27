@@ -47,7 +47,6 @@ public class ActionInventoryMod implements ModInitializer {
 		UseBlockCallback.EVENT.register(SignListener::onSignBlockUse);
 		UseBlockCallback.EVENT.register(BlockListener::onBlockUse);
 		AttackBlockCallback.EVENT.register(BlockListener::onBlockAttack);
-		AttackBlockCallback.EVENT.register(SignListener::onSignBlockAttack);
 		UseEntityCallback.EVENT.register(EntityListener::onEntityUse);
 		AttackEntityCallback.EVENT.register(EntityListener::onEntityAttack);
 		
