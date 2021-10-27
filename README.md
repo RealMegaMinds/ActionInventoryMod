@@ -1,5 +1,8 @@
 # ActionInventoryMod
-A Minecraft mod that allows the creation of special inventories that can do different things when items are clicked.
+**This is a server only mod** (works on both dedicated and single player servers)
+
+
+A Fabric Minecraft mod that allows the creation of special inventories that can do different things when items are clicked.
 
 An ActionInventory is composed of Openers (which say when the invventory should open) and ActionItems (displayed as ItemStacks). ActionItems are composed of requirements (which determine whether a player can view or use an ActionItem) and Actions (which do things such as executing commands and giving items).
 
