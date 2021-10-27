@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
@@ -23,6 +24,7 @@ import megaminds.actioninventory.inventory.openers.Opener;
 import megaminds.actioninventory.inventory.openers.OpenerSerializer;
 import megaminds.actioninventory.inventory.requirements.Requirement;
 import megaminds.actioninventory.inventory.requirements.RequirementSerializer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -33,6 +35,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.LowercaseEnumTypeAdapterFactory;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.registry.Registry;
 
 public class ActionJsonHelper {
 	public static final Gson GSON;
@@ -48,12 +51,21 @@ public class ActionJsonHelper {
 	public static class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack> {
 		@Override
 		public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-			return ItemStack.fromNbt(context.deserialize(json, NbtCompound.class));
+			JsonObject obj = json.getAsJsonObject();
+			int count = obj.get("count").getAsInt();
+			Item item = Registry.ITEM.get((Identifier) context.deserialize(obj.get("item"), Identifier.class));
+			ItemStack stack = new ItemStack(item, count);
+			stack.setNbt(context.deserialize(obj.get("nbt"), NbtCompound.class));
+			return stack;
 		}
 
 		@Override
 		public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context) {
-			return context.serialize(src.writeNbt(new NbtCompound()), NbtCompound.class);
+			JsonObject obj = new JsonObject();
+			obj.addProperty("count", src.getCount());
+			obj.add("item", context.serialize(Registry.ITEM.getId(src.getItem())));
+			obj.add("nbt", context.serialize(src.getNbt()));
+			return obj;
 		}
 	}
 
