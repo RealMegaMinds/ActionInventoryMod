@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "megaminds.actioninventory.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "SignEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

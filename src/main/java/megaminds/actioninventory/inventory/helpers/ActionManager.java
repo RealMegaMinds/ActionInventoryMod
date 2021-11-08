@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -30,6 +31,10 @@ public class ActionManager {
 	
 	public static Stream<String> getCommandInventoryNames() {
 		return allInventories.values().stream().filter(i->i.allowsCommand()).map(i->i.getName());
+	}
+	
+	public static Stream<String> getSignInventoryNames() {
+		return allInventories.values().stream().filter(i->i.allowsSign()).map(i->i.getName());
 	}
 	
 	public static void onCreate(ActionInventory inv) {
@@ -103,8 +108,10 @@ public class ActionManager {
 		return false;
 	}
 	
-	public static void open(ActionInventory inventory, ServerPlayerEntity player) {
-		if (inventory==null) return;
+	/**
+	 * This actually opens an inventory and doesn't perform any checks.
+	 */
+	public static void open(@NotNull ActionInventory inventory, ServerPlayerEntity player) {
 		player.openHandledScreen(new ActionScreenHandlerFactory(inventory));
 	}
 	

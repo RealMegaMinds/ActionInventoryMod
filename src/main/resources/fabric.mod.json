@@ -19,6 +19,9 @@
     "client": [],
     "server": []
   },
+  "mixins": [
+    "actioninventory.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=0.11.7",
     "fabric": "*"
