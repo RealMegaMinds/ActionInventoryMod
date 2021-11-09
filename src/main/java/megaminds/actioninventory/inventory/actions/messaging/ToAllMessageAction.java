@@ -8,7 +8,7 @@ import net.minecraft.text.MutableText;
 /**
  * Broadcasts a message to all players
  */
-public class ToAllMessageAction extends Action {
+public class ToAllMessageAction implements Action {
 	/**The message to send*/
 	private MutableText msg;
 	/**True - send a system message<br>
@@ -18,10 +18,5 @@ public class ToAllMessageAction extends Action {
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.broadcastMessage(player, msg, fromServer);
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.AllMessage;
 	}
 }

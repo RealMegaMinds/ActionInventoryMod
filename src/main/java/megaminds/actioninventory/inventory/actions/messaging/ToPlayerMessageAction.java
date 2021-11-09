@@ -8,7 +8,7 @@ import net.minecraft.text.MutableText;
 /**
  * Sends a message to the player that activated this action
  */
-public class ToPlayerMessageAction extends Action {
+public class ToPlayerMessageAction implements Action {
 	/**The message to send*/
 	private MutableText msg;
 	/**True - the message is from the server
@@ -18,10 +18,5 @@ public class ToPlayerMessageAction extends Action {
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.toPlayerMessage(player, msg, fromServer);
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.PlayerMessage;
 	}
 }

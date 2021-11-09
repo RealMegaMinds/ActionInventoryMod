@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 /**
  * This plays a sound
  */
-public class SoundAction extends Action {
+public class SoundAction implements Action {
 	/** The sound to play*/
 	private Identifier sound;
 	/** The pitch of the sound*/
@@ -19,9 +19,5 @@ public class SoundAction extends Action {
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound, SoundCategory.PLAYERS, player.getPos(), volume, pitch));
-	}
-	@Override
-	protected Type getTypeInternal() {
-		return Type.Sound;
 	}
 }

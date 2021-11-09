@@ -11,7 +11,7 @@ import net.minecraft.text.MutableText;
 /**
  * Sends a message to multiple players
  */
-public class ToMultiMessageAction extends Action {
+public class ToMultiMessageAction implements Action {
 	/**The message to send*/
 	private MutableText msg;
 	/**The users to send the message to*/
@@ -23,10 +23,5 @@ public class ToMultiMessageAction extends Action {
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.multiMessage(player, msg, to, fromServer);
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.MultiMessage;
 	}
 }

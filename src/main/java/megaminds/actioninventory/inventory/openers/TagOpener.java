@@ -8,7 +8,7 @@ import net.minecraft.tag.EntityTypeTags;
 import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 
-public class TagOpener extends Opener {
+public class TagOpener extends BaseOpener {
 	private Identifier tag;
 
 	@Override
@@ -23,10 +23,5 @@ public class TagOpener extends Opener {
 			return EntityTypeTags.getTagGroup().getTagsFor(((Entity)o).getType()).contains(o);
 		}
 		return false;
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.TAG;
 	}
 }

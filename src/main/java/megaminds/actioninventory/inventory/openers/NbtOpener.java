@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 
-public class NbtOpener extends Opener {
+public class NbtOpener extends BaseOpener {
 	private String key;
 	private NbtElement value;
 	private boolean onlyCheckPresence;
@@ -33,10 +33,5 @@ public class NbtOpener extends Opener {
 		} else {
 			return data.contains(key) && data.get(key).equals(value);
 		}
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.NBT;
 	}
 }

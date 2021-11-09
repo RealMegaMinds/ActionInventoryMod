@@ -14,7 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
  * @see GiveAction
  * @see OpenActionInventoryAction
  */
-public class CommandAction extends Action {
+public class CommandAction implements Action {
 	/**The command to execute*/
 	private String command;
 	/**True - the command will be executed by the server<br>
@@ -39,10 +39,5 @@ public class CommandAction extends Action {
 		} else {
 			MessageHelper.executeCommand(player, command, true);
 		}
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.Command;
 	}
 }

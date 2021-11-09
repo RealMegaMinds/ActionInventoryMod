@@ -10,7 +10,7 @@ import net.minecraft.text.MutableText;
 /**
  * Sends a message to a single player
  */
-public class ToSingleMessageAction extends Action {
+public class ToSingleMessageAction implements Action {
 	/**The message to send*/
 	private MutableText msg;
 	/**The player to send the message to*/
@@ -22,10 +22,5 @@ public class ToSingleMessageAction extends Action {
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.singleMessage(player, msg, to, fromServer);
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.SingleMessage;
 	}
 }

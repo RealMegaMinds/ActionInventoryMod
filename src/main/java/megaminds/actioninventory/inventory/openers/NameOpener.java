@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
-public class NameOpener extends Opener {
+public class NameOpener extends BaseOpener {
 	private MutableText name;
 	private boolean onlyChecksText;
 	private boolean useCustom;
@@ -39,10 +39,5 @@ public class NameOpener extends Opener {
 		} else {
 			return name.equals(t);
 		}
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.NAME;
 	}
 }

@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 
-public class UUIDOpener extends Opener {
+public class UUIDOpener extends BaseOpener {
 	private UUID uuid;
 
 	@Override
@@ -15,10 +15,5 @@ public class UUIDOpener extends Opener {
 			return isValidClick(click) && ((Entity)o).getUuid().equals(uuid);
 		}
 		return false;
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.UUID;
 	}
 }

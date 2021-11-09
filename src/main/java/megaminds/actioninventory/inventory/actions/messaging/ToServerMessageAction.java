@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 /**
  * Logs a message to the server
  */
-public class ToServerMessageAction extends Action {
+public class ToServerMessageAction implements Action {
 	/**The message to send*/
 	private Text message;
 	/**True - the message is from the player
@@ -18,10 +18,5 @@ public class ToServerMessageAction extends Action {
 	@Override
 	public void execute(ServerPlayerEntity player) {
 		MessageHelper.logMessage(player, message, fromPlayer);
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.ServerMessage;
 	}
 }

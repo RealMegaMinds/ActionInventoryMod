@@ -4,7 +4,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 
-public class PosOpener extends Opener {
+public class PosOpener extends BaseOpener {
 	private BlockPos pos;
 
 	@Override
@@ -17,10 +17,5 @@ public class PosOpener extends Opener {
 			return ((Entity)o).getBlockPos().equals(pos);
 		}
 		return false;
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.POS;
 	}
 }

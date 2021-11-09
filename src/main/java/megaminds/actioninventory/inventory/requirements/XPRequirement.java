@@ -2,7 +2,7 @@ package megaminds.actioninventory.inventory.requirements;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class XPRequirement extends Requirement {
+public class XPRequirement extends BaseRequirement {
 	private int requiredCost;
 	private boolean consumes;
 	private boolean allowPartial;
@@ -26,11 +26,6 @@ public class XPRequirement extends Requirement {
 			RequirementStorageManager.setPayment(this, player, paid+level);
 		}
 		return false;
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.XP;
 	}
 
 	@Override

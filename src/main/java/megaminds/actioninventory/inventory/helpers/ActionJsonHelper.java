@@ -17,13 +17,14 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.util.UUIDTypeAdapter;
 
 import megaminds.actioninventory.ExcludeAnnotationExclusionStrategy;
+import megaminds.actioninventory.TypeSerializer;
 import megaminds.actioninventory.inventory.ActionInventory;
 import megaminds.actioninventory.inventory.actions.Action;
-import megaminds.actioninventory.inventory.actions.ActionSerializer;
+import megaminds.actioninventory.inventory.actions.ActionManager;
 import megaminds.actioninventory.inventory.openers.Opener;
-import megaminds.actioninventory.inventory.openers.OpenerSerializer;
+import megaminds.actioninventory.inventory.openers.OpenerManager;
 import megaminds.actioninventory.inventory.requirements.Requirement;
-import megaminds.actioninventory.inventory.requirements.RequirementSerializer;
+import megaminds.actioninventory.inventory.requirements.RequirementManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -102,9 +103,9 @@ public class ActionJsonHelper {
 		GSON = ExcludeAnnotationExclusionStrategy.newBuilder()
 				.setPrettyPrinting()
 				.disableHtmlEscaping()
-				.registerTypeAdapter(Action.class, new ActionSerializer())
-				.registerTypeAdapter(Requirement.class, new RequirementSerializer())
-				.registerTypeAdapter(Opener.class, new OpenerSerializer())
+				.registerTypeAdapter(Opener.class, new TypeSerializer<Opener>(OpenerManager.INSTANCE))
+				.registerTypeAdapter(Action.class, new TypeSerializer<Action>(ActionManager.INSTANCE))
+				.registerTypeAdapter(Requirement.class, new TypeSerializer<Requirement>(RequirementManager.INSTANCE))
 				.registerTypeHierarchyAdapter(Text.class, new Text.Serializer())
 				.registerTypeAdapter(UUID.class, new UUIDTypeAdapter())
 				.registerTypeAdapter(Identifier.class, new Identifier.Serializer())

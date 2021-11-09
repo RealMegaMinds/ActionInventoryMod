@@ -3,7 +3,7 @@ package megaminds.actioninventory.inventory.openers;
 import net.minecraft.entity.Entity;
 import net.minecraft.scoreboard.AbstractTeam;
 
-public class TeamOpener extends Opener {
+public class TeamOpener extends BaseOpener {
 	private String teamName;
 
 	@Override
@@ -15,10 +15,5 @@ public class TeamOpener extends Opener {
 			return isValidClick(click) && team!=null && team.getName().equals(teamName);
 		}
 		return false;
-	}
-
-	@Override
-	protected Type getTypeInternal() {
-		return Type.TEAM;
 	}
 }
