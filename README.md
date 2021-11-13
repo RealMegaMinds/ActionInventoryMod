@@ -10,3 +10,22 @@ Checkout the wiki on how to create the inventories and for specifics on what can
 
 
 This mod is similar to the [Chest Commands](https://dev.bukkit.org/projects/chest-commands) bukkit plugin.
+
+### Some Planned Features
+* more requirement types
+    * items
+    * money
+    * energy
+    * liquids
+    * advancement
+    * location/dimension
+    * kill
+* more action types
+     * rewards
+      * xp
+      * choice
+      * random
+      * loot
+* quest-like alternative
+* special display for clients with the mod
+
