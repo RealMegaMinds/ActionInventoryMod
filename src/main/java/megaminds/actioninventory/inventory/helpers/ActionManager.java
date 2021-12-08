@@ -42,7 +42,11 @@ public class ActionManager {
 		allInventories.put(inv.getName(), inv);
 	}
 	public static void onOpen(ServerPlayerEntity p, ActionInventory inv) {
-		openInventories.put(p, inv);
+		if (inv==null) {
+			openInventories.remove(p);
+		} else {
+			openInventories.put(p, inv);
+		}
 	}
 	public static void onClose(ServerPlayerEntity p, ActionInventory inv) {
 		openInventories.remove(p, inv);
