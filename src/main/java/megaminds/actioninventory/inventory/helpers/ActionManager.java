@@ -14,7 +14,7 @@ import com.google.gson.JsonSyntaxException;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.MessageHelper;
-import megaminds.actioninventory.inventory.ActionInventory;
+import megaminds.actioninventory.inventory.ActionInventoryImpl;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;
 import megaminds.actioninventory.inventory.requirements.RequirementStorageManager;
@@ -22,10 +22,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ActionManager {
 	private static final String INVENTORY_FOLDER = "action inventories";
-	private static final Map<String, ActionInventory> allInventories = new HashMap<>();
-	private static final Map<ServerPlayerEntity, ActionInventory> openInventories = new HashMap<>();
+	private static final Map<String, ActionInventoryImpl> allInventories = new HashMap<>();
+	private static final Map<ServerPlayerEntity, ActionInventoryImpl> openInventories = new HashMap<>();
 
-	public static ActionInventory getInventory(String name) {
+	public static ActionInventoryImpl getInventory(String name) {
 		return allInventories.get(name);
 	}
 	
@@ -37,23 +37,23 @@ public class ActionManager {
 		return allInventories.values().stream().filter(i->i.allowsSign()).map(i->i.getName());
 	}
 	
-	public static void onCreate(ActionInventory inv) {
+	public static void onCreate(ActionInventoryImpl inv) {
 		if (inv==null) return;
 		allInventories.put(inv.getName(), inv);
 	}
-	public static void onOpen(ServerPlayerEntity p, ActionInventory inv) {
+	public static void onOpen(ServerPlayerEntity p, ActionInventoryImpl inv) {
 		if (inv==null) {
 			openInventories.remove(p);
 		} else {
 			openInventories.put(p, inv);
 		}
 	}
-	public static void onClose(ServerPlayerEntity p, ActionInventory inv) {
+	public static void onClose(ServerPlayerEntity p, ActionInventoryImpl inv) {
 		openInventories.remove(p, inv);
 	}
 	
 	public static boolean onCommand(ServerPlayerEntity player, String invName) {
-		ActionInventory inv = getInventory(invName);
+		ActionInventoryImpl inv = getInventory(invName);
 		if (inv==null) {
 			MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
 		} else if (!inv.allowsCommand()) {
@@ -66,7 +66,7 @@ public class ActionManager {
 	}
 	
 	public static boolean onSign(ServerPlayerEntity player, String invName) {
-		ActionInventory inv = getInventory(invName);
+		ActionInventoryImpl inv = getInventory(invName);
 		if (inv==null) {
 			MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
 		} else if (!inv.allowsSign()) {
@@ -79,7 +79,7 @@ public class ActionManager {
 	}
 	
 	public static boolean onAction(ServerPlayerEntity player, String invName) {
-		ActionInventory inv = getInventory(invName);
+		ActionInventoryImpl inv = getInventory(invName);
 		if (inv==null) {
 			MessageHelper.toPlayerMessage(player, MessageHelper.toError("No Action Inventory Called: "+invName), true);
 		} else if (!inv.allowsAction()) {
@@ -92,7 +92,7 @@ public class ActionManager {
 	}
 	
 	public static boolean notify(ServerPlayerEntity player, ClickType click, What what, Object arg) {
-		for (ActionInventory inv : allInventories.values()) {
+		for (ActionInventoryImpl inv : allInventories.values()) {
 			if (notify(inv, player, click, what, arg)) {
 				return true;
 			}
@@ -100,7 +100,7 @@ public class ActionManager {
 		return false;
 	}
 	
-	public static boolean notify(ActionInventory inv, ServerPlayerEntity player, ClickType click, What what, Object arg) {
+	public static boolean notify(ActionInventoryImpl inv, ServerPlayerEntity player, ClickType click, What what, Object arg) {
 		if (inv==null) {
 			ActionInventoryMod.log(Level.WARN, "Internal Error: Inventory cannot be null");
 			return false;
@@ -115,7 +115,7 @@ public class ActionManager {
 	/**
 	 * This actually opens an inventory and doesn't perform any checks.
 	 */
-	public static void open(@NotNull ActionInventory inventory, ServerPlayerEntity player) {
+	public static void open(@NotNull ActionInventoryImpl inventory, ServerPlayerEntity player) {
 		player.openHandledScreen(new ActionScreenHandlerFactory(inventory));
 	}
 	

@@ -1,6 +1,6 @@
 package megaminds.actioninventory.inventory.helpers;
 
-import megaminds.actioninventory.inventory.ActionInventory;
+import megaminds.actioninventory.inventory.ActionInventoryImpl;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -10,10 +10,10 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ActionScreenHandler extends ScreenHandler {
-	private ActionInventory inventory;
+	private ActionInventoryImpl inventory;
 	private ServerPlayerEntity player;
 
-	protected ActionScreenHandler(ActionInventory inventory, ServerPlayerEntity player, int syncId) {
+	protected ActionScreenHandler(ActionInventoryImpl inventory, ServerPlayerEntity player, int syncId) {
 		super(getType(inventory.getRows()), syncId);
 		int rows = inventory.getRows();
 		checkSize(inventory, rows * 9);
@@ -177,7 +177,7 @@ public class ActionScreenHandler extends ScreenHandler {
 		return !(slot instanceof ActionItemSlot);
 	}
 
-	private static ScreenHandlerType<?> getType(int rows) {
+	protected static ScreenHandlerType<?> getType(int rows) {
 		switch (rows) {
 		case 1:
 			return ScreenHandlerType.GENERIC_9X1;

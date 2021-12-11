@@ -1,14 +1,14 @@
 package megaminds.actioninventory.inventory.actions;
 
-import megaminds.actioninventory.inventory.ActionInventory;
+import megaminds.actioninventory.inventory.ActionInventoryImpl;
 import megaminds.actioninventory.inventory.helpers.ActionManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
- * This opens an {@link ActionInventory} screen
+ * This opens an {@link ActionInventoryImpl} screen
  */
 public class OpenActionInventoryAction implements Action {
-	/** The name of the {@link ActionInventory}*/
+	/** The name of the {@link ActionInventoryImpl}*/
 	private String name;
 	
 	@Override

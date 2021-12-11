@@ -2,8 +2,8 @@ package megaminds.actioninventory.inventory.helpers;
 
 import java.util.Optional;
 
-import megaminds.actioninventory.inventory.ActionInventory;
-import megaminds.actioninventory.inventory.ActionItem;
+import megaminds.actioninventory.api.ActionItem;
+import megaminds.actioninventory.api.gui.ActionInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;

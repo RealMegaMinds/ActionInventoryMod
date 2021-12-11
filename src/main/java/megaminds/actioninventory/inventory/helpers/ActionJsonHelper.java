@@ -18,7 +18,7 @@ import com.mojang.util.UUIDTypeAdapter;
 
 import megaminds.actioninventory.ExcludeAnnotationExclusionStrategy;
 import megaminds.actioninventory.TypeSerializer;
-import megaminds.actioninventory.inventory.ActionInventory;
+import megaminds.actioninventory.inventory.ActionInventoryImpl;
 import megaminds.actioninventory.inventory.actions.Action;
 import megaminds.actioninventory.inventory.actions.ActionManager;
 import megaminds.actioninventory.inventory.openers.Opener;
@@ -45,8 +45,8 @@ public class ActionJsonHelper {
 		return GSON.toJson(o);
 	}
 
-	public static ActionInventory fromJson(String json) {
-		return GSON.fromJson(json, ActionInventory.class);
+	public static ActionInventoryImpl fromJson(String json) {
+		return GSON.fromJson(json, ActionInventoryImpl.class);
 	}
 
 	public static class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack> {
