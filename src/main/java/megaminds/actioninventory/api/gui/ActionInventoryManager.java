@@ -2,8 +2,8 @@ package megaminds.actioninventory.api.gui;
 
 import java.util.Set;
 
-import megaminds.actioninventory.api.actionobjects.ActionInventory;
-import megaminds.actioninventory.api.actionobjects.ActionObjectHandler;
+import megaminds.actioninventory.api.base.ActionInventory;
+import megaminds.actioninventory.api.base.ActionObjectHandler;
 import megaminds.actioninventory.api.helper.ObjectId;
 import net.minecraft.util.Identifier;
 

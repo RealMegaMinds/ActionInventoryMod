@@ -1,4 +1,4 @@
-package megaminds.actioninventory.api.actionobjects;
+package megaminds.actioninventory.api.base;
 
 import java.util.List;
 
@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.Helper;
+import megaminds.actioninventory.api.actionobjects.ActionObject;
+import megaminds.actioninventory.api.actionobjects.Requirement;
 import megaminds.actioninventory.api.helper.ObjectId;
 import net.minecraft.util.Identifier;
 
@@ -32,11 +34,11 @@ public class ActionItem extends ActionObject {
 
 	@Override
 	public void deleteChild(ObjectId child) {
-		if (requirement!=null && child.equals(requirement.getFullId())) {
+		if (requirement!=null && child.equals(requirement.getId())) {
 			requirement = null;
 			return;
 		}
-		Helper.removeFirst(actions, a->child.equals(a.getFullId()));
+		Helper.removeFirst(actions, a->child.equals(a.getId()));
 	}
 
 	@Override
