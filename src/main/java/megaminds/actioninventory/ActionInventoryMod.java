@@ -2,6 +2,7 @@ package megaminds.actioninventory;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.WorldSavePath;
 
@@ -13,7 +14,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import megaminds.actioninventory.api.gui.ActionInventoryManager;
+import megaminds.actioninventory.api.base.ActionObjectHandler;
 
 public class ActionInventoryMod implements ModInitializer {
 
@@ -22,21 +23,24 @@ public class ActionInventoryMod implements ModInitializer {
 	public static final String MOD_NAME = "Action Inventory Mod";
 
 	private static MinecraftServer currentServer;
-	private static Path ROOT_DIR;
+	private static Path GLOBAL_DIR;
+	private static Path SERVER_DIR;
 	
 	@Override
 	public void onInitialize() {
 		info("Initializing");
 		
+		GLOBAL_DIR = FabricLoader.getInstance().getGameDir().resolve(MOD_ID);
+		
 		ServerLifecycleEvents.SERVER_STARTED.register((server)->{
 			currentServer = server;
-			ROOT_DIR = server.getSavePath(WorldSavePath.ROOT).resolve(MOD_ID);
+			SERVER_DIR = server.getSavePath(WorldSavePath.ROOT).resolve(MOD_ID);
 			if (checkDir()) {
-				ActionInventoryManager.load();
+				ActionObjectHandler.load();
 			}
 		});
 		ServerLifecycleEvents.SERVER_STOPPED.register((server)->{
-			ActionInventoryManager.stop(checkDir());
+			ActionObjectHandler.stop(checkDir());
 			currentServer = null;
 			ROOT_DIR = null;
 		});
@@ -55,8 +59,17 @@ public class ActionInventoryMod implements ModInitializer {
 		return currentServer;
 	}
 	
-	public static Path getModRootDir() {
-		return ROOT_DIR;
+	public static Path createDir(Path p) {
+		if (Files.notExists(p)) {
+			try {
+				Files.createDirectory(p);
+			} catch (IOException e) {
+				log(Level.WARN, "Couldn't create directory: "+p);
+				e.printStackTrace();
+				return null;
+			}
+		}
+		return p;
 	}
 	
 	public static void info(String message) {
@@ -65,25 +78,5 @@ public class ActionInventoryMod implements ModInitializer {
 
 	public static void log(Level level, String message){
 		LOGGER.log(level, message);
-	}
-	
-	private boolean checkDir() {
-		if (ROOT_DIR==null) return false;
-		
-		if (Files.notExists(ROOT_DIR)) {
-			try {
-				Files.createDirectory(ROOT_DIR);
-			} catch (IOException e) {
-				log(Level.WARN, "Couldn't create mod directory: ");
-				e.printStackTrace();
-				ROOT_DIR = null;
-				return false;
-			}
-		}
-		if (!Files.isDirectory(ROOT_DIR)) {
-			log(Level.WARN, "Path: "+ROOT_DIR.toString()+" needs to be a directory.");
-			return false;
-		}
-		return true;
 	}
 }

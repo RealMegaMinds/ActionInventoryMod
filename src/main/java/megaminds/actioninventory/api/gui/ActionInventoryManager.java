@@ -4,7 +4,7 @@ import java.util.Set;
 
 import megaminds.actioninventory.api.base.ActionInventory;
 import megaminds.actioninventory.api.base.ActionObjectHandler;
-import megaminds.actioninventory.api.helper.ObjectId;
+import megaminds.actioninventory.api.util.ObjectId;
 import net.minecraft.util.Identifier;
 
 /**

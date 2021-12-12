@@ -1,7 +1,7 @@
 package megaminds.actioninventory.api.actionobjects;
 
-import megaminds.actioninventory.api.helper.ObjectId;
-import megaminds.actioninventory.api.helper.PlayerData;
+import megaminds.actioninventory.api.util.ObjectId;
+import megaminds.actioninventory.api.util.PlayerData;
 import net.minecraft.text.Text;
 
 /**

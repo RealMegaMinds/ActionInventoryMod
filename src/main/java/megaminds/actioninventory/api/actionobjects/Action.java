@@ -1,6 +1,6 @@
 package megaminds.actioninventory.api.actionobjects;
 
-import megaminds.actioninventory.api.helper.ObjectId;
+import megaminds.actioninventory.api.util.ObjectId;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 

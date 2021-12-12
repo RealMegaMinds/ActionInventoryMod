@@ -2,7 +2,7 @@ package megaminds.actioninventory.api.actionobjects;
 
 import com.google.gson.JsonObject;
 
-import megaminds.actioninventory.api.helper.ObjectId;
+import megaminds.actioninventory.api.util.ObjectId;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
