@@ -2,11 +2,12 @@ package megaminds.actioninventory.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 
+import megaminds.actioninventory.OwnerHolder;
 import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @Mixin(EnderChestInventory.class)
-public class EnderChestInventoryMixin {
+public class EnderChestInventoryMixin implements OwnerHolder {
 	private ServerPlayerEntity owner;
 	
 	public ServerPlayerEntity getOwner() {

@@ -8,7 +8,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonObject;
 
@@ -16,6 +16,8 @@ import com.google.gson.JsonObject;
  * Just some random helper methods.
  */
 public class Helper {
+	public static Logger logger;
+	
 	/**
 	 * Returns the first object in the given collection that matches the given predicate.<br>
 	 * Returns null if none match.
@@ -97,12 +99,20 @@ public class Helper {
 		try {
 			return sup.get();
 		} catch (Exception e) {
-			ActionInventoryMod.log(Level.WARN, msg);
+			if (logger!=null) logger.warn(msg);
 			return null;
 		}
 	}
 	
 	public static <E, R> Set<R> combineResults(Collection<E> vals, Function<E, Set<R>> func) {
 		return vals.stream().flatMap(e->func.apply(e).stream()).collect(Collectors.toUnmodifiableSet());
+	}
+	
+	/**
+	 * Returns true if {@code o1} equals null or {@code o2}<br>
+	 * Returns false if {@code o1} doesn't equal null nor {@code o2}
+	 */
+	public static boolean nullOrEquals(Object o1, Object o2) {
+		return o1==null || o1.equals(o2);
 	}
 }

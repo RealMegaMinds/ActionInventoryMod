@@ -1,8 +1,8 @@
-package megaminds.actioninventory.inventory.actions.messaging;
+package megaminds.actioninventory.callbacks.click.messaging;
 
 import java.util.UUID;
 
-import megaminds.actioninventory.inventory.actions.Action;
+import megaminds.actioninventory.callbacks.click.Action;
 import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;

@@ -14,14 +14,21 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import eu.pb4.sgui.api.SlotHolder;
+import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
+import eu.pb4.sgui.api.gui.GuiInterface;
 import megaminds.actioninventory.mixin.EnderChestInventoryMixin;
 import megaminds.actioninventory.util.Helper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.registry.Registry;
 
 public class ScreenSerializer implements JsonSerializer<AnvilInputGui> {
 	private static final Map<String, Inventory> NAMED_INVENTORIES = new HashMap<>();
@@ -32,6 +39,22 @@ public class ScreenSerializer implements JsonSerializer<AnvilInputGui> {
 	@Override
 	public JsonElement serialize(AnvilInputGui gui, Type type, JsonSerializationContext context) {
 		return null;
+	}
+	
+	
+	
+	class AnimatedGuiElementSerializer implements JsonSerializer<AnimatedGuiElement> {
+		@Override
+		public JsonElement serialize(AnimatedGuiElement src, Type typeOfSrc, JsonSerializationContext context) {
+			
+			return null;
+		}
+	}
+	
+	class SerialableGuiElement extends AnimatedGuiElement {
+		public SerialableGuiElement(AnimatedGuiElement el) {
+			super(el.items, el.interval, el,.random, el.callback);
+		}
 	}
 	
 	enum InventoryType {

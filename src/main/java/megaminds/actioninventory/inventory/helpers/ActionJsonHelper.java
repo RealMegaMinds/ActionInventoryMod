@@ -18,9 +18,9 @@ import com.mojang.util.UUIDTypeAdapter;
 
 import megaminds.actioninventory.ExcludeAnnotationExclusionStrategy;
 import megaminds.actioninventory.TypeSerializer;
+import megaminds.actioninventory.callbacks.click.Action;
+import megaminds.actioninventory.callbacks.click.ActionManager;
 import megaminds.actioninventory.inventory.ActionInventoryImpl;
-import megaminds.actioninventory.inventory.actions.Action;
-import megaminds.actioninventory.inventory.actions.ActionManager;
 import megaminds.actioninventory.inventory.openers.Opener;
 import megaminds.actioninventory.inventory.openers.OpenerManager;
 import megaminds.actioninventory.inventory.requirements.Requirement;

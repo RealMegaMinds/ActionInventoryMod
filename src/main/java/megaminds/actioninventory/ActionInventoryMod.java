@@ -29,6 +29,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import megaminds.actioninventory.mixin.EnderChestInventoryMixin;
 import megaminds.actioninventory.util.ActionObjectHandler;
 
 public class ActionInventoryMod implements ModInitializer {
@@ -82,31 +83,7 @@ public class ActionInventoryMod implements ModInitializer {
 	}
 	
     private static int test(CommandContext<ServerCommandSource> cxt) throws CommandSyntaxException {
-    	ServerPlayerEntity player = cxt.getSource().getPlayer();
-    	SimpleGui gui = new SimpleGui(ScreenHandlerType.GENERIC_9X6, player, false);
-    	gui.setTitle(new LiteralText("WELCOME").formatted(Formatting.GREEN));
-    	gui.setSlot(7, new ItemStack(Items.DIAMOND_BLOCK, 1));
-    	gui.setSlot(1, new AnimatedGuiElement(new ItemStack[]{
-                Items.NETHERITE_PICKAXE.getDefaultStack(),
-                Items.DIAMOND_PICKAXE.getDefaultStack(),
-                Items.GOLDEN_PICKAXE.getDefaultStack(),
-                Items.IRON_PICKAXE.getDefaultStack(),
-                Items.STONE_PICKAXE.getDefaultStack(),
-                Items.WOODEN_PICKAXE.getDefaultStack()
-        }, 10, false, (x, y, z) -> {
-        }));
-    	gui.setSlot(20, new GuiElementBuilder()
-                .setItem(Items.BARRIER)
-                .glow()
-                .setName(new LiteralText("Bye")
-                        .setStyle(Style.EMPTY.withItalic(false).withBold(true)))
-                .addLoreLine(new LiteralText("Some lore"))
-                .addLoreLine(new LiteralText("More lore").formatted(Formatting.RED))
-                .setCount(3)
-                .setCallback((index, clickType, actionType) -> gui.close())
-        );
-        gui.setSlotRedirect(4, new Slot(player.getEnderChestInventory(), 0, 0, 0));
-    	gui.open();
+    	cxt.getSource().sendFeedback(new LiteralText((((OwnerHolder)cxt.getSource().getPlayer().getEnderChestInventory()).getOwner()==cxt.getSource().getPlayer())+""), false);
     	return 0;
     }
 	

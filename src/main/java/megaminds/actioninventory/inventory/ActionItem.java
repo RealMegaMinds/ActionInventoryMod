@@ -2,7 +2,7 @@ package megaminds.actioninventory.inventory;
 
 import java.util.List;
 
-import megaminds.actioninventory.inventory.actions.Action;
+import megaminds.actioninventory.callbacks.click.Action;
 import megaminds.actioninventory.inventory.requirements.Requirement;
 import megaminds.actioninventory.inventory.requirements.Requirement.When;
 import net.minecraft.item.ItemStack;

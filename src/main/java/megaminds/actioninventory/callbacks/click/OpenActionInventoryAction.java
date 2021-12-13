@@ -1,4 +1,4 @@
-package megaminds.actioninventory.inventory.actions;
+package megaminds.actioninventory.callbacks.click;
 
 import megaminds.actioninventory.inventory.ActionInventoryImpl;
 import megaminds.actioninventory.inventory.helpers.ActionManager;

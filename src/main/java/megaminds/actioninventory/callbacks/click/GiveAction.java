@@ -1,4 +1,4 @@
-package megaminds.actioninventory.inventory.actions;
+package megaminds.actioninventory.callbacks.click;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;

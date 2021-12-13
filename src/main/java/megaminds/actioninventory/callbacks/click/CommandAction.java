@@ -1,4 +1,4 @@
-package megaminds.actioninventory.inventory.actions;
+package megaminds.actioninventory.callbacks.click;
 
 import com.mojang.authlib.GameProfile;
 
@@ -14,7 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
  * @see GiveAction
  * @see OpenActionInventoryAction
  */
-public class CommandAction implements Action {
+public class CommandAction extends BasicAction {
 	/**The command to execute*/
 	private String command;
 	/**True - the command will be executed by the server<br>
@@ -25,7 +25,8 @@ public class CommandAction implements Action {
 	private boolean makeTempOp;
 	
 	@Override
-	public void execute(ServerPlayerEntity player) {
+	public void internalClick() {
+		ServerPlayerEntity player = gui.getPlayer();
 		if (makeTempOp && !fromServer) {
 			PlayerManager manager = player.server.getPlayerManager();
 			GameProfile profile = player.getGameProfile();
