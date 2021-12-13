@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import com.google.gson.JsonSyntaxException;
 
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.MessageHelper;
 import megaminds.actioninventory.inventory.ActionInventoryImpl;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;
 import megaminds.actioninventory.inventory.requirements.RequirementStorageManager;
+import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ActionManager {

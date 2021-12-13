@@ -2,7 +2,7 @@ package megaminds.actioninventory.inventory.actions;
 
 import com.mojang.authlib.GameProfile;
 
-import megaminds.actioninventory.MessageHelper;
+import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 

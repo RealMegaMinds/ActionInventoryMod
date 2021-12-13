@@ -1,4 +1,4 @@
-package megaminds.actioninventory.api.base;
+package megaminds.actioninventory.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,8 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.ApiStatus.Internal;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,14 +20,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 
-import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.Helper;
 import megaminds.actioninventory.api.actionobjects.ActionObject;
 import megaminds.actioninventory.api.util.ObjectId;
 import net.minecraft.util.Identifier;
 
 public class ActionObjectHandler {
-	private static final JsonParser PARSER = new JsonParser();
 	private static final Map<Identifier, Supplier<ActionObject>> ALLOWED_TYPES = new HashMap<>();
 	private static final List<ActionObjectHandler> HANDLERS = new ArrayList<>();
 	
@@ -37,11 +32,22 @@ public class ActionObjectHandler {
 	private final Path path;
 	private final String id;
 	
-	public ActionObjectHandler(Path path, String id) {
+	private ActionObjectHandler(Path path, String id) {
 		this.path = path;
 		this.id  = id;
-		ACTION_OBJECTS = new HashMap<>();
-		HANDLERS.add(this);
+		this.ACTION_OBJECTS = new HashMap<>();
+	}
+	
+	/**
+	 * Creates an ActionObjectHandler for the given path with the given id. Ids should be unique.
+	 */
+	public static ActionObjectHandler createActionObjectHandler(Path dir, String id) {
+		if (dir==null) {
+			return null;
+		}
+		ActionObjectHandler h = new ActionObjectHandler(dir, id);
+		HANDLERS.add(h);
+		return h;
 	}
 	
 	/**
@@ -51,6 +57,9 @@ public class ActionObjectHandler {
 		return Collections.unmodifiableList(HANDLERS);
 	}
 	
+	/**
+	 * Returns this ActionObjectHandler's id/name.
+	 */
 	public String getId() {
 		return id;
 	}
@@ -141,8 +150,7 @@ public class ActionObjectHandler {
 	 * Searches through all ActionObjectHandlers.
 	 */
 	public static Set<Identifier> getAllOfTypex(Identifier type) {
-		
-		return null;
+		return Helper.combineResults(HANDLERS, h->h.getAllOfType(type));
 	}
 
 	/**
@@ -156,7 +164,7 @@ public class ActionObjectHandler {
 			String jsonStr = Helper.warnIfException(()->Files.readString(p), "Couldn't read file: "+p);
 			if (jsonStr==null) continue;
 
-			JsonElement jsonEl = PARSER.parse(jsonStr);
+			JsonElement jsonEl = JsonParser.parseString(jsonStr);
 			count++;
 			if (jsonEl.isJsonObject()) {
 				doSingle(jsonEl.getAsJsonObject()).setFileName(p.getFileName().toString());
@@ -182,11 +190,12 @@ public class ActionObjectHandler {
 	}
 
 	/**
-	 * Saves and clears ActionObjects.
+	 * Saves and clears ActionObjects. Also removes this ActionObjectHandler from the handler list.
 	 */
-	public void stop() {
+	public final void stop() {
 		save();
 		ACTION_OBJECTS.clear();
+		HANDLERS.remove(this);
 	}
 
 	/**
@@ -228,18 +237,5 @@ public class ActionObjectHandler {
 	 */
 	private static String addExt(String base) {
 		return base.endsWith(".json") ? base : base+".json";
-	}
-	
-	/**
-	 * Returns true if directory exists.
-	 * Returns false if directory doesn't exist and prints warning.
-	 */
-	private static boolean checkDirExists(Path dir) {
-		if (dir==null) return false;
-		if (!Files.isDirectory(dir)) {
-			ActionInventoryMod.log(Level.WARN, "Directory doesn't exist or is not a directory: "+dir);
-			return false;
-		}
-		return true;
 	}
 }

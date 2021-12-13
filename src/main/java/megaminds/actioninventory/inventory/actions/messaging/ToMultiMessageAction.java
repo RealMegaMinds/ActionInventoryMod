@@ -3,8 +3,8 @@ package megaminds.actioninventory.inventory.actions.messaging;
 import java.util.List;
 import java.util.UUID;
 
-import megaminds.actioninventory.MessageHelper;
 import megaminds.actioninventory.inventory.actions.Action;
+import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 

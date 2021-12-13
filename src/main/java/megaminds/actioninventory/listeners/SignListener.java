@@ -11,10 +11,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
-
-import megaminds.actioninventory.MessageHelper;
 import megaminds.actioninventory.SpecialSign;
 import megaminds.actioninventory.inventory.helpers.ActionManager;
+import megaminds.actioninventory.util.MessageHelper;
 
 public class SignListener {
 	public static ActionResult onSignBlockUse(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {

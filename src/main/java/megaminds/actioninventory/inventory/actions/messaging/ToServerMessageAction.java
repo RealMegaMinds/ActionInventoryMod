@@ -1,7 +1,7 @@
 package megaminds.actioninventory.inventory.actions.messaging;
 
-import megaminds.actioninventory.MessageHelper;
 import megaminds.actioninventory.inventory.actions.Action;
+import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 

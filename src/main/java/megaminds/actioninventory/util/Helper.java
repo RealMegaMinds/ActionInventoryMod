@@ -1,12 +1,12 @@
-package megaminds.actioninventory;
+package megaminds.actioninventory.util;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Level;
 
@@ -103,7 +103,6 @@ public class Helper {
 	}
 	
 	public static <E, R> Set<R> combineResults(Collection<E> vals, Function<E, Set<R>> func) {
-		Collection<R> combined = new HashSet<>();
-		return vals.stream().flatMap(e->func.apply(e).stream()).collect(Set::collect);
+		return vals.stream().flatMap(e->func.apply(e).stream()).collect(Collectors.toUnmodifiableSet());
 	}
 }

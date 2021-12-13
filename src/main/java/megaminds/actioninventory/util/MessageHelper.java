@@ -1,4 +1,4 @@
-package megaminds.actioninventory;
+package megaminds.actioninventory.util;
 
 import java.util.List;
 import java.util.UUID;

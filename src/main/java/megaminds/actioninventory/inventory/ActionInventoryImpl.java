@@ -7,13 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import megaminds.actioninventory.Helper;
 import megaminds.actioninventory.api.ActionItem;
 import megaminds.actioninventory.api.ModifiableActionInventory;
 import megaminds.actioninventory.api.gui.ActionInventoryManager;
 import megaminds.actioninventory.inventory.openers.Opener;
 import megaminds.actioninventory.inventory.openers.Opener.ClickType;
 import megaminds.actioninventory.inventory.openers.Opener.What;
+import megaminds.actioninventory.util.Helper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandler;

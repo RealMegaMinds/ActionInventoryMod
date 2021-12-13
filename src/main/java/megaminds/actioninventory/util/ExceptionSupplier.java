@@ -1,4 +1,4 @@
-package megaminds.actioninventory;
+package megaminds.actioninventory.util;
 
 @FunctionalInterface
 public interface ExceptionSupplier<T> {
