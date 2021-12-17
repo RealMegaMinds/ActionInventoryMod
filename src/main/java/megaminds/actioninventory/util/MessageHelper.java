@@ -3,11 +3,15 @@ package megaminds.actioninventory.util;
 import java.util.List;
 import java.util.UUID;
 
+import org.jetbrains.annotations.Nullable;
+
+import com.mojang.authlib.GameProfile;
+
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
@@ -16,67 +20,70 @@ public class MessageHelper {
 	private static final Formatting ERROR = Formatting.RED, SUCCESS = Formatting.GREEN;
 	
 	public static Text toSuccess(String msg) {
-		return new LiteralText(msg).setStyle(Style.EMPTY.withColor(SUCCESS));
+		return new LiteralText(msg).formatted(SUCCESS);
 	}
 	
 	public static Text toError(String error) {
-		return new LiteralText(error).setStyle(Style.EMPTY.withColor(ERROR));
+		return new LiteralText(error).formatted(ERROR);
 	}
 	
-	public static void multiMessage(ServerPlayerEntity player, Text message, List<UUID> to, boolean fromServer) {
-		MessageType type = getType(fromServer);
-		UUID from = getOrNil(player, fromServer);
-		to.forEach(uuid -> {
-			player.getServer().getPlayerManager().getPlayer(uuid).sendMessage(message, type, from);
-		});
+	/**
+	 * Sends a message to the given players.
+	 */
+	public static void message(@Nullable UUID from, List<UUID> to, Text message, @Nullable MessageType type, MinecraftServer server) {
+		from = from!=null ? from : Util.NIL_UUID;
+		type = type!=null ? type : from==Util.NIL_UUID ? MessageType.SYSTEM : MessageType.CHAT;
+		
+		for (UUID uuid : to) {
+			server.getPlayerManager().getPlayer(uuid).sendMessage(message, type, from);
+		}
 	}
 	
-	public static void multiMessage(ServerPlayerEntity player, String message, List<UUID> to, boolean fromServer) {
-		multiMessage(player, new LiteralText(message), to, fromServer);
-	}
-	
-	public static void singleMessage(ServerPlayerEntity player, Text message, UUID to, boolean fromServer) {
-		player.getServer().getPlayerManager().getPlayer(to).sendMessage(message, getType(fromServer), getOrNil(player, fromServer));
-	}
-	
-	public static void singleMessage(ServerPlayerEntity player, String message, UUID to, boolean fromServer) {
-		singleMessage(player, new LiteralText(message), to, fromServer);
-	}
-	
-	public static void toPlayerMessage(ServerPlayerEntity player, Text message, boolean fromServer) {
-		player.sendMessage(message, getType(fromServer), Util.NIL_UUID);
-	}
-	
-	public static void toPlayerMessage(ServerPlayerEntity player, String message, boolean fromServer) {
-		toPlayerMessage(player, new LiteralText(message), fromServer);
-	}
-	
-	public static void broadcastMessage(ServerPlayerEntity player, Text message, boolean fromServer) {
-		player.getServer().getPlayerManager().broadcastChatMessage(message, getType(fromServer), getOrNil(player, fromServer));
-	}
-	
-	public static void broadcastMessage(ServerPlayerEntity player, String message, boolean fromServer) {
-		broadcastMessage(player, new LiteralText(message), fromServer);
-	}
-	
-	public static void logMessage(ServerPlayerEntity player, Text message, boolean fromPlayer) {
-		player.getServer().sendSystemMessage(message, getOrNil(player, !fromPlayer));
-	}
-	
-	public static void logMessage(ServerPlayerEntity player, String message, boolean fromPlayer) {
-		logMessage(player, new LiteralText(message), fromPlayer);
-	}
+	/**
+	 * Broadcasts a message to all players.
+	 */
+	public static void broadcast(@Nullable UUID from, Text message, @Nullable MessageType type, MinecraftServer server) {
+		from = from!=null ? from : Util.NIL_UUID;
+		type = type!=null ? type : from==Util.NIL_UUID ? MessageType.SYSTEM : MessageType.CHAT;
 
-	private static MessageType getType(boolean fromServer) {
-		return fromServer ? MessageType.SYSTEM : MessageType.CHAT;
+		server.getPlayerManager().broadcast(message, type, from);
 	}
 	
-	private static UUID getOrNil(ServerPlayerEntity player, boolean fromServer) {
-		return fromServer ? Util.NIL_UUID : player.getUuid();
+	/**
+	 * Logs a message to the server.
+	 */
+	public static void log(@Nullable UUID from, Text message, MinecraftServer server) {
+		server.sendSystemMessage(message, from);
 	}
 	
-	public static int executeCommand(ServerPlayerEntity player, String command, boolean fromServer) {
-		MinecraftServer server = player.getServer();
-    	return server.getCommandManager().execute(fromServer ? server.getCommandSource() : player.getCommandSource(), command);
+	/**
+	 * Executes the given command as the server.
+	 */
+	public static int executeCommand(MinecraftServer server, String command) {
+		return server.getCommandManager().execute(server.getCommandSource(), command);
+	}
+	
+	/**
+	 * Executes the given command as the player.<br>
+	 * Command may fail if the player has incorrect permissions.
+	 */
+	public static int executeCommand(ServerPlayerEntity player, String command) {
+    	return player.getServer().getCommandManager().execute(player.getCommandSource(), command);
+	}
+	
+	/**
+	 * Executes the given command as the given player.<br>
+	 * If the player was not already an op, they made an op before executing the command and deopped after completing the command.
+	 */
+	public static int executeOppedCommand(ServerPlayerEntity player, String command) {
+		PlayerManager manager = player.getServer().getPlayerManager();
+		GameProfile profile = player.getGameProfile();
+		boolean wasOp = manager.isOperator(profile);
+		
+		if (!wasOp) manager.addToOperators(profile);
+		int result = executeCommand(player, command);
+		if (!wasOp) manager.removeFromOperators(profile);
+		
+		return result;
 	}
 }

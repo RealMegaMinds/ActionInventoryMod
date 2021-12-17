@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.JsonObject;
-
 /**
  * Just some random helper methods.
  */
@@ -89,10 +87,6 @@ public class Helper {
 		if (e!=null&&consumer!=null) {
 			consumer.accept(e);
 		}
-	}
-	
-	public static <E> E readTyped(JsonObject obj, Function<String, E> func) {
-		return func.apply(obj.get("type").getAsString());
 	}
 	
 	public static <E> E warnIfException(ExceptionSupplier<E> sup, String msg) {

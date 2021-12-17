@@ -1,9 +1,11 @@
 package megaminds.actioninventory.callbacks.click;
 
-import com.mojang.authlib.GameProfile;
-
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
+import eu.pb4.sgui.api.ClickType;
+import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
@@ -15,30 +17,30 @@ import net.minecraft.server.network.ServerPlayerEntity;
  * @see OpenActionInventoryAction
  */
 public class CommandAction extends BasicAction {
-	/**The command to execute*/
-	private String command;
-	/**True - the command will be executed by the server<br>
-	 * False - the command will be executed by the player*/
-	private boolean fromServer;
-	/**True - the player will be opped to execute the command and then deopped<br>
-	 * False - the player will not be opped and the command may give an error if it requires op*/
-	private boolean makeTempOp;
+	private static final String COMMAND = "command", FROM_SERVER = "fromServer", MAKE_OP = "makeTempOp";
 	
+	private String command;
+	private boolean fromServer;
+	private boolean makeTempOp;
+		
 	@Override
-	public void internalClick() {
+	public void internalClick(int index, ClickType type, SlotActionType action, SlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
-		if (makeTempOp && !fromServer) {
-			PlayerManager manager = player.server.getPlayerManager();
-			GameProfile profile = player.getGameProfile();
-			if (manager.isOperator(profile)) {
-				MessageHelper.executeCommand(player, command, false);
-			} else {
-				manager.addToOperators(profile);
-				MessageHelper.executeCommand(player, command, false);
-				manager.removeFromOperators(profile);
-			}
+
+		if (fromServer) {
+			MessageHelper.executeCommand(player.getServer(), command);
+		} else if (makeTempOp) {
+			MessageHelper.executeOppedCommand(player, command);
 		} else {
-			MessageHelper.executeCommand(player, command, true);
+			MessageHelper.executeCommand(player, command);
 		}
+	}
+
+	@Override
+	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
+		this.command = obj.has("command") ? obj.get(COMMAND).getAsString() : "";
+		this.fromServer = obj.has(FROM_SERVER) ? obj.get(FROM_SERVER).getAsBoolean() : false;
+		this.makeTempOp = obj.has(MAKE_OP) ? obj.get(MAKE_OP).getAsBoolean() : false;
+		return this;
 	}
 }

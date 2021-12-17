@@ -4,26 +4,25 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
 import eu.pb4.sgui.api.ClickType;
+import eu.pb4.sgui.api.ScreenProperty;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
 
-/**
- * This gives an item to the player (will be dropped if the player's inventory is full)
- */
-public class GiveAction extends BasicAction {
-	private static final String ITEM = "itemStackToGive";
+public class SendPropertyAction extends BasicAction {
+	private static final String PROPERTY = "property", VALUE = "value";
 	
-	private ItemStack itemStack;
-	
+	private ScreenProperty property;
+	private int value;
+
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, SlotGuiInterface gui) {
-		gui.getPlayer().getInventory().offerOrDrop(itemStack.copy());
+		gui.sendProperty(property, value);
 	}
 
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		itemStack = obj.has(ITEM) ? context.deserialize(obj.get(ITEM), ItemStack.class) : ItemStack.EMPTY;
+		property = obj.has(PROPERTY) ? context.deserialize(obj.get(PROPERTY), ScreenProperty.class) : ScreenProperty.FIRE_LEVEL;
+		value = obj.has(VALUE) ? obj.get(VALUE).getAsInt() : 0;
 		return this;
 	}
 }
