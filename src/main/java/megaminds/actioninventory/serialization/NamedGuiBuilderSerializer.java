@@ -1,6 +1,7 @@
 package megaminds.actioninventory.serialization;
 
 import java.lang.reflect.Type;
+import java.util.UUID;
 import java.util.function.Function;
 
 import com.google.gson.JsonArray;
@@ -14,8 +15,9 @@ import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
-import megaminds.actioninventory.NamedGuiBuilder;
 import megaminds.actioninventory.callbacks.click.BasicAction;
+import megaminds.actioninventory.gui.NamedGuiBuilder;
+import megaminds.actioninventory.util.GuiIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -31,6 +33,8 @@ public class NamedGuiBuilderSerializer implements JsonDeserializer<NamedGuiBuild
 	private static final String SLOT_TYPE = "type", INDEX = "index", CALLBACK = "callback", ITEMS = "items";
 	//animated slot fields
 	private static final String RANDOM = "isRandom", INTERVAL = "interval";
+	//redirect fields
+	private static final String REDIRECT_INDEX = "redirectIndex";
 	//slot types
 	private static final String NORMAL = "normal", REDIRECT = "redirect";
 	
@@ -46,7 +50,7 @@ public class NamedGuiBuilderSerializer implements JsonDeserializer<NamedGuiBuild
 
 		//Get the builder's name
 		if (!obj.has(NAME)) throw new JsonParseException("NamedGuis must have a name");
-		builder.setName(obj.get(NAME).getAsString());
+		builder.setName(obj.get(NAME).getAsString().replaceAll("\s", ""));
 
 		//Set builder's values
 		if (obj.has(TITLE)) builder.setTitle(Text.Serializer.fromJson(obj.get(TITLE)));
@@ -100,7 +104,8 @@ public class NamedGuiBuilderSerializer implements JsonDeserializer<NamedGuiBuild
 				
 				case REDIRECT -> {
 					//set the redirect slot in the builder with deserialized slot
-					builder.setSlotRedirect(index, context.<Function<ServerPlayerEntity, Slot>>deserialize(slot, Function.class));
+					int redirectIndex = slot.has(REDIRECT_INDEX) ? slot.get(REDIRECT_INDEX).getAsInt() : 0;
+					builder.setSlotRedirect(index, getSlotFunc(context.deserialize(slot, GuiIdentifier.class), redirectIndex));
 				}
 				
 				//no known type, throw exception
@@ -110,5 +115,12 @@ public class NamedGuiBuilderSerializer implements JsonDeserializer<NamedGuiBuild
 		}
 		//return the finished builder
 		return builder;
+	}
+	
+	public static Function<ServerPlayerEntity, Slot> getSlotFunc(GuiIdentifier id, int index) {
+		return p -> {
+			ServerPlayerEntity real = id.name==null ? p : p.getServer().getPlayerManager().getPlayer(UUID.fromString(id.name));
+			return new Slot(id.isEnderChest ? real.getEnderChestInventory() : real.getInventory(), index, 0, 0);
+		};
 	}
 }

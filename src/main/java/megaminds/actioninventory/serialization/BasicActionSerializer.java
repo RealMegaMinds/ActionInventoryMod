@@ -20,7 +20,7 @@ public class BasicActionSerializer implements JsonDeserializer<BasicAction> {
 	public BasicAction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
 		
-		if (!obj.has(TYPE)) throw new JsonParseException("BasicActions must have a type");
+		if (!obj.has(TYPE)) throw new JsonParseException("Actions must have a type");
 		BasicAction action = context.<Action>deserialize(obj.get(TYPE), Action.class).get();
 		
 		action.setIndex(obj.has(INDEX) ? obj.get(INDEX).getAsInt() : BasicAction.UNSET_INDEX);

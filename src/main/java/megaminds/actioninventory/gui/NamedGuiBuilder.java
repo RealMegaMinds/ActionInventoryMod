@@ -1,4 +1,4 @@
-package megaminds.actioninventory;
+package megaminds.actioninventory.gui;
 
 import java.util.function.Function;
 
@@ -15,10 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 /**
- * CLONED OF {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder}<br>
- * Has additional: name field, getName() method, and setName(String) method.<br>
- * Changed slot redirects to a {@literal Function<ServerEntityPlayer, Slot>}. (Now accepts slots or a Function for redirects)<br>
- * Redirects are calculated when build is called.
+ * Mostly cloned from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder}, with some additions/changes.
  * <p>
  * Simple Gui Builder
  * <p>
@@ -30,14 +27,14 @@ public final class NamedGuiBuilder implements SlotHolder {
     private final int height;
     private final ScreenHandlerType<?> type;
     private final GuiElementInterface[] elements;
-    private final Function<ServerPlayerEntity, Slot>[] slotRedirects;	//changed
+    private final Function<ServerPlayerEntity, Slot>[] slotRedirects;
     private final boolean includePlayer;
     private final int sizeCont;
     private boolean lockPlayerInventory = false;
     private boolean hasRedirects = false;
     private Text title = null;
     
-    private String name;	//added
+    private String name;
 
     /**
      * Constructs a new simple container gui for the supplied player.
@@ -57,7 +54,7 @@ public final class NamedGuiBuilder implements SlotHolder {
         this.size = this.width * this.height + tmp;
         this.sizeCont = this.width * this.height;
         this.elements = new GuiElementInterface[this.size];
-        this.slotRedirects = new Function[this.size];	//changed
+        this.slotRedirects = new Function[this.size];
 
         this.includePlayer = includePlayerInventorySlots;
     }
@@ -69,7 +66,7 @@ public final class NamedGuiBuilder implements SlotHolder {
      * @return SimpleGui instance
      */
     public SimpleGui build(ServerPlayerEntity player) {
-        SimpleGui gui = new SimpleGui(this.type, player, this.includePlayer);
+        SimpleGui gui = new NamedGui(this.type, player, this.includePlayer, this.name);
         gui.setTitle(this.title);
         gui.setLockPlayerInventory(true);
 
@@ -84,9 +81,9 @@ public final class NamedGuiBuilder implements SlotHolder {
 
         pos = 0;
 
-        for (Function<ServerPlayerEntity, Slot> slot : this.slotRedirects) {	//changed
+        for (Function<ServerPlayerEntity, Slot> slot : this.slotRedirects) {
             if (slot != null) {
-                gui.setSlotRedirect(pos, slot.apply(player));	//changed
+                gui.setSlotRedirect(pos, slot.apply(player));
             }
             pos++;
         }
@@ -145,7 +142,7 @@ public final class NamedGuiBuilder implements SlotHolder {
 
     public void setSlotRedirect(int index, Slot slot) {
         this.elements[index] = null;
-        this.slotRedirects[index] = (p)->slot;	//changed
+        this.slotRedirects[index] = (p)->slot;
         this.hasRedirects = true;
     }
 
@@ -184,7 +181,7 @@ public final class NamedGuiBuilder implements SlotHolder {
 
     public Slot getSlotRedirect(int index) {
         if (index >= 0 && index < this.size) {
-            return this.slotRedirects[index].apply(null);	//changed
+            return this.slotRedirects[index].apply(null);
         }
         return null;
     }
@@ -218,29 +215,24 @@ public final class NamedGuiBuilder implements SlotHolder {
         this.lockPlayerInventory = value;
     }
     
-    //added
     public String getName() {
     	return name;
     }
     
-    //added
     public void setName(String name) {
     	this.name = name;
     }
     
-    //added
     public void setSlotRedirect(int index, Function<ServerPlayerEntity, Slot> slot) {
         this.elements[index] = null;
         this.slotRedirects[index] = slot;
         this.hasRedirects = true;
     }
 
-    //added
     public void addSlotRedirect(Function<ServerPlayerEntity, Slot> slot) {
         this.setSlotRedirect(this.getFirstEmptySlot(), slot);
     }
     
-    //added
     public Function<ServerPlayerEntity, Slot> getSlotRedirectFunc(int index) {
         if (index >= 0 && index < this.size) {
             return this.slotRedirects[index];

@@ -4,9 +4,7 @@
   "package": "megaminds.actioninventory.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "SignEntityMixin",
-    "EnderChestInventoryMixin",
-    "ServerPlayerEntityMixin"
+    "SignEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
