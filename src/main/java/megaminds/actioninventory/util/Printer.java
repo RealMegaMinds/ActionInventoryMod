@@ -1,14 +1,11 @@
 package megaminds.actioninventory.util;
 
+import megaminds.actioninventory.gui.NamedGuiBuilder;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.registry.Registry;
 
 public class Printer {
-	public static void print(ScreenHandlerType<?> handler) {
-		System.out.println(Registry.SCREEN_HANDLER.getId(handler).toString());
-	}
-	
-	public static void test() {
-//		print(ScreenHandlerType.GENERIC_9X6);
+	public static void print() {
+		NamedGuiBuilder builder = new NamedGuiBuilder(null, false);
 	}
 }

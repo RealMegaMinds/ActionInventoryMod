@@ -1,17 +1,19 @@
-package megaminds.actioninventory.callbacks.click.requirement;
+package megaminds.actioninventory.actions.consumables;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import megaminds.actioninventory.callbacks.click.BasicAction;
+import megaminds.actioninventory.actions.Action;
+import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.actions.ConsumeAction;
 import megaminds.actioninventory.gui.NamedGui;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class XpRequirement extends RequireAction {
+public class XpConsumable extends BasicConsumable {
 	private static enum Kind{XP, LEVEL};
 	
 	private static final String KIND = "kind", AMOUNT = "amount";
@@ -46,5 +48,10 @@ public class XpRequirement extends RequireAction {
 		if (logToStore) {			
 			nbt.putInt("xp", amount);
 		}
+	}
+
+	@Override
+	public Action getType() {
+		return Action.REQUIRE_XP;
 	}
 }

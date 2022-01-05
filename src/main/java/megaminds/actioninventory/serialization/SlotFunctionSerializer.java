@@ -1,51 +1,57 @@
 package megaminds.actioninventory.serialization;
 
+import static megaminds.actioninventory.util.JsonHelper.getOrDefault;
+
 import java.lang.reflect.Type;
 import java.util.UUID;
-import java.util.function.Function;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-import eu.pb4.sgui.virtual.inventory.VirtualInventory;
-import megaminds.actioninventory.util.NamedGuiLoader;
+import megaminds.actioninventory.gui.SlotFunction;
+import megaminds.actioninventory.gui.SlotFunction.InventoryType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class SlotFunctionSerializer implements JsonDeserializer<Function<ServerPlayerEntity, Slot>> {
-	private static final String TYPE = "type", PLAYER = "playerInventory", ENDERCHEST = "enderChest", NAMED_GUI = "gui";
-	private static final String PLAYER_ID = "player", GUI_NAME = "guiName", INDEX = "index";
+public class SlotFunctionSerializer implements JsonDeserializer<SlotFunction>, JsonSerializer<SlotFunction> {
+	private static final String INDEX = "redirectIndex", TYPE = "inventoryType", NAME = "inventoryName";
 
 	@Override
-	public Function<ServerPlayerEntity, Slot> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+	public SlotFunction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
+
+		int index = getOrDefault(obj.get(INDEX), JsonElement::getAsInt, 0);
+		String name = getOrDefault(obj.get(NAME), JsonElement::getAsString, null);
+		InventoryType type = getOrDefault(obj.get(TYPE), e->context.deserialize(e, InventoryType.class), InventoryType.PLAYER);
+		if (type==InventoryType.GENERATED) throw new JsonParseException("Cannot deserialize slot redirects of type:"+type);
 		
-		int index = obj.has(INDEX) ? obj.get(INDEX).getAsInt() : 0;
-		
-		boolean isInventory;
-		if (!obj.has(TYPE) || obj.get(TYPE).getAsString().equals(NAMED_GUI)) {
-			if (!obj.has(GUI_NAME)) throw new JsonParseException("Slots of type: "+NAMED_GUI+" must have a value for: "+GUI_NAME);
-			return p -> new Slot(new VirtualInventory(NamedGuiLoader.getGui(p, obj.get(GUI_NAME).getAsString())), index, 0, 0);
-		} else if (obj.get(TYPE).getAsString().equals(PLAYER)) {
-			isInventory = true;
-		} else if (obj.get(TYPE).getAsString().equals(ENDERCHEST)) {
-			isInventory = false;
-		} else {
-			throw new JsonParseException("No known slot type of: "+obj.get(TYPE).getAsString());
-		}
-		
-		UUID uuid;
-		if (!obj.has(PLAYER_ID) || obj.get(PLAYER_ID).toString().equals(PLAYER_ID)) {
-			uuid = null;
-		} else {
-			uuid = UUID.fromString(obj.get(PLAYER_ID).getAsString());
-		}
-		return p -> {
-			ServerPlayerEntity player = uuid==null ? p : p.getServer().getPlayerManager().getPlayer(uuid);
-			return new Slot(isInventory ? player.getInventory() : player.getEnderChestInventory(), index, 0, 0);
+		return new SlotFunction() {
+			@Override public String getName() {return name;}
+			@Override public int getRedirectIndex() {return index;}
+			@Override public InventoryType getType() {return type;}
+			@Override
+			public Slot apply(ServerPlayerEntity p) {
+				ServerPlayerEntity real = name==null ? p : p.getServer().getPlayerManager().getPlayer(UUID.fromString(name));
+				return switch (type) {
+				case PLAYER -> new Slot(real.getInventory(), index, 0, 0);
+				case ENDERCHEST -> new Slot(real.getEnderChestInventory(), index, 0, 0);
+				case GENERATED -> throw new JsonParseException("Cannot deserialize slot redirects of type:"+type);
+				};
+			}
 		};
+	}
+
+	@Override
+	public JsonElement serialize(SlotFunction src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject obj = new JsonObject();
+		obj.addProperty(INDEX, src.getRedirectIndex());
+		obj.add(TYPE, context.serialize(src.getType()));
+		obj.addProperty(NAME, src.getName());
+		return obj;
 	}
 }

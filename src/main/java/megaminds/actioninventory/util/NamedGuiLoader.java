@@ -26,7 +26,7 @@ public class NamedGuiLoader {
 	private static final Map<String, NamedGuiBuilder> BUILDERS = new HashMap<>();
 	
 	public static Inventory getGuiInv(ServerPlayerEntity player, String name) {
-		return Helper.ifNotNullGet(getGui(player, name), VirtualInventory::new);
+		return Helper.getOrDefault(getGui(player, name), VirtualInventory::new, null);
 	}
 		
 	public static boolean openGui(ServerPlayerEntity player, String name) {

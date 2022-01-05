@@ -1,126 +1,112 @@
 package megaminds.actioninventory.serialization;
 
+import static megaminds.actioninventory.util.JsonHelper.getOrDefault;
+import static megaminds.actioninventory.util.JsonHelper.getOrError;
+import static megaminds.actioninventory.util.JsonHelper.getDo;
 import java.lang.reflect.Type;
-import java.util.UUID;
-import java.util.function.Function;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
-import megaminds.actioninventory.callbacks.click.BasicAction;
+import megaminds.actioninventory.gui.AccessableAnimatedGuiElement;
+import megaminds.actioninventory.gui.AccessableGuiElement;
 import megaminds.actioninventory.gui.NamedGuiBuilder;
-import megaminds.actioninventory.util.GuiIdentifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
+import megaminds.actioninventory.gui.SlotFunction;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class NamedGuiBuilderSerializer implements JsonDeserializer<NamedGuiBuilder> {
+public class NamedGuiBuilderSerializer implements JsonDeserializer<NamedGuiBuilder>, JsonSerializer<NamedGuiBuilder> {
 	//builder fields
 	private static final String NAME = "name", TYPE = "type", INCLUDE_PLAYER = "includePlayerSlots", TITLE = "title", LOCK_PLAYER = "lockPlayerSlots", SLOTS = "slots";
 	//all slot fields
-	private static final String SLOT_TYPE = "type", INDEX = "index", CALLBACK = "callback", ITEMS = "items";
-	//animated slot fields
-	private static final String RANDOM = "isRandom", INTERVAL = "interval";
-	//redirect fields
-	private static final String REDIRECT_INDEX = "redirectIndex";
-	//slot types
-	private static final String NORMAL = "normal", REDIRECT = "redirect";
-	
+	private static final String SLOT_TYPE = "type", INDEX = "index";
+	private enum SlotType {
+		NORMAL {
+		@Override
+		void add(NamedGuiBuilder b, JsonElement s, int i, JsonDeserializationContext c) {
+			b.setSlot(i, c.<AccessableGuiElement>deserialize(s, AccessableGuiElement.class));
+		}
+	}, ANIMATED {
+		@Override
+		void add(NamedGuiBuilder b, JsonElement s, int i, JsonDeserializationContext c) {
+			b.setSlot(i, c.<AccessableAnimatedGuiElement>deserialize(s, AccessableAnimatedGuiElement.class));
+		}
+	}, REDIRECT {
+		@Override
+		void add(NamedGuiBuilder b, JsonElement s, int i, JsonDeserializationContext c) {
+			b.setSlot(i, c.<SlotFunction>deserialize(s, SlotFunction.class));
+		}
+	}; abstract void add(NamedGuiBuilder b, JsonElement s, int i, JsonDeserializationContext c);}
+
+
 	@Override
 	public NamedGuiBuilder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
 
 		//Make the builder
-		if (!obj.has(TYPE)) throw new JsonParseException("NamedGuis must have a type");
-		ScreenHandlerType<?> type = Registry.SCREEN_HANDLER.get(new Identifier(obj.get(TYPE).getAsString()));
-		boolean includePlayer = obj.has(INCLUDE_PLAYER) ? obj.get(INCLUDE_PLAYER).getAsBoolean() : false;
-		NamedGuiBuilder builder = new NamedGuiBuilder(type, includePlayer);
+		String type = getOrError(obj.get(TYPE), JsonElement::getAsString, "NamedGuis must have a type");		
+		boolean includePlayer = getOrDefault(obj.get(INCLUDE_PLAYER), JsonElement::getAsBoolean, false);
+		NamedGuiBuilder builder = new NamedGuiBuilder(Registry.SCREEN_HANDLER.get(new Identifier(type)), includePlayer);
 
 		//Get the builder's name
-		if (!obj.has(NAME)) throw new JsonParseException("NamedGuis must have a name");
-		builder.setName(obj.get(NAME).getAsString().replaceAll("\s", ""));
+		String name = getOrError(obj.get(NAME), JsonElement::getAsString, "NamedGuis must have a name");
+		builder.setName(name.replaceAll("\s", ""));
 
 		//Set builder's values
-		if (obj.has(TITLE)) builder.setTitle(Text.Serializer.fromJson(obj.get(TITLE)));
-		if (obj.has(LOCK_PLAYER)) builder.setLockPlayerInventory(obj.get(LOCK_PLAYER).getAsBoolean());
+		getDo(obj.get(TITLE), Text.Serializer::fromJson, builder::setTitle);
+		getDo(obj.get(LOCK_PLAYER), JsonElement::getAsBoolean, builder::setLockPlayerInventory);
 
 		//Set builder's slots by iterating through all given values
-		if (obj.has(SLOTS)) {
-			JsonArray slots = obj.get(SLOTS).getAsJsonArray();
+		getDo(obj.get(SLOTS), JsonElement::getAsJsonArray, slots->{
 			for (JsonElement el : slots) {
 				JsonObject slot = el.getAsJsonObject();
-				
+
 				//Get the correct index, or throw error
-				int index = slot.has(INDEX) ? slot.get(INDEX).getAsInt() : builder.getFirstEmptySlot();
+				int index = getOrDefault(slot.get(INDEX), JsonElement::getAsInt, builder.getFirstEmptySlot());
 				if (index >= builder.getSize()) throw new JsonParseException("Slot index must be less than the defined size of: "+builder.getSize());
 				if (index < 0) throw new JsonParseException("No more empty slots. Slot index must be defined.");
-				
-				//Get callback or empty
-				ClickCallback callback = slot.has(CALLBACK) ? context.deserialize(slot.get(CALLBACK), BasicAction.class) : GuiElementInterface.EMPTY_CALLBACK;
 
-				//Do rest based on the slot's type
-				String slotType = slot.has(SLOT_TYPE) ? slot.get(SLOT_TYPE).getAsString() : NORMAL;
-				switch (slotType) {
-				case NORMAL -> {
-					GuiElementInterface guiEl;
-					if (slot.has(ITEMS)) {
-						if (slot.get(ITEMS) instanceof JsonArray items) {	//multiple items, animated gui element
-							//iterate through deserializing each item
-							ItemStack[] stacks = new ItemStack[items.size()];
-							for (int i = 0; i < items.size(); i++) {
-								stacks[i] = context.deserialize(items.get(i), ItemStack.class);
-							}
-							
-							//get interval and random
-							int interval = slot.has(INTERVAL) ? slot.get(INTERVAL).getAsInt() : 1;
-							boolean random = slot.has(RANDOM) ? slot.get(RANDOM).getAsBoolean() : false;
-							
-							//return the new element
-							guiEl = new AnimatedGuiElement(stacks, interval, random, callback);
-							
-						} else {	//single item, simple gui element
-							guiEl = new GuiElement(context.deserialize(slot.get(ITEMS), ItemStack.class), callback);
-						}
-						
-					} else {	//no items, empty element
-						guiEl = GuiElement.EMPTY;
-					}
 
-					//set the slot in the builder to the created gui element
-					builder.setSlot(index, guiEl);
-				}
-				
-				case REDIRECT -> {
-					//set the redirect slot in the builder with deserialized slot
-					int redirectIndex = slot.has(REDIRECT_INDEX) ? slot.get(REDIRECT_INDEX).getAsInt() : 0;
-					builder.setSlotRedirect(index, getSlotFunc(context.deserialize(slot, GuiIdentifier.class), redirectIndex));
-				}
-				
-				//no known type, throw exception
-				default -> throw new JsonParseException("Unknown Slot Type: "+slotType);
-				}
+				//Deserialize based on the slot's type
+				getOrDefault(slot.get(SLOT_TYPE), e->context.deserialize(e, SlotType.class), SlotType.NORMAL).add(builder, slot, index, context);
 			}
-		}
+		});
+
 		//return the finished builder
 		return builder;
 	}
-	
-	public static Function<ServerPlayerEntity, Slot> getSlotFunc(GuiIdentifier id, int index) {
-		return p -> {
-			ServerPlayerEntity real = id.name==null ? p : p.getServer().getPlayerManager().getPlayer(UUID.fromString(id.name));
-			return new Slot(id.isEnderChest ? real.getEnderChestInventory() : real.getInventory(), index, 0, 0);
-		};
+
+	/**
+	 * This is unable to completely serialize a NamedGuiBuilder and notes where it can't.
+	 */
+	@Override
+	public JsonElement serialize(NamedGuiBuilder src, Type typeOfSrc, JsonSerializationContext context) {
+		JsonObject obj = new JsonObject();
+		obj.addProperty(NAME, src.getName());
+		obj.addProperty(TYPE, Registry.SCREEN_HANDLER.getId(src.getType()).toString());
+		obj.add(TITLE, context.serialize(src.getTitle()));
+		obj.addProperty(INCLUDE_PLAYER, src.isIncludingPlayer());
+		obj.addProperty(LOCK_PLAYER, src.getLockPlayerInventory());
+		int size = src.getSize();
+		JsonArray slots = new JsonArray(size);
+		for (int i = 0; i < size; i++) {
+			GuiElementInterface g;
+			SlotFunction func;
+			if ((g=src.getSlot(i))!=null) {
+				if (g!=GuiElement.EMPTY) slots.add(context.serialize(g));
+			} else if ((func=src.getSlotFunc(i))!=null) {
+				slots.add(context.serialize(func));
+			}
+		}
+		obj.add(SLOTS, slots);
+		return obj;
 	}
 }

@@ -7,6 +7,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 
 import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.JsonHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -35,7 +36,7 @@ public class BlockOpener extends BasicOpener {
 		} else {
 			pos = null;
 		}
-		tags = obj.has(TAGS) ? Helper.toList(obj.get(TAGS).getAsJsonArray(), e->new Identifier(e.getAsString())) : null;
+		tags = obj.has(TAGS) ? JsonHelper.toList(obj.get(TAGS).getAsJsonArray(), e->new Identifier(e.getAsString())) : null;
 		return this;
 	}
 	

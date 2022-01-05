@@ -1,242 +1,164 @@
 package megaminds.actioninventory.gui;
 
-import java.util.function.Function;
-
 import eu.pb4.sgui.api.GuiHelpers;
-import eu.pb4.sgui.api.SlotHolder;
-import eu.pb4.sgui.api.elements.GuiElement;
-import eu.pb4.sgui.api.elements.GuiElementBuilderInterface;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.api.gui.SimpleGui;
+import megaminds.actioninventory.actions.BasicAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 /**
- * Mostly cloned from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder}, with some additions/changes.
- * <p>
- * Simple Gui Builder
- * <p>
- * This class allow for quick building of gui layout, that will be used for multiple users.
+ * Originally cloned from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder} and then many changes made.
  */
-public final class NamedGuiBuilder implements SlotHolder {
-    private final int size;
-    private final int width;
-    private final int height;
-    private final ScreenHandlerType<?> type;
-    private final GuiElementInterface[] elements;
-    private final Function<ServerPlayerEntity, Slot>[] slotRedirects;
-    private final boolean includePlayer;
-    private final int sizeCont;
-    private boolean lockPlayerInventory = false;
-    private boolean hasRedirects = false;
-    private Text title = null;
-    
-    private String name;
+public final class NamedGuiBuilder {
+	private final int size;
+	private final ScreenHandlerType<?> type;
+	private final GuiElementInterface[] elements;
+	private final SlotFunction[] slotRedirects;
+	private final boolean includePlayer;
+	private boolean lockPlayerInventory, hasRedirects;
+	private Text title;
+	private String name;
 
-    /**
-     * Constructs a new simple container gui for the supplied player.
-     *
-     * @param type                        the screen handler that the client should display
-     * @param includePlayerInventorySlots if <code>true</code> the players inventory
-     *                                    will be treated as slots of this gui
-     */
-    @SuppressWarnings("unchecked")
 	public NamedGuiBuilder(ScreenHandlerType<?> type, boolean includePlayerInventorySlots) {
-        this.height = GuiHelpers.getHeight(type);
-        this.width = GuiHelpers.getWidth(type);
+		this.type = type;
 
-        this.type = type;
+		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayerInventorySlots ? 36 : 0);
+		this.elements = new GuiElementInterface[this.size];
+		this.slotRedirects = new SlotFunction[this.size];
 
-        int tmp = includePlayerInventorySlots ? 36 : 0;
-        this.size = this.width * this.height + tmp;
-        this.sizeCont = this.width * this.height;
-        this.elements = new GuiElementInterface[this.size];
-        this.slotRedirects = new Function[this.size];
+		this.includePlayer = includePlayerInventorySlots;
+	}
 
-        this.includePlayer = includePlayerInventorySlots;
-    }
+	public NamedGui build(ServerPlayerEntity player) {
+		NamedGui gui = new NamedGui(this.type, player, this.includePlayer, this.name);
+		gui.setTitle(this.title);
+		gui.setLockPlayerInventory(true);
 
-    /**
-     * Creates {@link SimpleGui} instance based on this builder.
-     *
-     * @param player Player
-     * @return SimpleGui instance
-     */
-    public SimpleGui build(ServerPlayerEntity player) {
-        SimpleGui gui = new NamedGui(this.type, player, this.includePlayer, this.name);
-        gui.setTitle(this.title);
-        gui.setLockPlayerInventory(true);
+		int pos = 0;
 
-        int pos = 0;
+		for (GuiElementInterface element : this.elements) {
+			if (element != null) {
+				gui.setSlot(pos, element);
+			}
+			pos++;
+		}
 
-        for (GuiElementInterface element : this.elements) {
-            if (element != null) {
-                gui.setSlot(pos, element);
-            }
-            pos++;
-        }
+		pos = 0;
 
-        pos = 0;
+		for (SlotFunction slot : this.slotRedirects) {
+			if (slot != null) {
+				gui.setSlotRedirect(pos, slot.apply(player));
+			}
+			pos++;
+		}
 
-        for (Function<ServerPlayerEntity, Slot> slot : this.slotRedirects) {
-            if (slot != null) {
-                gui.setSlotRedirect(pos, slot.apply(player));
-            }
-            pos++;
-        }
+		return gui;
+	}
 
-        return gui;
-    }
+	public void setSlot(int index, AccessableGuiElement element) {
+		this.elements[index] = element;
+	}
 
+	public void setSlot(int index, AccessableAnimatedGuiElement element) {
+		this.elements[index] = element;
+	}
 
-    public int getHeight() {
-        return this.height;
-    }
+	public void addSlot(AccessableGuiElement element) {
+		this.setSlot(this.getFirstEmptySlot(), element);
+	}
 
-    public int getWidth() {
-        return this.width;
-    }
+	public void addSlot(AccessableAnimatedGuiElement element) {
+		this.setSlot(this.getFirstEmptySlot(), element);
+	}
 
-    public void setSlot(int index, GuiElementInterface element) {
-        this.elements[index] = element;
-    }
+	public void setSlot(int index, ItemStack itemStack) {
+		this.setSlot(index, new AccessableGuiElement(itemStack));
+	}
 
-    public void addSlot(GuiElementInterface element) {
-        this.setSlot(this.getFirstEmptySlot(), element);
-    }
+	public void addSlot(ItemStack itemStack) {
+		this.setSlot(this.getFirstEmptySlot(), itemStack);
+	}
 
-    public void setSlot(int index, ItemStack itemStack) {
-        this.setSlot(index, new GuiElement(itemStack, GuiElementInterface.EMPTY_CALLBACK));
-    }
+	public void setSlot(int index, ItemStack itemStack, BasicAction callback) {
+		this.setSlot(index, new AccessableGuiElement(itemStack, callback));
+	}
 
-    public void addSlot(ItemStack itemStack) {
-        this.setSlot(this.getFirstEmptySlot(), itemStack);
-    }
+	public void addSlot(ItemStack itemStack, BasicAction callback) {
+		this.setSlot(this.getFirstEmptySlot(), new AccessableGuiElement(itemStack, callback));
+	}
 
-    public void setSlot(int index, GuiElementBuilderInterface<?> element) {
-        this.setSlot(index, element.build());
-    }
+	public int getFirstEmptySlot() {
+		for (int i = 0; i < this.elements.length; i++) {
+			if (this.elements[i] == null && this.slotRedirects[i] == null) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
-    public void addSlot(GuiElementBuilderInterface<?> element) {
-        this.setSlot(this.getFirstEmptySlot(), element.build());
-    }
+	public boolean isIncludingPlayer() {
+		return this.includePlayer;
+	}
 
-    public void setSlot(int index, ItemStack itemStack, GuiElement.ClickCallback callback) {
-        this.setSlot(index, new GuiElement(itemStack, callback));
-    }
+	public GuiElementInterface getSlot(int index) {
+		if (index >= 0 && index < this.size) {
+			return this.elements[index];
+		}
+		return null;
+	}
 
-    public void setSlot(int index, ItemStack itemStack, GuiElementInterface.ItemClickCallback callback) {
-        this.setSlot(index, new GuiElement(itemStack, callback));
-    }
+	public boolean isRedirectingSlots() {
+		return this.hasRedirects;
+	}
 
-    public void addSlot(ItemStack itemStack, GuiElement.ClickCallback callback) {
-        this.setSlot(this.getFirstEmptySlot(), new GuiElement(itemStack, callback));
-    }
+	public Text getTitle() {
+		return this.title;
+	}
 
-    public void addSlot(ItemStack itemStack, GuiElementInterface.ItemClickCallback callback) {
-        this.setSlot(this.getFirstEmptySlot(), new GuiElement(itemStack, callback));
-    }
+	public void setTitle(Text title) {
+		this.title = title;
+	}
 
-    public void setSlotRedirect(int index, Slot slot) {
-        this.elements[index] = null;
-        this.slotRedirects[index] = (p)->slot;
-        this.hasRedirects = true;
-    }
+	public ScreenHandlerType<?> getType() {
+		return this.type;
+	}
 
-    public void addSlotRedirect(Slot slot) {
-        this.setSlotRedirect(this.getFirstEmptySlot(), slot);
-    }
+	public int getSize() {
+		return this.size;
+	}
 
-    public int getFirstEmptySlot() {
-        for (int i = 0; i < this.elements.length; i++) {
-            if (this.elements[i] == null && this.slotRedirects[i] == null) {
-                return i;
-            }
-        }
-        return -1;
-    }
+	public boolean getLockPlayerInventory() {
+		return this.lockPlayerInventory || this.includePlayer;
+	}
 
-    public void clearSlot(int index) {
-        this.elements[index] = null;
-        this.slotRedirects[index] = null;
-    }
+	public void setLockPlayerInventory(boolean value) {
+		this.lockPlayerInventory = value;
+	}
 
-    public boolean isIncludingPlayer() {
-        return this.includePlayer;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public int getVirtualSize() {
-        return this.sizeCont;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public GuiElementInterface getSlot(int index) {
-        if (index >= 0 && index < this.size) {
-            return this.elements[index];
-        }
-        return null;
-    }
+	public void setSlot(int index, SlotFunction slot) {
+		this.elements[index] = null;
+		this.slotRedirects[index] = slot;
+		this.hasRedirects = true;
+	}
 
-    public Slot getSlotRedirect(int index) {
-        if (index >= 0 && index < this.size) {
-            return this.slotRedirects[index].apply(null);
-        }
-        return null;
-    }
+	public void addSlot(SlotFunction slot) {
+		this.setSlot(this.getFirstEmptySlot(), slot);
+	}
 
-    public boolean isRedirectingSlots() {
-        return this.hasRedirects;
-    }
-
-    public Text getTitle() {
-        return this.title;
-    }
-
-    public void setTitle(Text title) {
-        this.title = title;
-    }
-
-    public ScreenHandlerType<?> getType() {
-        return this.type;
-    }
-
-    @Override
-    public int getSize() {
-        return this.size;
-    }
-
-    public boolean getLockPlayerInventory() {
-        return this.lockPlayerInventory || this.includePlayer;
-    }
-
-    public void setLockPlayerInventory(boolean value) {
-        this.lockPlayerInventory = value;
-    }
-    
-    public String getName() {
-    	return name;
-    }
-    
-    public void setName(String name) {
-    	this.name = name;
-    }
-    
-    public void setSlotRedirect(int index, Function<ServerPlayerEntity, Slot> slot) {
-        this.elements[index] = null;
-        this.slotRedirects[index] = slot;
-        this.hasRedirects = true;
-    }
-
-    public void addSlotRedirect(Function<ServerPlayerEntity, Slot> slot) {
-        this.setSlotRedirect(this.getFirstEmptySlot(), slot);
-    }
-    
-    public Function<ServerPlayerEntity, Slot> getSlotRedirectFunc(int index) {
-        if (index >= 0 && index < this.size) {
-            return this.slotRedirects[index];
-        }
-        return null;
-    }
+	public SlotFunction getSlotFunc(int index) {
+		if (index >= 0 && index < this.size) {
+			return this.slotRedirects[index];
+		}
+		return null;
+	}
 }
