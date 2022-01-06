@@ -86,7 +86,7 @@ public class MessageAction extends BasicAction {
 	@Override
 	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
 		obj.add(MESSAGE, Text.Serializer.toJsonTree(msg));
-		obj.addProperty(SENDER, Helper.getOrDefault(from, UUID::toString, null));
+		obj.addProperty(SENDER, Helper.getOrDefault(from, UUID::toString, (String)null));
 		obj.add(RECIEVERS, context.serialize(Helper.mapEach(to, UUID::toString, null)));
 		obj.add(MESSAGE_TYPE, context.serialize(type));
 		return obj;

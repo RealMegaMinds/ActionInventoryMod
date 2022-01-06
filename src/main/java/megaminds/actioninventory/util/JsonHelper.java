@@ -37,7 +37,7 @@ public class JsonHelper {
 	 * If the given object is null or the object returned from the function is null, returns the given default object.
 	 * If the given object is not null, returns the result of the given function.
 	 */
-	public static <R> R getOrDefault2(JsonElement e, Function<JsonElement, R> func, Supplier<R> defaultObj) {
+	public static <R> R getOrDefault(JsonElement e, Function<JsonElement, R> func, Supplier<R> defaultObj) {
 		return notNull(e) ? Helper.getOrDefault(func.apply(e), defaultObj) : defaultObj.get();
 	}
 	

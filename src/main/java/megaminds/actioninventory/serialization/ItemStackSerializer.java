@@ -63,7 +63,7 @@ public class ItemStackSerializer implements JsonDeserializer<ItemStack>, JsonSer
 		stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, loreNbt);
 		
 		getDoForEach(obj.get(ENCHANMENTS), JsonElement::getAsJsonObject,  o->{
-			Enchantment ench = Registry.ENCHANTMENT.get(new Identifier(getOrDefault(o.get(ENCHANTMENT), JsonElement::getAsString, null)));
+			Enchantment ench = Registry.ENCHANTMENT.get(new Identifier(getOrDefault(o.get(ENCHANTMENT), JsonElement::getAsString, (String)null)));
 			int lvl = getOrDefault(o.get(LEVEL), JsonElement::getAsInt, 1);
 			stack.addEnchantment(ench, lvl);
 		});

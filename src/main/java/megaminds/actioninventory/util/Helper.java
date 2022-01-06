@@ -16,6 +16,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import megaminds.actioninventory.ActionInventoryMod;
@@ -101,6 +102,10 @@ public class Helper {
 		return e!=null ? getOrDefault(func.apply(e), defaultObj) : defaultObj;
 	}
 	
+	public static <E, R> R getOrDefault(E e, Function<E, R> func, Supplier<R> defaultObj) {
+		return e!=null ? Objects.requireNonNullElseGet(func.apply(e), defaultObj) : defaultObj.get();
+	}
+	
 	/**
 	 * If the given object is null, returns the given default object.
 	 * If the given object is not null, returns the given object.
@@ -109,18 +114,21 @@ public class Helper {
         return e!=null ? e : defaultObj;
     }
     
-//	
-//	/**
-//	 * If the given object is null, throws given error.
-//	 * If the given object is not null, returns the result of the given function.
-//	 */
+    public static <E> E getOrDefault(E e, Supplier<E> defaultObj) {
+        return e!=null ? e : defaultObj.get();
+    }
+    	
+	/**
+	 * If the given object is null, throws given error.
+	 * If the given object is not null, returns the result of the given function.
+	 */
 //	public static <E, R, T extends RuntimeException> R getOrError(E e, Function<E, R> func, Supplier<T> error) {
 //		if (e!=null) {
 //			return func.apply(e);
 //		}
 //		throw error.get();
 //	}
-//	
+	
 	/**
 	 * If the given object is null, does nothing. Returns false. <br>
 	 * If the given object is not null, executes the given consumer. Returns true.
@@ -143,10 +151,11 @@ public class Helper {
 	 * If the given object is null, does nothing.
 	 * If the given object is not null, executes the given consumer.
 	 */
-	public static <E, R> void getDo(E e, Function<E, R> func, Consumer<R> consumer) {
+	public static <E, R> boolean getDo(E e, Function<E, R> func, Consumer<R> consumer) {
 		if (e!=null) {
-			consumer.accept(func.apply(e));
+			return ifDo(func.apply(e), consumer);
 		}
+		return false;
 	}
 	
 	public static <C, E, R> void getDoForEach(C c, Function<C, Collection<E>> map, Function<E, R> func, Consumer<R> consumer) {

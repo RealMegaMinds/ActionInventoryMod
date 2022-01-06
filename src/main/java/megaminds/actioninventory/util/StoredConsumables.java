@@ -1,4 +1,4 @@
-package megaminds.actioninventory.actions;
+package megaminds.actioninventory.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,10 +11,8 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.actions.consumables.BasicConsumable;
+import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.mixin.NbtCompoundMixin;
-import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.Saver;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
@@ -59,6 +57,13 @@ public class StoredConsumables extends Saver {
 	 */
 	public NbtElement getDeepSub(String guiName, int slot, String consumable) {
 		return ((NbtCompound)getOrCreateSub(guiName, slot, NbtCompound::new)).get(consumable);
+	}
+
+	/**
+	 * Sets the {@link NbtElement} for the {@link BasicConsumable} in the slot in the gui.
+	 */
+	public void setDeepSub(String guiName, int slot, String consumable, NbtElement el) {
+		((NbtCompound)getOrCreateSub(guiName, slot, NbtCompound::new)).put(consumable, el);
 	}
 
 	@Override

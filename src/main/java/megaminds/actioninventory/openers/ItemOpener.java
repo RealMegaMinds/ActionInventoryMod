@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -70,5 +71,10 @@ public class ItemOpener extends BasicOpener {
 	
 	public static boolean tryOpen(ServerPlayerEntity p, ItemStack s) {
 		return Helper.getFirst(OPENERS, o->o.open(p, s))!=null;
+	}
+
+	@Override
+	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
+		return null;
 	}
 }

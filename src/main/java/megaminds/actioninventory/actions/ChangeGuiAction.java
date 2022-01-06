@@ -40,7 +40,7 @@ public class ChangeGuiAction extends BasicAction {
 
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		name = JsonHelper.getOrDefault(obj.get(NAME), JsonElement::getAsString, null);
+		name = JsonHelper.getOrDefault(obj.get(NAME), JsonElement::getAsString, (String)null);
 		type = JsonHelper.getOrDefault(obj.get(TYPE), GuiType.class, context::deserialize, GuiType.NAMED_GUI);
 		return this;
 	}

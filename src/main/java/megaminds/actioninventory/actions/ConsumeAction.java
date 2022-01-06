@@ -3,6 +3,7 @@ package megaminds.actioninventory.actions;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import com.google.gson.JsonDeserializationContext;
@@ -11,10 +12,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 import eu.pb4.sgui.api.ClickType;
-import megaminds.actioninventory.actions.consumables.BasicConsumable;
+import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.JsonHelper;
+import megaminds.actioninventory.util.StoredConsumables;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -45,23 +47,34 @@ public class ConsumeAction extends BasicAction {
 			return;
 		}
 		
-		if (requireFull) {
-			for (BasicConsumable c : consumables) {
-				if (!c.canConsume(p)) return;
-			}
+		Function<String, NbtElement> getSub = str->s.getDeepSub(gui.getName(), index, str);
+		
+		if (requireFull && !checkConsumption(p, getSub)) {
+			return;
 		}
 		
-		consume(p, str->s.getDeepSub(gui.getName(), index, str));
+		consume(p, getSub, (str,e)->s.setDeepSub(gui.getName(), index, str, e));
 		if (singlePay) s.setSub(gui.getName(), index, NbtByte.ONE);
 		execute(index, type, action, gui);
 	}
 	
 	/**
+	 * Checks if the player can consume the full amount from all consumables
+	 */
+	private boolean checkConsumption(ServerPlayerEntity p, Function<String, NbtElement> func) {
+		for (BasicConsumable c : consumables) {
+			if (!c.canConsumeFull(p, func.apply(c.getType().toString()))) return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Actually does consuming
 	 */
-	private void consume(ServerPlayerEntity p, Function<String, NbtElement> func) {
+	private void consume(ServerPlayerEntity p, Function<String, NbtElement> func, BiConsumer<String, NbtElement> resultConsumer) {
 		for (BasicConsumable c : consumables) {
-			c.consume(p, func.apply(c.getType().toString()));
+			String type = c.getType().toString();
+			resultConsumer.accept(type, c.consume(p, func.apply(type)));
 		}
 	}
 

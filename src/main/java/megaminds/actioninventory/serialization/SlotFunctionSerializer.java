@@ -26,7 +26,7 @@ public class SlotFunctionSerializer implements JsonDeserializer<SlotFunction>, J
 		JsonObject obj = json.getAsJsonObject();
 
 		int index = getOrDefault(obj.get(INDEX), JsonElement::getAsInt, 0);
-		String name = getOrDefault(obj.get(NAME), JsonElement::getAsString, null);
+		String name = getOrDefault(obj.get(NAME), JsonElement::getAsString, (String)null);
 		InventoryType type = getOrDefault(obj.get(TYPE), e->context.deserialize(e, InventoryType.class), InventoryType.PLAYER);
 		if (type==InventoryType.GENERATED) throw new JsonParseException("Cannot deserialize slot redirects of type:"+type);
 		

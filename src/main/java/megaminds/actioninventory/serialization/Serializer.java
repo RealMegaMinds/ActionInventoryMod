@@ -1,13 +1,13 @@
 package megaminds.actioninventory.serialization;
 
 import java.io.Reader;
-import java.util.function.Function;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.AccessableAnimatedGuiElement;
 import megaminds.actioninventory.gui.AccessableGuiElement;
 import megaminds.actioninventory.gui.NamedGuiBuilder;
@@ -46,14 +46,14 @@ public class Serializer {
 		GSON = new GsonBuilder()
 				.disableHtmlEscaping()
 				.setPrettyPrinting()
-				.registerTypeHierarchyAdapter(BasicAction.class, new BasicActionSerializer())
-				.registerTypeHierarchyAdapter(BasicOpener.class, new BasicOpenerSerializer())
-				.registerTypeHierarchyAdapter(SlotFunction.class, new SlotFunctionSerializer())
-				.registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
-				.registerTypeAdapter(NamedGuiBuilder.class, new NamedGuiBuilderSerializer())
-				.registerTypeAdapter(Function.class, new SlotFunctionSerializer())
 				.registerTypeAdapter(AccessableGuiElement.class, new AccessableGuiElementSerializer())
 				.registerTypeAdapter(AccessableAnimatedGuiElement.class, new AccessableAnimatedGuiElementSerializer())
+				.registerTypeHierarchyAdapter(BasicAction.class, new BasicActionSerializer())
+				.registerTypeHierarchyAdapter(BasicConsumable.class, new BasicConsumableSerializer())
+				.registerTypeHierarchyAdapter(BasicOpener.class, new BasicOpenerSerializer())
+				.registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
+				.registerTypeAdapter(NamedGuiBuilder.class, new NamedGuiBuilderSerializer())
+				.registerTypeHierarchyAdapter(SlotFunction.class, new SlotFunctionSerializer())
 				.create();
 	}
 }
