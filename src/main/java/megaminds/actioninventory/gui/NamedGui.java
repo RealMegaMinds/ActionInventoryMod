@@ -7,7 +7,9 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -51,5 +53,15 @@ public class NamedGui extends SimpleGui {
 	
 	public static interface NamedSlotGuiInterface extends SlotGuiInterface {
 		String getName();
+		default ItemStack getStack(int slot) {
+			GuiElementInterface temp;
+			Slot temp2;
+			if ((temp=getSlot(slot))!=null) {
+				return temp.getItemStack().copy();
+			} else if (isRedirectingSlots() && (temp2=getSlotRedirect(slot))!=null) {
+				return temp2.getStack().copy();
+			}
+			return ItemStack.EMPTY;
+		}
 	}
 }

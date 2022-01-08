@@ -1,9 +1,6 @@
 package megaminds.actioninventory.serialization;
 
-import static megaminds.actioninventory.util.JsonHelper.getOrDefault;
 import static megaminds.actioninventory.util.JsonHelper.getDo;
-import static megaminds.actioninventory.util.JsonHelper.getDoForEach;
-
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import org.spongepowered.include.com.google.gson.JsonSyntaxException;
@@ -20,6 +17,7 @@ import com.google.gson.JsonSerializer;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.ItemStackish;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -39,7 +37,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class ItemStackSerializer implements JsonDeserializer<ItemStack>, JsonSerializer<ItemStack> {
+public class ItemStackishSerializer implements JsonDeserializer<ItemStackish>, JsonSerializer<ItemStackish> {
 	//most useful
 	private static final String ITEM = "item", COUNT = "count", NAME = "name", LORE = "lore", DAMAGE = "damage", ENCHANMENTS = "enchantments";
 	//others

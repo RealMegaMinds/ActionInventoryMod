@@ -13,6 +13,8 @@ public enum Action {
 	REQUIRE(RequirementAction::new),
 	CONSUME(ConsumeAction::new);
 	
+	//TODO ParticleAction StatusAction
+	
 	private final Supplier<BasicAction> supplier;
 	
 	private Action(Supplier<BasicAction> supplier) {

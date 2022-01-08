@@ -1,13 +1,13 @@
 package megaminds.actioninventory.actions;
 
+import static megaminds.actioninventory.util.JsonHelper.*;
+
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
-import megaminds.actioninventory.util.JsonHelper;
 import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -42,9 +42,9 @@ public class CommandAction extends BasicAction {
 
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		this.command = JsonHelper.getOrDefault(obj.get(COMMAND), JsonElement::getAsString, "");
-		this.fromServer = JsonHelper.getOrDefault(obj.get(FROM_SERVER), JsonElement::getAsBoolean, false);
-		this.makeTempOp = JsonHelper.getOrDefault(obj.get(MAKE_OP), JsonElement::getAsBoolean, false);
+		this.command = string(obj.get(COMMAND), "");
+		this.fromServer = bool(obj.get(FROM_SERVER));
+		this.makeTempOp = bool(obj.get(MAKE_OP));
 		return this;
 	}
 

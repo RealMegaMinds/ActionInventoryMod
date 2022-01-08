@@ -1,6 +1,9 @@
 package megaminds.actioninventory.actions;
 
+import static megaminds.actioninventory.util.JsonHelper.*;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,13 +16,11 @@ import com.google.gson.JsonSerializationContext;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.JsonHelper;
 import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.network.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
@@ -40,7 +41,7 @@ public class MessageAction extends BasicAction {
 		ServerPlayerEntity player = gui.getPlayer();
 		MinecraftServer server = player.getServer();
 		from = Objects.requireNonNullElse(from, player.getUuid());
-		if (to==null) {
+		if (to.isEmpty()) {
 			MessageHelper.broadcast(from, msg, type, server);
 			return;
 		}
@@ -57,23 +58,24 @@ public class MessageAction extends BasicAction {
 
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		msg = JsonHelper.getOrDefault(obj.get(MESSAGE), Text.Serializer::fromJson, LiteralText.EMPTY);
-		from = JsonHelper.getOrDefault(obj.get(SENDER), s-> uuidFromStr(s.toString()), Util.NIL_UUID);
-		to = JsonHelper.getOrDefault(obj.get(RECIEVERS), MessageAction::getTo, List.of((UUID)null));
-		type = JsonHelper.getOrDefault(obj.get(MESSAGE_TYPE), MessageType.class, context::deserialize, MessageType.CHAT);
+		msg = text(obj.get(MESSAGE));
+		from = custom(obj.get(SENDER), MessageAction::uuid, Util.NIL_UUID);
+		to = custom(obj.get(RECIEVERS), MessageAction::getTo, List.of((UUID)null));
+		type = clazz(obj.get(MESSAGE_TYPE), MessageType.class, context, MessageType.CHAT);
 		return this;
 	}
 	
 	private static List<UUID> getTo(JsonElement el) {
-		JsonArray arr = JsonHelper.arrayOf(el);
-		if (JsonHelper.isNull(el)||arr.isEmpty()||arr.size()==1&&arr.getAsString().equals(BROADCAST)) {
-			return null;
+		JsonArray arr = array(el);
+		if (arr.size()==1&&arr.getAsString().equals(BROADCAST)) {
+			return Collections.emptyList();
 		} else {
-			return JsonHelper.toList(arr, e->uuidFromStr(e.getAsString()));
+			return customList(arr, MessageAction::uuid, true);
 		}
 	}
 	
-	private static UUID uuidFromStr(String fromStr) {
+	private static UUID uuid(JsonElement e) {
+		String fromStr = string(e);
 		if (fromStr.equals(PLAYER)) {
 			return null;
 		} else if (fromStr.equals(SERVER)) {
@@ -86,8 +88,8 @@ public class MessageAction extends BasicAction {
 	@Override
 	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
 		obj.add(MESSAGE, Text.Serializer.toJsonTree(msg));
-		obj.addProperty(SENDER, Helper.getOrDefault(from, UUID::toString, (String)null));
-		obj.add(RECIEVERS, context.serialize(Helper.mapEach(to, UUID::toString, null)));
+		obj.addProperty(SENDER, Helper.apply(from, UUID::toString));
+		obj.add(RECIEVERS, context.serialize(Helper.mapEach(to, UUID::toString, true)));
 		obj.add(MESSAGE_TYPE, context.serialize(type));
 		return obj;
 	}

@@ -1,16 +1,32 @@
 package megaminds.actioninventory.util;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.jetbrains.annotations.NotNull;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
+
+import megaminds.actioninventory.util.Defaults.BooleanDefault;
+import megaminds.actioninventory.util.Defaults.ClassDefault;
+import megaminds.actioninventory.util.Defaults.NewDefault;
+import megaminds.actioninventory.util.Defaults.NullDefault;
+import megaminds.actioninventory.util.Defaults.NumberDefault;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class JsonHelper {	
 	public static boolean isNull(JsonElement e) {
@@ -21,31 +37,11 @@ public class JsonHelper {
 		return e!=null&&!e.isJsonNull();
 	}
 	
-	/**
-	 * If the given object is null or the object returned from the function is null, returns the given default object.
-	 * If the given object is not null, returns the result of the given function.
-	 */
-	public static <R> R getOrDefault(JsonElement e, Function<JsonElement, R> func, R defaultObj) {
-		return notNull(e) ? Helper.getOrDefault(func.apply(e), defaultObj) : defaultObj;
+	public static <E> E notNull(E e, E def) {
+		return e!=null ? e : def;
 	}
 	
-	public static <R> R getOrDefault(JsonElement e, Class<R> clazz, BiFunction<JsonElement, Class<R>, R> func, R defaultObj) {
-		return notNull(e) ? Helper.getOrDefault(func.apply(e, clazz), defaultObj) : defaultObj;
-	}
-	
-	/**
-	 * If the given object is null or the object returned from the function is null, returns the given default object.
-	 * If the given object is not null, returns the result of the given function.
-	 */
-	public static <R> R getOrDefault(JsonElement e, Function<JsonElement, R> func, Supplier<R> defaultObj) {
-		return notNull(e) ? Helper.getOrDefault(func.apply(e), defaultObj) : defaultObj.get();
-	}
-	
-	/**
-	 * If the given object is null, throws given error.
-	 * If the given object is not null, returns the result of the given function.
-	 */
-	public static <R> R getOrError(JsonElement e, Function<JsonElement, R> func, String error) {
+	public static <E> E notNull(JsonElement e, Function<JsonElement, E> func, String error) {
 		if (notNull(e)) {
 			return func.apply(e);
 		}
@@ -82,50 +78,176 @@ public class JsonHelper {
 		}
 	}
 	
-	/**
-	 * Converts the given object into an array.
-	 * Executes {@link #getDo(JsonElement, Function, Consumer)} for each element in the array.
-	 * If the object was null, does nothing.
-	 */
-	public static <R> void getDoForEach(JsonElement a, Function<JsonElement, R> func, Consumer<R> consumer) {
-		ifDo(arrayOf(a), arr->arr.forEach(e->getDo(e, func, consumer)));
+	//GET AS TYPE HELPERS
+	@NotNull
+	public static JsonArray array(JsonElement e) {
+		return array(e, JsonArray::new);
 	}
 	
-	public static <R> void getDoForEach(JsonElement a, Class<R> clazz, BiFunction<JsonElement, Class<R>, R> func, Consumer<R> consumer) {
-		ifDo(arrayOf(a), arr->arr.forEach(e->getDo(e, clazz, func, consumer)));
-	}
-	
-	public static <R> Collection<R> getForEach(JsonElement a, Function<JsonElement, R> func) {
-		List<R> list = new ArrayList<>();
-		getDoForEach(a, func, list::add);
-		return list;
-	}
-	
-	public static <R> Collection<R> getForEach(JsonElement a, Class<R> clazz, BiFunction<JsonElement, Class<R>, R> func) {
-		List<R> list = new ArrayList<>();
-		getDoForEach(a, clazz, func, list::add);
-		return list;
-	}
-	
-	public static JsonArray arrayOf(JsonElement el) {
-		if (notNull(el)) {
-			if (el.isJsonArray()) {
-				return el.getAsJsonArray();
+	public static JsonArray array(JsonElement e, Supplier<JsonArray> def) {
+		if (notNull(e)) {
+			if (e.isJsonArray()) {
+				return e.getAsJsonArray();
 			} else {
 				JsonArray arr = new JsonArray(1);
-				arr.add(el);
+				arr.add(e);
 				return arr;
 			}
 		}
-		return null;
+		return def.get();
+	}
+
+	@NullDefault
+	public static String string(JsonElement e) {
+		return string(e, null);
+	}
+		
+	public static String string(JsonElement e, @NullDefault String def) {
+		return notNull(e) ? e.getAsString() : def;
 	}
 	
-	/**
-	 * Returns a new list containing the results of applying the given function to each JsonElement in the given array.
-	 */
-	public static <R> List<R> toList(JsonArray arr, Function<JsonElement, R> map) {
-		List<R> list = new ArrayList<>(arr.size());
-		arr.forEach(e->list.add(map.apply(e)));
+	@NullDefault
+	public static Identifier identifier(JsonElement e) {
+		return identifier(e, (Identifier)null);
+	}
+		
+	public static Identifier identifier(JsonElement e, @NullDefault Identifier def) {
+		return notNull(e) ? new Identifier(e.getAsString()) : def;
+	}
+	
+	public static Identifier identifier(JsonElement e, Supplier<Identifier> def) {
+		return notNull(e) ? new Identifier(e.getAsString()) : def.get();
+	}
+	
+	@NumberDefault
+	public static Number number(JsonElement e) {
+		return number(e, 0);
+	}
+		
+	public static Number number(JsonElement e, @NumberDefault Number def) {
+		return notNull(e) ? e.getAsNumber() : def;
+	}
+	
+	@NumberDefault
+	public static int integer(JsonElement e) {
+		return integer(e, 0);
+	}
+		
+	public static int integer(JsonElement e, @NumberDefault int def) {
+		return notNull(e) ? e.getAsInt() : def;
+	}
+	
+	@NumberDefault
+	public static float floatt(JsonElement e) {
+		return floatt(e, 0);
+	}
+		
+	public static float floatt(JsonElement e, @NumberDefault float def) {
+		return notNull(e) ? e.getAsFloat() : def;
+	}
+	
+	@BooleanDefault
+	public static boolean bool(JsonElement e) {
+		return bool(e, false);
+	}
+	
+	public static boolean bool(JsonElement e, boolean def) {
+		return notNull(e) ? e.getAsBoolean() : def;
+	}
+	
+	public static <E> Optional<E> optional(JsonElement e, JsonDeserializationContext context, @ClassDefault Type inner) {
+		return context.deserialize(e, TypeToken.getParameterized(Optional.class, inner).getType());
+	}
+	
+	@NewDefault
+	public static Text text(JsonElement e) {
+		return text(e, LiteralText.EMPTY);
+	}
+	
+	public static Text text(JsonElement e, Text def) {
+		return notNull(e) ? notNull(Text.Serializer.fromJson(e), def) : def;
+	}
+	
+	@NullDefault
+	public static <E> E clazz(JsonElement e, Class<E> clazz, JsonDeserializationContext context) {
+		return clazz(e, clazz, context, (E)null);
+	}
+	
+	public static <E> E clazz(JsonElement e, Class<E> clazz, JsonDeserializationContext context, E def) {
+		return notNull(e) ? context.deserialize(e, clazz) : def;
+	}
+	
+	public static <E> E clazz(JsonElement e, Class<E> clazz, JsonDeserializationContext context, Supplier<E> def) {
+		return notNull(e) ? context.deserialize(e, clazz) : def.get();
+	}
+	
+	@NullDefault
+	public static <E> E custom(JsonElement e, Function<JsonElement, E> func) {
+		return custom(e, func, (E)null);
+	}
+	
+	public static <E> E custom(JsonElement e, Function<JsonElement, E> func, E def) {
+		return notNull(e) ? func.apply(e) : def;
+	}
+	
+	public static <E> E custom(JsonElement e, Function<JsonElement, E> func, Supplier<E> def) {
+		return notNull(e) ? func.apply(e) : def.get();
+	}
+	
+	@NotNull
+	public static List<String> stringList(JsonElement e, boolean allowNull) {
+		List<String> list = new ArrayList<>();
+		array(e).forEach(s->Helper.ifOrDo(string(s), t->allowNull, list::add));
 		return list;
+	}
+	
+	@NotNull
+	public static <E> List<E> clazzList(JsonElement e, Class<E> clazz, JsonDeserializationContext context, boolean allowNull) {
+		List<E> list = new ArrayList<>();
+		array(e).forEach(c->Helper.ifOrDo(clazz(c, clazz, context), t->allowNull, list::add));
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@NotNull
+	public static <E extends Number> List<E> numberList(JsonElement e, boolean allowNull) {
+		List<E> list = new ArrayList<>();
+		
+		array(e).forEach(c->Helper.ifOrDo((E)number(c), t->allowNull, list::add));
+		return list;
+	}
+	
+	@NotNull
+	public static <E> List<E> customList(JsonElement e, Function<JsonElement, E> func, boolean allowNull) {
+		List<E> list = new ArrayList<>();
+		array(e).forEach(c->Helper.ifOrDo(custom(c, func), t->allowNull, list::add));
+		return list;
+	}
+	
+	@NotNull
+	public static <E, R extends List<E>> R customList(JsonElement e, Function<JsonElement, E> func, boolean allowNull, R list) {
+		array(e).forEach(c->Helper.ifOrDo(custom(c, func), t->allowNull, list::add));
+		return list;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@NotNull
+	public static <E> E[] clazzArr(JsonElement e, Class<E> clazz, JsonDeserializationContext context, @BooleanDefault boolean allowNull) {
+		return clazzList(e, clazz, context, allowNull).toArray(i->(E[])Array.newInstance(clazz, i));
+	}
+	
+	@NotNull
+	public static <E> E[] clazzArr(JsonElement e, Class<E> clazz, JsonDeserializationContext context) {
+		return clazzArr(e, clazz, context, false);
+	}
+	
+	@NotNull
+	public static <E> Stream<E> clazzStream(JsonElement e, Class<E> clazz, JsonDeserializationContext context, @BooleanDefault boolean allowNull) {
+		return clazzList(e, clazz, context, allowNull).stream();
+	}
+	
+	@NotNull
+	public static <E> Stream<E> clazzStream(JsonElement e, Class<E> clazz, JsonDeserializationContext context) {
+		return clazzStream(e, clazz, context, false);
 	}
 }

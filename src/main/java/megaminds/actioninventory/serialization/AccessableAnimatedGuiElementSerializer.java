@@ -1,6 +1,6 @@
 package megaminds.actioninventory.serialization;
 
-import static megaminds.actioninventory.util.JsonHelper.getOrDefault;
+import static megaminds.actioninventory.util.JsonHelper.*;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -16,7 +16,6 @@ import com.google.gson.JsonSerializer;
 
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.gui.AccessableAnimatedGuiElement;
-import megaminds.actioninventory.util.JsonHelper;
 import net.minecraft.item.ItemStack;
 
 public class AccessableAnimatedGuiElementSerializer implements JsonDeserializer<AccessableAnimatedGuiElement>, JsonSerializer<AccessableAnimatedGuiElement> {
@@ -38,10 +37,10 @@ public class AccessableAnimatedGuiElementSerializer implements JsonDeserializer<
 	public AccessableAnimatedGuiElement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
 
-		BasicAction callback = getOrDefault(obj.get(CALLBACK), BasicAction.class, context::deserialize, null);
-		ItemStack[] stacks = getOrDefault(obj.get(ITEMS), l->JsonHelper.toList(l.getAsJsonArray(), e->context.deserialize(e, ItemStack.class)).toArray(ItemStack[]::new), new ItemStack[] {ItemStack.EMPTY});
-		int interval = getOrDefault(obj.get(INTERVAL), JsonElement::getAsInt, 1);
-		boolean random = getOrDefault(obj.get(RANDOM), JsonElement::getAsBoolean, false);
+		BasicAction callback = clazz(obj.get(CALLBACK), BasicAction.class, context);
+		ItemStack[] stacks = clazzArr(obj.get(ITEMS), ItemStack.class, context);
+		int interval = integer(obj.get(INTERVAL), 1);
+		boolean random = bool(obj.get(RANDOM));
 
 		return new AccessableAnimatedGuiElement(stacks, interval, random, callback);
 	}

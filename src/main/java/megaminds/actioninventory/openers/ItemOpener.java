@@ -1,8 +1,11 @@
 package megaminds.actioninventory.openers;
 
+import static megaminds.actioninventory.util.JsonHelper.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.mojang.brigadier.StringReader;
@@ -10,6 +13,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.ItemStackish;
+import megaminds.actioninventory.util.JsonHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -21,25 +26,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class ItemOpener extends BasicOpener {
-	private static final String ITEM = "item", NAME = "customName", TEXT_ONLY = "textOnly", NBT = "nbt", TAGS = "tags";
+	private static final String ITEM = "item", TEXT_ONLY = "textOnly", NBT = "nbt", TAGS = "tags";
 	private static final List<ItemOpener> OPENERS = new ArrayList<>();
 
-	private Item item;
-	private Text customName;
+	private ItemStackish stack;
 	private boolean textOnly;
-	private NbtCompound nbt;
 	private List<Identifier> tags;
 
 	@Override
 	public BasicOpener fromJson(JsonObject obj, JsonDeserializationContext context) {
-		item = obj.has(ITEM) ? Registry.ITEM.get(new Identifier(obj.get(ITEM).getAsString())) : null;
-		customName = obj.has(NAME) ? Text.Serializer.fromJson(obj.get(NAME)) : null;
-		textOnly = obj.has(TEXT_ONLY) ? obj.get(TEXT_ONLY).getAsBoolean() : true;
-		try {
-			nbt = obj.has(NBT) ? new StringNbtReader(new StringReader(obj.get(NBT).getAsString())).parseCompound()  : null;
-		} catch (CommandSyntaxException e) {
-			ActionInventoryMod.warn("Failed to read nbt data for an ItemOpener.");
-		}
+		textOnly = bool(obj.get(TEXT_ONLY));
 		tags = obj.has(TAGS) ? Helper.toList(obj.get(TAGS).getAsJsonArray(), e->new Identifier(e.getAsString())) : null;
 		return this;
 	}

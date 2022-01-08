@@ -1,7 +1,6 @@
 package megaminds.actioninventory.serialization;
 
-import static megaminds.actioninventory.util.JsonHelper.getOrDefault;
-import static megaminds.actioninventory.util.JsonHelper.getOrError;
+import static megaminds.actioninventory.util.JsonHelper.*;
 
 import java.lang.reflect.Type;
 
@@ -25,10 +24,10 @@ public class BasicActionSerializer implements JsonDeserializer<BasicAction>, Jso
 	public BasicAction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
 		
-		BasicAction action = getOrError(obj.get(TYPE), e->context.<Action>deserialize(e, Action.class), "Actions must have a type").get();
-		action.setIndex(getOrDefault(obj.get(INDEX), JsonElement::getAsInt, BasicAction.UNSET_INDEX));
-		action.setClickType(getOrDefault(obj.get(CLICK_TYPE), ClickType.class, context::deserialize, null));
-		action.setSlotActionType(getOrDefault(obj.get(ACTION_TYPE), SlotActionType.class, context::deserialize, null));
+		BasicAction action = clazz(obj.get(TYPE), Action.class, context).get();
+		action.setIndex(integer(obj.get(INDEX), BasicAction.UNSET_INDEX));
+		action.setClickType(clazz(obj.get(CLICK_TYPE), ClickType.class, context));
+		action.setSlotActionType(clazz(obj.get(ACTION_TYPE), SlotActionType.class, context));
 
 		return action.fromJson(obj, context);
 	}

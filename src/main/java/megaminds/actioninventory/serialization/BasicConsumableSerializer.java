@@ -1,7 +1,6 @@
 package megaminds.actioninventory.serialization;
 
-import static megaminds.actioninventory.util.JsonHelper.getOrError;
-import static megaminds.actioninventory.util.JsonHelper.getDo;
+import static megaminds.actioninventory.util.JsonHelper.*;
 
 import java.lang.reflect.Type;
 

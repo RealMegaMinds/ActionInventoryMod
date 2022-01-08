@@ -1,6 +1,6 @@
 package megaminds.actioninventory.serialization;
 
-import static megaminds.actioninventory.util.JsonHelper.getOrDefault;
+import static megaminds.actioninventory.util.JsonHelper.*;
 
 import java.lang.reflect.Type;
 import com.google.gson.JsonDeserializationContext;
@@ -21,8 +21,8 @@ public class AccessableGuiElementSerializer implements JsonDeserializer<Accessab
 	@Override
 	public AccessableGuiElement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject obj = json.getAsJsonObject();
-		BasicAction callback = getOrDefault(obj.get(CALLBACK), BasicAction.class, context::deserialize, null);
-		ItemStack item = getOrDefault(obj.get(ITEM), i->context.deserialize(i, ItemStack.class), ItemStack.EMPTY);
+		BasicAction callback = clazz(obj.get(CALLBACK), BasicAction.class, context);
+		ItemStack item = clazz(obj.get(ITEM), ItemStack.class, context, ItemStack.EMPTY);
 		return new AccessableGuiElement(item, callback);
 	}
 	

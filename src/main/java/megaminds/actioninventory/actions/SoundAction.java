@@ -1,17 +1,19 @@
 package megaminds.actioninventory.actions;
 
+import static megaminds.actioninventory.util.JsonHelper.*;
+
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
-import megaminds.actioninventory.util.JsonHelper;
+import megaminds.actioninventory.util.Helper;
 import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
@@ -40,16 +42,16 @@ public class SoundAction extends BasicAction {
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
-		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound, category, pos!=null ? pos : player.getPos(), volume, pitch));
+		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound, category, Helper.get(pos, player.getPos()), volume, pitch));
 	}
 
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		sound = new Identifier(JsonHelper.getOrDefault(obj.get(SOUND), JsonElement::getAsString, "ui.button.click"));
-		category = JsonHelper.getOrDefault(obj.get(CATEGORY), SoundCategory.class, context::deserialize, SoundCategory.MASTER);
-		pos = JsonHelper.getOrDefault(obj.get(POS), Vec3d.class, context::deserialize, null);
-		volume = JsonHelper.getOrDefault(obj.get(VOLUME), JsonElement::getAsFloat, 1f);
-		pitch = JsonHelper.getOrDefault(obj.get(PITCH), JsonElement::getAsFloat, 1f);
+		sound = identifier(obj.get(SOUND), SoundEvents.UI_BUTTON_CLICK::getId);
+		category = clazz(obj.get(CATEGORY), SoundCategory.class, context, SoundCategory.MASTER);
+		pos = clazz(obj.get(POS), Vec3d.class, context);
+		volume = floatt(obj.get(VOLUME), 1f);
+		pitch = floatt(obj.get(PITCH), 1f);
 		return this;
 	}
 	

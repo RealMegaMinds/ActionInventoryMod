@@ -1,14 +1,14 @@
 package megaminds.actioninventory.actions;
 
+import static megaminds.actioninventory.util.JsonHelper.*;
+
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.ScreenProperty;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
-import megaminds.actioninventory.util.JsonHelper;
 import net.minecraft.screen.slot.SlotActionType;
 
 public class SendPropertyAction extends BasicAction {
@@ -24,8 +24,8 @@ public class SendPropertyAction extends BasicAction {
 
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		property = JsonHelper.getOrDefault(obj.get(PROPERTY), ScreenProperty.class, context::deserialize, ScreenProperty.FIRE_LEVEL);
-		value = JsonHelper.getOrDefault(obj.get(VALUE), JsonElement::getAsInt, 0);
+		property = clazz(obj.get(PROPERTY), ScreenProperty.class, context, ScreenProperty.FIRE_LEVEL);
+		value = integer(obj.get(VALUE));
 		return this;
 	}
 

@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import static megaminds.actioninventory.util.JsonHelper.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -7,7 +9,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
@@ -15,7 +16,6 @@ import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.JsonHelper;
 import megaminds.actioninventory.util.StoredConsumables;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
@@ -93,10 +93,10 @@ public class ConsumeAction extends BasicAction {
 	
 	@Override
 	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		actions = JsonHelper.getForEach(obj.get(ACTIONS), BasicAction.class, context::deserialize).toArray(BasicAction[]::new);
-		consumables = JsonHelper.getForEach(obj.get(CONSUMABLES), BasicConsumable.class, context::deserialize).toArray(BasicConsumable[]::new);
-		singlePay = JsonHelper.getOrDefault(obj.get(SINGLE_PAY), JsonElement::getAsBoolean, false);
-		requireFull = JsonHelper.getOrDefault(obj.get(REQUIRE_FULL), JsonElement::getAsBoolean, true);
+		actions = clazzArr(obj.get(ACTIONS), BasicAction.class, context);
+		consumables = clazzArr(obj.get(CONSUMABLES), BasicConsumable.class, context);
+		singlePay = bool(obj.get(SINGLE_PAY));
+		requireFull = bool(obj.get(REQUIRE_FULL), true);
 		if (requireFull) Helper.forEach(consumables, BasicConsumable::requireFull);
 		return this;
 	}
