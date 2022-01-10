@@ -1,8 +1,11 @@
 package megaminds.actioninventory.gui;
 
+import com.google.gson.annotations.JsonAdapter;
+
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.serialization.NamedGuiBuilderSerializer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -11,6 +14,7 @@ import net.minecraft.text.Text;
 /**
  * Originally cloned from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder} and then many changes made.
  */
+@JsonAdapter(NamedGuiBuilderSerializer.class)
 public final class NamedGuiBuilder {
 	private final int size;
 	private final ScreenHandlerType<?> type;

@@ -1,30 +1,28 @@
 package megaminds.actioninventory.actions;
 
-import static megaminds.actioninventory.util.JsonHelper.*;
-
 import java.util.UUID;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
 
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.util.Constants.GuiType;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.NamedGuiLoader;
+import megaminds.actioninventory.util.TypeName;
 import net.minecraft.screen.slot.SlotActionType;
 
-public class ChangeGuiAction extends BasicAction {
-	private static final String NAME = "name", TYPE = "guiType";
-	private enum GuiType {PLAYER, ENDER_CHEST, NAMED_GUI}
-
+@TypeName("OpenGui")
+public final class ChangeGuiAction extends BasicAction {
 	private String name;
-	private GuiType type;
+	private GuiType guiType;
+	
+	public ChangeGuiAction() {
+	}
 
 	@Override
 	public void internalClick(int index, ClickType cType, SlotActionType action, NamedSlotGuiInterface gui) {
-		gui.close();
-		switch (type) {
+		if (guiType==null) gui.close();
+		
+		switch (guiType) {
 		case ENDER_CHEST -> {
 			UUID uuid = Helper.apply(name, UUID::fromString, gui.getPlayer()::getUuid);
 			NamedGuiLoader.openEnderChest(gui.getPlayer(), uuid);
@@ -39,22 +37,19 @@ public class ChangeGuiAction extends BasicAction {
 		}
 	}
 
-	@Override
-	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		name = string(obj.get(NAME));
-		type = clazz(obj.get(TYPE), GuiType.class, context, ()->GuiType.NAMED_GUI);
-		return this;
+	public String getName() {
+		return name;
 	}
 
-	@Override
-	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
-		obj.addProperty(NAME, name);
-		obj.add(TYPE, context.serialize(type));
-		return obj;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	@Override
-	public Action getType() {
-		return Action.OPEN_GUI;
+	public GuiType getGuiType() {
+		return guiType;
+	}
+
+	public void setGuiType(GuiType guiType) {
+		this.guiType = guiType;
 	}
 }

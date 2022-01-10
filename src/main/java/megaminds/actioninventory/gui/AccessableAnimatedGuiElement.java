@@ -2,10 +2,14 @@ package megaminds.actioninventory.gui;
 
 import java.util.Objects;
 
+import com.google.gson.annotations.JsonAdapter;
+
 import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.serialization.AccessableAnimatedGuiElementSerializer;
 import net.minecraft.item.ItemStack;
 
+@JsonAdapter(AccessableAnimatedGuiElementSerializer.class)
 public class AccessableAnimatedGuiElement extends AnimatedGuiElement {
 
 	public AccessableAnimatedGuiElement(ItemStack[] items, int interval, boolean random, BasicAction callback) {

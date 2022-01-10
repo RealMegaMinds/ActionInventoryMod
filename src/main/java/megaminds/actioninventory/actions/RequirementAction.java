@@ -1,68 +1,59 @@
 package megaminds.actioninventory.actions;
 
-import static megaminds.actioninventory.util.JsonHelper.*;
+import java.util.Objects;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import eu.pb4.sgui.api.ClickType;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.LevelSetter;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
-import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.TypeName;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.screen.slot.SlotActionType;
 
-public class RequirementAction extends BasicAction {
-	private static final String ACTIONS = "actions", SELECTOR = "entitySelector";
-
+@TypeName("Require")
+public final class RequirementAction extends BasicAction {	
 	private BasicAction[] actions;
-	private EntitySelector selector;
-	private String selectorStr;
+	//null or empty allows all
+	private String entitySelector;
+	private transient EntitySelector selector;
+	private boolean failed;
 
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
-		if (Helper.nullOr(selector, s-> matches(s, gui.getPlayer()))) {
+		if (!failed && selector==null) {
+			fixSelector();
+		}
+		
+		if (selector==null || matches(gui.getPlayer())) {
 			for (BasicAction a : actions) {
 				a.internalClick(index, type, action, gui);
 			}
 		}
 	}
 	
-	private static boolean matches(EntitySelector s, Entity e) {
+	private boolean matches(Entity e) {
 		try {
-			return e.equals(s.getEntity(((LevelSetter)e.getCommandSource()).withHigherLevel(2)));
+			return e.equals(selector.getEntity(((LevelSetter)e.getCommandSource()).withHigherLevel(2)));
 		} catch (CommandSyntaxException e1) {
 			return false;
 		}
 	}
 
-	@Override
-	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		this.selectorStr = "@s"+string(obj.get(SELECTOR), "").strip();
+	public void fixSelector() {
+		String whole = "@s"+Objects.requireNonNullElse(entitySelector, "").strip();
+		
 		try {
-			this.selector = new EntitySelectorReader(new StringReader(selectorStr)).read();
+			this.selector = new EntitySelectorReader(new StringReader(whole)).read();
 		} catch (CommandSyntaxException e) {
-			throw new JsonSyntaxException("Failed to read entity selector for an EntityOpener.", e);
+			ActionInventoryMod.warn("Failed to read entity selector for an EntityOpener.");
+			e.printStackTrace();
+			this.failed = true;
+			this.selector = null;
 		}
-		actions = clazzArr(obj.get(ACTIONS), BasicAction.class, context, false);
-		return this;
-	}
-	
-	@Override
-	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
-		obj.add(ACTIONS, context.serialize(actions));
-		obj.addProperty(SELECTOR, selectorStr);
-		return obj;
-	}
-
-	@Override
-	public Action getType() {
-		return Action.REQUIRE;
 	}
 }

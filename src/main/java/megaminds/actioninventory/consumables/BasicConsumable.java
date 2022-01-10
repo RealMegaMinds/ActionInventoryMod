@@ -1,12 +1,12 @@
 package megaminds.actioninventory.consumables;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
+import com.google.gson.annotations.JsonAdapter;
 
+import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+@JsonAdapter(PolymorphicTypeAdapterFactory.class)
 public abstract class BasicConsumable {
 	private boolean requireFull;
 
@@ -18,10 +18,10 @@ public abstract class BasicConsumable {
 	 * Consumes from the player, and returns the corrected storage.
 	 */
 	public abstract NbtElement consume(ServerPlayerEntity player, NbtElement storage);
-	
-	public abstract BasicConsumable fromJson(JsonObject obj, JsonDeserializationContext context);
-	public abstract JsonObject toJson(JsonObject obj, JsonSerializationContext context);
-	public abstract Consumable getType();
+	/**
+	 * Returns the name of the storage this consumable accesses
+	 */
+	public abstract String getStorageName();
 	
 	public final boolean getRequireFull() {
 		return requireFull;

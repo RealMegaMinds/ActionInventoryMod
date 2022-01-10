@@ -16,9 +16,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
-import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.AccessableAnimatedGuiElement;
 import megaminds.actioninventory.gui.AccessableGuiElement;
 import megaminds.actioninventory.gui.NamedGuiBuilder;
@@ -40,9 +37,11 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 
 public class Serializer {
+	private static JsonSerializer<Object> CANT_SERIALIZE = (s, t, c)->new JsonPrimitive("Can't serialize");
 	public static final Gson GSON;
 	
 	public static NamedGuiBuilder builderFromJson(Reader json) {
@@ -75,10 +74,8 @@ public class Serializer {
 				.setPrettyPrinting()
 				.registerTypeAdapter(AccessableGuiElement.class, new AccessableGuiElementSerializer())
 				.registerTypeAdapter(AccessableAnimatedGuiElement.class, new AccessableAnimatedGuiElementSerializer())
-				.registerTypeHierarchyAdapter(BasicAction.class, new BasicActionSerializer())
-				.registerTypeHierarchyAdapter(BasicConsumable.class, new BasicConsumableSerializer())
-				.registerTypeHierarchyAdapter(BasicOpener.class, new BasicOpenerSerializer())
 				.registerTypeAdapter(ItemStack.class, delegateD(ItemStackish.class, ItemStackish::toStack))
+				.registerTypeAdapter(ItemStack.class, CANT_SERIALIZE)
 				.registerTypeAdapter(NamedGuiBuilder.class, new NamedGuiBuilderSerializer())
 				.registerTypeHierarchyAdapter(SlotFunction.class, new SlotFunctionSerializer())
 				.registerTypeAdapter(Identifier.class, delegate(String.class, Identifier::new, Identifier::toString))
@@ -93,7 +90,7 @@ public class Serializer {
 				.registerTypeAdapter(ScreenHandler.class, registryDelegate(Registry.SCREEN_HANDLER))
 				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registry.STATUS_EFFECT))
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registry.PARTICLE_TYPE))
-				.registerTypeAdapter(Optional.class, new NullOptionalSerializer(false))
+				.registerTypeAdapter(Optional.class, new OptionalAdapterFactory())
 				.create();
 	}
 	

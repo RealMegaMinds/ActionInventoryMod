@@ -1,12 +1,14 @@
 package megaminds.actioninventory.openers;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
+import java.util.Objects;
 
+import com.google.gson.annotations.JsonAdapter;
+
+import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
 import megaminds.actioninventory.util.NamedGuiLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+@JsonAdapter(PolymorphicTypeAdapterFactory.class)
 public abstract class BasicOpener {
 	private String name;
 	
@@ -19,15 +21,9 @@ public abstract class BasicOpener {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = Objects.requireNonNull(name);
 	}
 	
-	/**
-	 * Implementors should return themselves.
-	 */
-	public abstract BasicOpener fromJson(JsonObject obj, JsonDeserializationContext context);
-	public abstract JsonObject toJson(JsonObject obj, JsonSerializationContext context);
-	public abstract Opener getType();
 	public abstract boolean addToMap();
 	public abstract void removeFromMap();
 }

@@ -1,14 +1,9 @@
 package megaminds.actioninventory.actions;
 
-import static megaminds.actioninventory.util.JsonHelper.*;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
+import megaminds.actioninventory.util.TypeName;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -20,13 +15,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
  * @see GiveAction
  * @see OpenActionInventoryAction
  */
-public class CommandAction extends BasicAction {
-	private static final String COMMAND = "command", FROM_SERVER = "fromServer", MAKE_OP = "makeTempOp";
-	
+@TypeName("Command")
+public final class CommandAction extends BasicAction {
 	private String command;
 	private boolean fromServer;
 	private boolean makeTempOp;
-		
+	
+	public CommandAction() {
+		command = "";
+	}
+			
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
@@ -38,26 +36,5 @@ public class CommandAction extends BasicAction {
 		} else {
 			MessageHelper.executeCommand(player, command);
 		}
-	}
-
-	@Override
-	public BasicAction fromJson(JsonObject obj, JsonDeserializationContext context) {
-		this.command = string(obj.get(COMMAND), "");
-		this.fromServer = bool(obj.get(FROM_SERVER));
-		this.makeTempOp = bool(obj.get(MAKE_OP));
-		return this;
-	}
-
-	@Override
-	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
-		obj.addProperty(COMMAND, command);
-		obj.addProperty(FROM_SERVER, fromServer);
-		obj.addProperty(MAKE_OP, makeTempOp);
-		return obj;
-	}
-
-	@Override
-	public Action getType() {
-		return Action.COMMAND;
 	}
 }

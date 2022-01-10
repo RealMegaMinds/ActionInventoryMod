@@ -1,13 +1,15 @@
 package megaminds.actioninventory.openers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
 
 import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.JsonHelper;
+import megaminds.actioninventory.util.Constants.TagOption;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -15,31 +17,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 
 public class BlockOpener extends BasicOpener {
-	private static final String BLOCK = "block", ENTITY_TYPE = "entityType", POS = "position", TAGS = "tags";
 	private static final List<BlockOpener> OPENERS = new ArrayList<>();
 	
 	private Block block;
-	private BlockEntityType<?> entityType;
-	private BlockPos pos;
-	private List<Identifier> tags;
+	private BlockPos position;
+	@Nullable private Optional<BlockEntityType<?>> entityType;
+	@Nullable private Optional<Set<Identifier>> tags;
+	private TagOption tagOption = TagOption.ALL;
 
-	@Override
-	public BasicOpener fromJson(JsonObject obj, JsonDeserializationContext context) {
-		block = obj.has(BLOCK) ? Registry.BLOCK.get(new Identifier(obj.get(BLOCK).getAsString())) : null;
-		entityType = obj.has(ENTITY_TYPE) ? Registry.BLOCK_ENTITY_TYPE.get(new Identifier(obj.get(ENTITY_TYPE).getAsString())) : null;
-		if (obj.has(POS)) {
-			JsonArray arr = obj.get(POS).getAsJsonArray();
-			pos = new BlockPos(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
-		} else {
-			pos = null;
-		}
-		tags = obj.has(TAGS) ? JsonHelper.toList(obj.get(TAGS).getAsJsonArray(), e->new Identifier(e.getAsString())) : null;
-		return this;
-	}
-	
 	/**
 	 * context[0] = Block <br>
 	 * context[1] = BlockPos <br>
@@ -53,17 +40,34 @@ public class BlockOpener extends BasicOpener {
 		return false;
 	}
 	
-	private boolean checkEntity(Object o) {
-		return !(o instanceof BlockEntity e) || Helper.nullOrEquals(entityType, e.getType());
-	}
-	
 	private boolean checkBlock(Object o, Object bPos) {
-		return !(o instanceof Block b) || Helper.nullOrEquals(block, b) && Helper.nullOrEquals(pos, bPos) && BlockTags.getTagGroup().getTagsFor(b).containsAll(tags);
+		if  (block==null||block.equals(o) && position==null||position.equals(bPos)) {
+			if (tags==null) return true;
+			
+			Collection<Identifier> c = BlockTags.getTagGroup().getTagsFor((Block)o);
+			switch (tagOption) {
+			case ALL:
+				return c.containsAll(tags.get());
+			case ANY:
+				break;
+			case EXACT:
+				List<Identifier> test = tags.get();
+				if (c.size()!=test.size()) return false;
+				
+				List<Identifier> real = List.copyOf(c);
+				for (Identifier i : test) {
+					real.remove(c);
+				}
+				return real.isEmpty();
+			case NONE:
+				break;
+			}
+		}
+		return false;
 	}
 
-	@Override
-	public Opener getType() {
-		return Opener.BLOCK;
+	private boolean checkEntity(Object o) {
+		return !(o instanceof BlockEntity e) || entityType.filter(t->!t.equals(e.getType())).isEmpty();
 	}
 	
 	public boolean addToMap() {
