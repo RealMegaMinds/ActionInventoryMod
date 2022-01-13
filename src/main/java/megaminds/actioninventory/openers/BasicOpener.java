@@ -4,23 +4,24 @@ import java.util.Objects;
 
 import com.google.gson.annotations.JsonAdapter;
 
+import megaminds.actioninventory.loaders.NamedGuiLoader;
 import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
-import megaminds.actioninventory.util.NamedGuiLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 @JsonAdapter(PolymorphicTypeAdapterFactory.class)
-public abstract class BasicOpener {
-	private String name;
+public abstract sealed class BasicOpener permits BlockOpener, EntityOpener, ItemOpener {
+	private Identifier name;
 	
-	public boolean open(ServerPlayerEntity player, Object... context) {
+	public boolean open(ServerPlayerEntity player, Object... context) {	//NOSONAR Used by subclasses
 		return NamedGuiLoader.openGui(player, name);
 	}
 	
-	public String getName() {
+	public Identifier getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(Identifier name) {
 		this.name = Objects.requireNonNull(name);
 	}
 	

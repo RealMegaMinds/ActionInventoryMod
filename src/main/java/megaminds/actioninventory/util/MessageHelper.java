@@ -17,7 +17,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 
 public class MessageHelper {
-	private static final Formatting ERROR = Formatting.RED, SUCCESS = Formatting.GREEN;
+	private static final Formatting ERROR = Formatting.RED;
+	private static final Formatting SUCCESS = Formatting.GREEN;
+	
+	private MessageHelper() {}
 	
 	public static Text toSuccess(String msg) {
 		return new LiteralText(msg).formatted(SUCCESS);
@@ -32,11 +35,15 @@ public class MessageHelper {
 	 */
 	public static void message(@Nullable UUID from, List<UUID> to, Text message, @Nullable MessageType type, MinecraftServer server) {
 		from = from!=null ? from : Util.NIL_UUID;
-		type = type!=null ? type : from==Util.NIL_UUID ? MessageType.SYSTEM : MessageType.CHAT;
+		type = type!=null ? type : getType(from);
 		
 		for (UUID uuid : to) {
 			server.getPlayerManager().getPlayer(uuid).sendMessage(message, type, from);
 		}
+	}
+	
+	private static MessageType getType(UUID uuid) {
+		return uuid==Util.NIL_UUID ? MessageType.SYSTEM : MessageType.CHAT;
 	}
 	
 	/**
@@ -44,7 +51,7 @@ public class MessageHelper {
 	 */
 	public static void broadcast(@Nullable UUID from, Text message, @Nullable MessageType type, MinecraftServer server) {
 		from = from!=null ? from : Util.NIL_UUID;
-		type = type!=null ? type : from==Util.NIL_UUID ? MessageType.SYSTEM : MessageType.CHAT;
+		type = type!=null ? type : getType(from);
 
 		server.getPlayerManager().broadcast(message, type, from);
 	}

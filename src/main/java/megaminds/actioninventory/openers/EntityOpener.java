@@ -2,57 +2,63 @@ package megaminds.actioninventory.openers;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import java.util.Objects;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.LevelSetter;
+import megaminds.actioninventory.misc.LevelSetter;
 import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.annotations.Exclude;
+import megaminds.actioninventory.util.annotations.TypeName;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 
-public class EntityOpener extends BasicOpener {
-	private static final String SELECTOR = "entitySelector";
+@TypeName("Entity")
+public final class EntityOpener extends BasicOpener {
 	private static final List<EntityOpener> OPENERS = new ArrayList<>();
 
-	private EntitySelector selector;
+	private String entitySelector;	
+	private boolean failed;
+	
+	@Exclude private EntitySelector selector;
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
-		if (context[0] instanceof Entity e && (selector==null || matches(selector, e))) {
+		if (!failed && selector==null) {
+			fixSelector();
+		}
+
+		if (selector==null || matches((Entity)context[0])) {
 			return super.open(player, context);
 		}
 		return false;
 	}
-
-	private static boolean matches(EntitySelector s, Entity e) {
+	private boolean matches(Entity e) {
 		try {
-			return e.equals(s.getEntity(((LevelSetter)e.getCommandSource()).withHigherLevel(2)));
+			return e.equals(selector.getEntity(((LevelSetter)e.getCommandSource()).withHigherLevel(2)));
 		} catch (CommandSyntaxException e1) {
 			return false;
 		}
 	}
 
-	@Override
-	public BasicOpener fromJson(JsonObject obj, JsonDeserializationContext context) {
-		if (obj.has(SELECTOR)) {
-			String selector = "@s"+obj.get(SELECTOR).getAsString().trim();
-			try {
-				this.selector = new EntitySelectorReader(new StringReader(selector)).read();
-			} catch (CommandSyntaxException e1) {
-				ActionInventoryMod.warn("Failed to read entity selector for an EntityOpener.");
-			}
-		}
-		return this;
-	}
+	public void fixSelector() {
+		String whole = "@s"+Objects.requireNonNullElse(entitySelector, "").strip();
 
-	@Override
-	public Opener getType() {
-		return Opener.ENTITY;
+		try {
+			this.selector = new EntitySelectorReader(new StringReader(whole)).read();
+		} catch (CommandSyntaxException e) {
+			ActionInventoryMod.warn("Failed to read entity selector for an EntityOpener.");
+			e.printStackTrace();
+			this.failed = true;
+			this.selector = null;
+		}
 	}
 
 	public boolean addToMap() {
@@ -65,5 +71,14 @@ public class EntityOpener extends BasicOpener {
 
 	public static boolean tryOpen(ServerPlayerEntity p, Entity e) {
 		return Helper.getFirst(OPENERS, o->o.open(p, e))!=null;
+	}
+	
+	public static void registerCallbacks() {
+		UseEntityCallback.EVENT.register((p,w,h,e,r)->
+			!w.isClient&&tryOpen((ServerPlayerEntity)p, e) ? ActionResult.SUCCESS : ActionResult.PASS
+		);
+		AttackEntityCallback.EVENT.register((p,w,h,e,r)->
+			!w.isClient&&tryOpen((ServerPlayerEntity)p, e) ? ActionResult.SUCCESS : ActionResult.PASS
+		);
 	}
 }

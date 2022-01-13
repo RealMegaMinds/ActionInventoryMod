@@ -4,7 +4,7 @@ import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -45,10 +45,10 @@ public class VirtualPlayerInventory extends SimpleGui {
 	}
 
 	private class ArmorSlot extends Slot {
-		private EquipmentSlot armorSlot;
+		private EquipmentSlot equipmentSlot;
 		ArmorSlot(Inventory inv, int index, int armorIndex) {
 			super(inv, index, 0, 0);
-			this.armorSlot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, 3-armorIndex);
+			this.equipmentSlot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, 3-armorIndex);
 		}
 		@Override
 		public int getMaxItemCount() {
@@ -57,7 +57,7 @@ public class VirtualPlayerInventory extends SimpleGui {
 
 		@Override
 		public boolean canInsert(ItemStack stack) {
-			return armorSlot == MobEntity.getPreferredEquipmentSlot(stack);
+			return equipmentSlot == LivingEntity.getPreferredEquipmentSlot(stack);
 		}
 
 		@Override

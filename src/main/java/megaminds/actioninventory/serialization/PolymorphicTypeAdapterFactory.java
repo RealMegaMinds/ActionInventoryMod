@@ -16,7 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import megaminds.actioninventory.util.TypeName;
+import megaminds.actioninventory.util.annotations.TypeName;
 
 /*
  * Classes MUST be sealed. Subclasses must be sealed or final.<br>
@@ -95,7 +95,12 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 		@Override
 		public T read(JsonReader in) throws IOException {
 			JsonObject obj = Streams.parse(in).getAsJsonObject();
-			return (T) nameToAdapter.get(obj.remove("type").getAsString()).fromJsonTree(obj);
+			String type = obj.remove("type").getAsString();
+			TypeAdapter<T> adapter = (TypeAdapter<T>) nameToAdapter.get(type);
+			if (adapter==null) {
+				throw new IllegalArgumentException("Failed to find Class for: "+type);
+			}
+			return adapter.fromJsonTree(obj);
 		}
 	}
 }

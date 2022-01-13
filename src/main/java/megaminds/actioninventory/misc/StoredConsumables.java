@@ -1,4 +1,4 @@
-package megaminds.actioninventory.util;
+package megaminds.actioninventory.misc;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.mixin.NbtCompoundMixin;
+import megaminds.actioninventory.util.Helper;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
@@ -71,7 +72,7 @@ public class StoredConsumables extends Saver {
 		try {
 			File file = loadDir.resolve(owner.toString()+".dat").toFile();
 			if (file.exists() && file.isFile()) {
-				stores = Helper.mapEach(((NbtCompoundMixin)NbtIo.readCompressed(file)).invokeToMap(), NbtCompound.class::cast, null);
+				stores = Helper.mapEach(((NbtCompoundMixin)NbtIo.readCompressed(file)).invokeToMap(), NbtCompound.class::cast, null, false);
 			}
 		} catch (IOException file) {
 			ActionInventoryMod.warn("Failed to load RequirementStore for: "+owner);

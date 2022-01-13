@@ -1,4 +1,4 @@
-package megaminds.actioninventory;
+package megaminds.actioninventory.misc;
 
 public interface SpecialSign {
 	boolean isSpecialSign();

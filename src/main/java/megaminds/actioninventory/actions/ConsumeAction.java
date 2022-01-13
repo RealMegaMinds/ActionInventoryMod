@@ -9,8 +9,8 @@ import java.util.function.Function;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
-import megaminds.actioninventory.util.StoredConsumables;
-import megaminds.actioninventory.util.TypeName;
+import megaminds.actioninventory.misc.StoredConsumables;
+import megaminds.actioninventory.util.annotations.TypeName;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -24,11 +24,13 @@ public final class ConsumeAction extends BasicAction {
 	/**Consumables to consume*/
 	private BasicConsumable[] consumables;
 	/**True->pay first time, false->pay every time*/
-	private boolean singlePay = false;
+	private boolean singlePay;
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
-	private boolean requireFull = true;
+	private boolean requireFull;
 	/**Actions to execute when full amount is consumed*/
 	private BasicAction[] actions;
+	
+	private ConsumeAction() {}
 	
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
@@ -56,6 +58,7 @@ public final class ConsumeAction extends BasicAction {
 	 * Checks if the player can consume the full amount from all consumables
 	 */
 	private boolean checkConsumption(ServerPlayerEntity p, Function<String, NbtElement> func) {
+		if (consumables==null) consumables = new BasicConsumable[0];
 		for (BasicConsumable c : consumables) {
 			if (!c.canConsumeFull(p, func.apply(c.getStorageName()))) return false;
 		}
@@ -76,6 +79,7 @@ public final class ConsumeAction extends BasicAction {
 	 * Executes all actions.
 	 */
 	private void execute(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+		if (actions==null) actions = new BasicAction[0];
 		for (BasicAction a : actions) {
 			a.internalClick(index, type, action, gui);
 		}

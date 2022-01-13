@@ -1,24 +1,58 @@
 package megaminds.actioninventory.gui;
 
-import java.util.function.Function;
+import java.util.UUID;
 
-import com.google.gson.annotations.JsonAdapter;
-
-import megaminds.actioninventory.serialization.SlotFunctionSerializer;
+import megaminds.actioninventory.misc.Constants.GuiType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-@JsonAdapter(SlotFunctionSerializer.class)
-public interface SlotFunction extends Function<ServerPlayerEntity, Slot> {
-	public enum InventoryType {PLAYER, ENDERCHEST, GENERATED}
+public class SlotFunction {	
+	private GuiType type;
+	private String name;
+	private int index;
 	
-	default InventoryType getType() {
-		return InventoryType.GENERATED;
+	public SlotFunction(GuiType type, String name, int index) {
+		this.type = type;
+		this.name = name;
+		this.index = index;
 	}
-	default String getName() {
-		return "This cannot be deserialized.";
+	
+	public static SlotFunction build(Slot slot) {
+		return new SlotFunction(GuiType.GENERATED, "", slot.getIndex()) {
+			@Override public Slot getSlot(ServerPlayerEntity p) {return slot;}
+		};
 	}
-	default int getRedirectIndex() {
-		return apply(null).getIndex();
+
+	public Slot getSlot(ServerPlayerEntity p) {
+		ServerPlayerEntity real = name==null ? p : p.getServer().getPlayerManager().getPlayer(UUID.fromString(name));
+		return switch (type) {
+		case PLAYER -> new Slot(real.getInventory(), index, 0, 0);
+		case ENDER_CHEST -> new Slot(real.getEnderChestInventory(), index, 0, 0);
+		default -> throw new IllegalArgumentException("Unimplemented case: " + type);
+		};
+	}
+
+	public GuiType getType() {
+		return type;
+	}
+
+	public void setType(GuiType type) {
+		this.type = type;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 }

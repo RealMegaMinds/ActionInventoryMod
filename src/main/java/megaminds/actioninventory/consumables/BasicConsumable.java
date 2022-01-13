@@ -9,6 +9,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @JsonAdapter(PolymorphicTypeAdapterFactory.class)
 public abstract class BasicConsumable {
 	private boolean requireFull;
+	
+	protected BasicConsumable() {}
 
 	/**
 	 * Returns true if the player has paid or can pay the full amount.

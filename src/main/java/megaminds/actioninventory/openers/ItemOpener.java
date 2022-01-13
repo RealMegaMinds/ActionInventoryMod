@@ -1,62 +1,37 @@
 package megaminds.actioninventory.openers;
 
-import static megaminds.actioninventory.util.JsonHelper.*;
-
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Set;
 
-import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.misc.ItemStackish;
+import megaminds.actioninventory.misc.Constants.TagOption;
 import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.ItemStackish;
-import megaminds.actioninventory.util.JsonHelper;
-import net.minecraft.item.Item;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.tag.ItemTags;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.TypedActionResult;
 
-public class ItemOpener extends BasicOpener {
-	private static final String ITEM = "item", TEXT_ONLY = "textOnly", NBT = "nbt", TAGS = "tags";
+@TypeName("Item")
+public final class ItemOpener extends BasicOpener {
 	private static final List<ItemOpener> OPENERS = new ArrayList<>();
 
 	private ItemStackish stack;
-	private boolean textOnly;
-	private List<Identifier> tags;
+	private Set<Identifier> tags;
+	private TagOption tagOption = TagOption.ALL;
 
 	@Override
-	public BasicOpener fromJson(JsonObject obj, JsonDeserializationContext context) {
-		textOnly = bool(obj.get(TEXT_ONLY));
-		tags = obj.has(TAGS) ? Helper.toList(obj.get(TAGS).getAsJsonArray(), e->new Identifier(e.getAsString())) : null;
-		return this;
-	}
-	
-	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
-		if (context[0] instanceof ItemStack s 
-				&& Helper.nullOrEquals(item, s.getItem())
-				&& Helper.nullOr(customName, c->s.hasCustomName() && (textOnly ? c.toString() : c).equals(textOnly ? s.getName().toString() : s.getName()))
-				&& Helper.compareNbt(nbt, s.writeNbt(new NbtCompound()))
-				&& Helper.nullOr(tags, t->ItemTags.getTagGroup().getTagsFor(s.getItem()).containsAll(t))) {
+		ItemStack s = (ItemStack) context[0];
+		if ((stack==null || stack.specifiedEquals(s)) && (tags==null || tagOption.matches(tags, ItemTags.getTagGroup().getTagsFor(s.getItem())))) {
 			return super.open(player, context);
 		}
 		return false;
 	}
-	
-	@Override
-	public Opener getType() {
-		return Opener.ITEM;
-	}
-	
+		
 	public boolean addToMap() {
 		return OPENERS.contains(this) || OPENERS.add(this);
 	}
@@ -69,8 +44,9 @@ public class ItemOpener extends BasicOpener {
 		return Helper.getFirst(OPENERS, o->o.open(p, s))!=null;
 	}
 
-	@Override
-	public JsonObject toJson(JsonObject obj, JsonSerializationContext context) {
-		return null;
+	public static void registerCallbacks() {
+		UseItemCallback.EVENT.register((p,w,h)->
+			!w.isClient&&ItemOpener.tryOpen((ServerPlayerEntity)p, p.getStackInHand(h)) ? TypedActionResult.success(ItemStack.EMPTY) : TypedActionResult.pass(ItemStack.EMPTY)
+		);		
 	}
 }

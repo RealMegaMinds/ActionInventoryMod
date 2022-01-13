@@ -19,8 +19,10 @@ import megaminds.actioninventory.gui.AccessableAnimatedGuiElement;
 import net.minecraft.item.ItemStack;
 
 public class AccessableAnimatedGuiElementSerializer implements JsonDeserializer<AccessableAnimatedGuiElement>, JsonSerializer<AccessableAnimatedGuiElement> {
-	private static final String CALLBACK = "callback", ITEMS = "items";
-	private static final String RANDOM = "isRandom", INTERVAL = "interval";
+	private static final String CALLBACK = "callback";
+	private static final String ITEMS = "items";
+	private static final String RANDOM = "isRandom";
+	private static final String INTERVAL = "interval";
 	
 	@Override
 	public JsonElement serialize(AccessableAnimatedGuiElement src, Type typeOfSrc, JsonSerializationContext context) {

@@ -1,4 +1,4 @@
-package megaminds.actioninventory.util;
+package megaminds.actioninventory.loaders;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +15,8 @@ import megaminds.actioninventory.serialization.Serializer;
 public class BasicOpenerLoader {
 	private static final List<BasicOpener> loadedOpeners = new ArrayList<>();
 
+	private BasicOpenerLoader() {}
+	
 	public static void load(Path[] paths) {
 		for (Path p : paths) {
 			load(p);
@@ -48,7 +50,7 @@ public class BasicOpenerLoader {
 	}
 	
 	public static void clear() {
-		loadedOpeners.forEach(o->o.removeFromMap());
+		loadedOpeners.forEach(BasicOpener::removeFromMap);
 		loadedOpeners.clear();
 	}
 }

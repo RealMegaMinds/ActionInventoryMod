@@ -1,6 +1,6 @@
 package megaminds.actioninventory.consumables;
 
-import megaminds.actioninventory.util.TypeName;
+import megaminds.actioninventory.util.annotations.TypeName;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -8,9 +8,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 @TypeName("Xp")
 public class XpConsumable extends BasicConsumable {
-	private static final String LEVEL = "level", AMOUNT = "amount";
+	private static final String LEVEL_KEY = "level";
+	private static final String AMOUNT_KEY = "amount";
 	
-	private int level, amount;
+	private int level;
+	private int amount;
 
 	@Override
 	public boolean canConsumeFull(ServerPlayerEntity player, NbtElement storage) {
@@ -18,8 +20,8 @@ public class XpConsumable extends BasicConsumable {
 		int[] saved = {player.experienceLevel, player.totalExperience};
 		if (storage!=null) {
 			NbtCompound c = (NbtCompound) storage;
-			saved[0] += c.contains(LEVEL) ? c.getInt(LEVEL) : 0;
-			saved[1] += c.contains(AMOUNT) ? c.getInt(AMOUNT) : 0;
+			saved[0] += c.contains(LEVEL_KEY) ? c.getInt(LEVEL_KEY) : 0;
+			saved[1] += c.contains(AMOUNT_KEY) ? c.getInt(AMOUNT_KEY) : 0;
 		}
 		return (saved[0] >= level) && (saved[1] >= amount);
 	}
@@ -30,8 +32,8 @@ public class XpConsumable extends BasicConsumable {
 
 		NbtCompound c = storage!=null ? (NbtCompound) storage : new NbtCompound();
 		int[] paid = {
-				c.contains(LEVEL) ? c.getInt(LEVEL) : 0,
-				c.contains(AMOUNT) ? c.getInt(AMOUNT) : 0
+				c.contains(LEVEL_KEY) ? c.getInt(LEVEL_KEY) : 0,
+				c.contains(AMOUNT_KEY) ? c.getInt(AMOUNT_KEY) : 0
 		};
 
 		int[] toPay = {
@@ -47,8 +49,8 @@ public class XpConsumable extends BasicConsumable {
 		if (paid[0]>=level && paid[1]>=amount) {
 			return NbtByte.ONE;
 		}
-		c.putInt(LEVEL, level);
-		c.putInt(AMOUNT, amount);
+		c.putInt(LEVEL_KEY, level);
+		c.putInt(AMOUNT_KEY, amount);
 		return c;
 	}
 

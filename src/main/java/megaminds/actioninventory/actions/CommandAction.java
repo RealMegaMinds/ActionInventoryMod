@@ -3,7 +3,7 @@ package megaminds.actioninventory.actions;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
-import megaminds.actioninventory.util.TypeName;
+import megaminds.actioninventory.util.annotations.TypeName;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -21,14 +21,14 @@ public final class CommandAction extends BasicAction {
 	private boolean fromServer;
 	private boolean makeTempOp;
 	
-	public CommandAction() {
-		command = "";
-	}
+	private CommandAction() {}
 			
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 
+		if (command==null) command = "";
+		
 		if (fromServer) {
 			MessageHelper.executeCommand(player.getServer(), command);
 		} else if (makeTempOp) {

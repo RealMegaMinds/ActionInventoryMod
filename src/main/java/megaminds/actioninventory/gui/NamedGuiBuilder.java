@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 /**
  * Originally cloned from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder} and then many changes made.
@@ -21,9 +22,10 @@ public final class NamedGuiBuilder {
 	private final GuiElementInterface[] elements;
 	private final SlotFunction[] slotRedirects;
 	private final boolean includePlayer;
-	private boolean lockPlayerInventory, hasRedirects;
+	private boolean lockPlayerInventory;
+	private boolean hasRedirects;
 	private Text title;
-	private String name;
+	private Identifier name;
 
 	public NamedGuiBuilder(ScreenHandlerType<?> type, boolean includePlayerInventorySlots) {
 		this.type = type;
@@ -53,7 +55,7 @@ public final class NamedGuiBuilder {
 
 		for (SlotFunction slot : this.slotRedirects) {
 			if (slot != null) {
-				gui.setSlotRedirect(pos, slot.apply(player));
+				gui.setSlotRedirect(pos, slot.getSlot(player));
 			}
 			pos++;
 		}
@@ -141,11 +143,11 @@ public final class NamedGuiBuilder {
 		this.lockPlayerInventory = value;
 	}
 
-	public String getName() {
+	public Identifier getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(Identifier name) {
 		this.name = name;
 	}
 

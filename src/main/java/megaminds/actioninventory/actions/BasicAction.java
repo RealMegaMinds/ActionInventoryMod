@@ -9,16 +9,16 @@ import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
 import net.minecraft.screen.slot.SlotActionType;
 
 @JsonAdapter(PolymorphicTypeAdapterFactory.class)
-public sealed abstract class BasicAction implements NamedGuiCallback permits ChangeGuiAction, CloseAction, CommandAction, ConsumeAction, GiveAction, MessageAction, RequirementAction, SendPropertyAction, SoundAction {
+public abstract sealed class BasicAction implements NamedGuiCallback permits ChangeGuiAction, CloseAction, CommandAction, ConsumeAction, GiveAction, MessageAction, RequirementAction, SendPropertyAction, SoundAction {
 	private Integer requiredIndex;
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
 	private String requiredGuiName;
 	
-	public BasicAction() {
+	protected BasicAction() {
 	}
 	
-	public BasicAction(Integer index, ClickType clickType, SlotActionType slotActionType, String guiName) {
+	protected BasicAction(Integer index, ClickType clickType, SlotActionType slotActionType, String guiName) {
 		setIndex(index);
 		setClickType(clickType);
 		setSlotActionType(slotActionType);

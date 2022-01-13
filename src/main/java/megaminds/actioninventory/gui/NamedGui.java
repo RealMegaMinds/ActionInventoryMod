@@ -12,19 +12,20 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 public class NamedGui extends SimpleGui {
 	/**
 	 * Just a copy of the builder's name.
 	 */
-	private String name;
+	private Identifier name;
 	
-	public NamedGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, String name) {
+	public NamedGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name) {
 		super(type, player, includePlayerInventorySlots);
 		this.name = name;
 	}
 
-	public String getName() {
+	public Identifier getName() {
 		return name;
 	}
 	
@@ -42,8 +43,8 @@ public class NamedGui extends SimpleGui {
 	public static interface NamedGuiCallback extends ClickCallback {
 		@Override
 		default void click(int index, ClickType type, SlotActionType action, SlotGuiInterface gui) {
-			if (gui instanceof NamedSlotGuiInterface) {
-				click(index, type, action, (NamedSlotGuiInterface)gui);
+			if (gui instanceof NamedSlotGuiInterface ngui) {
+				click(index, type, action, ngui);
 			} else {
 				throw new UnsupportedOperationException("SlotGuiInterface for a NamedGuiCallback must be an instance of NamedSlotGuiInterface!");
 			}

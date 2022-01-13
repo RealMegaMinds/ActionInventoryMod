@@ -1,4 +1,4 @@
-package megaminds.actioninventory.util;
+package megaminds.actioninventory.misc;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ public abstract class Saver {
 	private static Path savesDir;
 	private static final List<Saver> SAVERS = new ArrayList<>();
 	
-	public Saver() {
+	protected Saver() {
 		SAVERS.add(this);
 	}
 	

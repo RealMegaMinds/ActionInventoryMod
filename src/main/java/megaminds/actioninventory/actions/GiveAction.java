@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
-import megaminds.actioninventory.util.TypeName;
+import megaminds.actioninventory.util.annotations.TypeName;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
 
@@ -16,11 +16,12 @@ import net.minecraft.screen.slot.SlotActionType;
 public final class GiveAction extends BasicAction {
 	private ItemStack[] itemsToGive;
 	
+	private GiveAction() {}
+	
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ItemStack current = Objects.requireNonNullElse(gui.getStack(index), ItemStack.EMPTY);
-		Arrays.stream(itemsToGive).map(s->Objects.requireNonNullElse(s, current)).forEach(s->{
-			gui.getPlayer().getInventory().offerOrDrop(s.copy());
-		});
+		if (itemsToGive==null) itemsToGive = new ItemStack[0];
+		Arrays.stream(itemsToGive).map(s->Objects.requireNonNullElse(s, current)).forEach(s->gui.getPlayer().getInventory().offerOrDrop(s.copy()));
 	}
 }

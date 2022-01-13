@@ -1,4 +1,4 @@
-package megaminds.actioninventory;
+package megaminds.actioninventory.misc;
 
 import net.minecraft.server.command.ServerCommandSource;
 

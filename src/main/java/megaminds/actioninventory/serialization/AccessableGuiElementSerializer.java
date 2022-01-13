@@ -16,7 +16,8 @@ import megaminds.actioninventory.gui.AccessableGuiElement;
 import net.minecraft.item.ItemStack;
 
 public class AccessableGuiElementSerializer implements JsonDeserializer<AccessableGuiElement>, JsonSerializer<AccessableGuiElement> {
-	private static final String CALLBACK = "callback", ITEM = "item";
+	private static final String CALLBACK = "callback";
+	private static final String ITEM = "item";
 	
 	@Override
 	public AccessableGuiElement deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
