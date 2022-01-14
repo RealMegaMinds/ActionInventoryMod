@@ -2,8 +2,6 @@ package megaminds.actioninventory.openers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -25,16 +23,11 @@ public final class EntityOpener extends BasicOpener {
 	private static final List<EntityOpener> OPENERS = new ArrayList<>();
 
 	private String entitySelector;	
-	private boolean failed;
 	
 	@Exclude private EntitySelector selector;
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
-		if (!failed && selector==null) {
-			fixSelector();
-		}
-
 		if (selector==null || matches((Entity)context[0])) {
 			return super.open(player, context);
 		}
@@ -48,25 +41,16 @@ public final class EntityOpener extends BasicOpener {
 		}
 	}
 
-	public void fixSelector() {
-		String whole = "@s"+Objects.requireNonNullElse(entitySelector, "").strip();
-
+	private void validateSelector() {
+		if (entitySelector==null || entitySelector.isBlank()) return;
+		
+		String whole = "@s"+entitySelector.strip();
+		
 		try {
 			this.selector = new EntitySelectorReader(new StringReader(whole)).read();
 		} catch (CommandSyntaxException e) {
-			ActionInventoryMod.warn("Failed to read entity selector for an EntityOpener.");
-			e.printStackTrace();
-			this.failed = true;
-			this.selector = null;
+			throw new IllegalArgumentException("Failed to read entity selector for an EntityOpener.", e);
 		}
-	}
-
-	public boolean addToMap() {
-		return OPENERS.contains(this) || OPENERS.add(this);
-	}
-
-	public void removeFromMap() {
-		OPENERS.remove(this);
 	}
 
 	public static boolean tryOpen(ServerPlayerEntity p, Entity e) {
@@ -80,5 +64,16 @@ public final class EntityOpener extends BasicOpener {
 		AttackEntityCallback.EVENT.register((p,w,h,e,r)->
 			!w.isClient&&tryOpen((ServerPlayerEntity)p, e) ? ActionResult.SUCCESS : ActionResult.PASS
 		);
+	}
+	
+	public static void clearOpeners() {
+		OPENERS.clear();
+	}
+	
+	@Override
+	public void validate() {
+		super.validate();
+		validateSelector();
+		if (OPENERS.contains(this) || OPENERS.add(this)) ActionInventoryMod.warn("Failed to add Item opener to list.");
 	}
 }

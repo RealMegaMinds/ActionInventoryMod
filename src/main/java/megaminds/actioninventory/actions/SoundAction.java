@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.misc.Validated;
 import megaminds.actioninventory.util.annotations.TypeName;
 import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -30,11 +31,14 @@ public final class SoundAction extends BasicAction {
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		
+		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound.getId(), category, Objects.requireNonNullElseGet(position, player::getPos), volume, pitch));
+	}
+
+	@Override
+	public void validate() {
 		if (sound==null) sound = SoundEvents.UI_BUTTON_CLICK;
 		if (category==null) category = SoundCategory.MASTER;
-		if (volume < 1) volume = 1;
-		if (pitch < 1) pitch = 1;
-		
-		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound.getId(), category, Objects.requireNonNullElseGet(position, player::getPos), volume, pitch));
+		Validated.validate(volume>=0, "Sound action requires volume to be 0 or above, but it is: "+volume);
+		Validated.validate(pitch>=0, "Sound action requires pitch to be 0 or above, but it is: "+pitch);
 	}
 }

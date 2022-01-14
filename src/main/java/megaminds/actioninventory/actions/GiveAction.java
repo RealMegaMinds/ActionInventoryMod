@@ -14,6 +14,8 @@ import net.minecraft.screen.slot.SlotActionType;
  */
 @TypeName("Give")
 public final class GiveAction extends BasicAction {
+	private static final ItemStack[] EMPTY = new ItemStack[0];
+	
 	private ItemStack[] itemsToGive;
 	
 	private GiveAction() {}
@@ -21,7 +23,11 @@ public final class GiveAction extends BasicAction {
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ItemStack current = Objects.requireNonNullElse(gui.getStack(index), ItemStack.EMPTY);
-		if (itemsToGive==null) itemsToGive = new ItemStack[0];
 		Arrays.stream(itemsToGive).map(s->Objects.requireNonNullElse(s, current)).forEach(s->gui.getPlayer().getInventory().offerOrDrop(s.copy()));
+	}
+
+	@Override
+	public void validate() {
+		if (itemsToGive==null) itemsToGive = EMPTY;
 	}
 }

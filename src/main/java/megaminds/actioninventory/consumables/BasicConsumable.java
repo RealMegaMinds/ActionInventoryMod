@@ -2,12 +2,13 @@ package megaminds.actioninventory.consumables;
 
 import com.google.gson.annotations.JsonAdapter;
 
+import megaminds.actioninventory.misc.Validated;
 import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @JsonAdapter(PolymorphicTypeAdapterFactory.class)
-public abstract class BasicConsumable {
+public abstract class BasicConsumable implements Validated {
 	private boolean requireFull;
 	
 	protected BasicConsumable() {}

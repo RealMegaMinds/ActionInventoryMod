@@ -5,11 +5,15 @@ import com.google.gson.annotations.JsonAdapter;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.NamedGui.NamedGuiCallback;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.misc.Validated;
 import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
 import net.minecraft.screen.slot.SlotActionType;
+import megaminds.actioninventory.actions.BasicAction.EmptyAction;
 
 @JsonAdapter(PolymorphicTypeAdapterFactory.class)
-public abstract sealed class BasicAction implements NamedGuiCallback permits ChangeGuiAction, CloseAction, CommandAction, ConsumeAction, GiveAction, MessageAction, RequirementAction, SendPropertyAction, SoundAction {
+public abstract sealed class BasicAction implements NamedGuiCallback, Validated permits EmptyAction, ChangeGuiAction, CloseAction, CommandAction, GiveAction, MessageAction, SendPropertyAction, SoundAction, GroupAction {
+	public static final BasicAction EMPTY = new EmptyAction();
+	
 	private Integer requiredIndex;
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
@@ -40,9 +44,6 @@ public abstract sealed class BasicAction implements NamedGuiCallback permits Cha
 		}
 	}
 	
-	/**
-	 * If the optional is empty or matches the given value, returns true.
-	 */
 	protected static <E> boolean check(E o, E e) {
 		return o==null || o==e;
 	}
@@ -77,5 +78,11 @@ public abstract sealed class BasicAction implements NamedGuiCallback permits Cha
 
 	public void setGuiName(String guiName) {
 		this.requiredGuiName = guiName;
+	}
+	
+	static final class EmptyAction extends BasicAction {
+		private EmptyAction() {}
+		@Override public void validate() {}
+		@Override public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {}
 	}
 }

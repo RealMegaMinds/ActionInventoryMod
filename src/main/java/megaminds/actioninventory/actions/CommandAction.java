@@ -26,8 +26,6 @@ public final class CommandAction extends BasicAction {
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
-
-		if (command==null) command = "";
 		
 		if (fromServer) {
 			MessageHelper.executeCommand(player.getServer(), command);
@@ -36,5 +34,10 @@ public final class CommandAction extends BasicAction {
 		} else {
 			MessageHelper.executeCommand(player, command);
 		}
+	}
+
+	@Override
+	public void validate() {
+		if (command==null) command = "";
 	}
 }

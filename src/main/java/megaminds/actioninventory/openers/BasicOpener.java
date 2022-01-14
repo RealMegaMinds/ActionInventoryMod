@@ -5,12 +5,13 @@ import java.util.Objects;
 import com.google.gson.annotations.JsonAdapter;
 
 import megaminds.actioninventory.loaders.NamedGuiLoader;
+import megaminds.actioninventory.misc.Validated;
 import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @JsonAdapter(PolymorphicTypeAdapterFactory.class)
-public abstract sealed class BasicOpener permits BlockOpener, EntityOpener, ItemOpener {
+public abstract sealed class BasicOpener implements Validated permits BlockOpener, EntityOpener, ItemOpener {
 	private Identifier name;
 	
 	public boolean open(ServerPlayerEntity player, Object... context) {	//NOSONAR Used by subclasses
@@ -25,6 +26,8 @@ public abstract sealed class BasicOpener permits BlockOpener, EntityOpener, Item
 		this.name = Objects.requireNonNull(name);
 	}
 	
-	public abstract boolean addToMap();
-	public abstract void removeFromMap();
+	@Override
+	public void validate() {
+		Validated.validate(name!=null, "Openers require name to not be null.");
+	}
 }

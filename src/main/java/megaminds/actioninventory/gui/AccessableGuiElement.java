@@ -1,27 +1,41 @@
 package megaminds.actioninventory.gui;
 
-import java.util.Objects;
-
-import com.google.gson.annotations.JsonAdapter;
-
 import eu.pb4.sgui.api.elements.GuiElement;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
+import eu.pb4.sgui.api.elements.GuiElementInterface.ItemClickCallback;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.serialization.AccessableGuiElementSerializer;
 import net.minecraft.item.ItemStack;
 
-@JsonAdapter(AccessableGuiElementSerializer.class)
-public class AccessableGuiElement extends GuiElement {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AccessableGuiElement extends AccessableElement {
+    protected ItemStack item;
 
-	public AccessableGuiElement(ItemStack item, BasicAction callback) {
-		super(item, Objects.requireNonNullElse(callback, EMPTY_CALLBACK));
-	}
-	
-	public AccessableGuiElement(ItemStack item) {
-		super(item, EMPTY_CALLBACK);
-	}
-	
-	@Override
-	public BasicAction getGuiCallback() {
-		return (BasicAction) super.getGuiCallback();
-	}
+    @Override
+    public ItemStack getItemStack() {
+        return this.item;
+    }
+
+    /**
+     * Sets the display ItemStack
+     *
+     * @param itemStack the display item
+     */
+    public void setItemStack(ItemStack itemStack) {
+        this.item = itemStack;
+    }
+
+    @Override
+    public ClickCallback getGuiCallback() {
+        return this.callback;
+    }
+
+    @Override
+    public ItemStack getItemStackInternalUseOnly() {
+        return this.item.copy();
+    }
 }

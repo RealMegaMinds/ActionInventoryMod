@@ -18,8 +18,9 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @TypeName("Consume")
-public final class ConsumeAction extends BasicAction {
+public final class ConsumeAction extends GroupAction {
 	private static final Map<UUID, StoredConsumables> STORED_CONSUMABLES = new HashMap<>();
+	private static final BasicConsumable[] EMPTY_C = new BasicConsumable[0];
 	
 	/**Consumables to consume*/
 	private BasicConsumable[] consumables;
@@ -27,8 +28,6 @@ public final class ConsumeAction extends BasicAction {
 	private boolean singlePay;
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
 	private boolean requireFull;
-	/**Actions to execute when full amount is consumed*/
-	private BasicAction[] actions;
 	
 	private ConsumeAction() {}
 	
@@ -39,7 +38,7 @@ public final class ConsumeAction extends BasicAction {
 		NbtElement sc = s.getOrCreateSub(gui.getName(), index, NbtCompound::new);
 		
 		if (singlePay && sc.equals(NbtByte.ONE)) {
-			execute(index, type, action, gui);
+			super.internalClick(index, type, action, gui);
 			return;
 		}
 		
@@ -51,14 +50,13 @@ public final class ConsumeAction extends BasicAction {
 		
 		consume(p, getSub, (str,e)->s.setDeepSub(gui.getName(), index, str, e));
 		if (singlePay) s.setSub(gui.getName(), index, NbtByte.ONE);
-		execute(index, type, action, gui);
+		super.internalClick(index, type, action, gui);
 	}
 	
 	/**
 	 * Checks if the player can consume the full amount from all consumables
 	 */
 	private boolean checkConsumption(ServerPlayerEntity p, Function<String, NbtElement> func) {
-		if (consumables==null) consumables = new BasicConsumable[0];
 		for (BasicConsumable c : consumables) {
 			if (!c.canConsumeFull(p, func.apply(c.getStorageName()))) return false;
 		}
@@ -75,17 +73,13 @@ public final class ConsumeAction extends BasicAction {
 		}
 	}
 
-	/**
-	 * Executes all actions.
-	 */
-	private void execute(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
-		if (actions==null) actions = new BasicAction[0];
-		for (BasicAction a : actions) {
-			a.internalClick(index, type, action, gui);
-		}
-	}
-	
 	private StoredConsumables getStore(UUID uuid) {
 		return STORED_CONSUMABLES.computeIfAbsent(uuid, StoredConsumables::new);
+	}
+
+	@Override
+	public void validate() {
+		super.validate();
+		if (consumables==null) consumables = EMPTY_C;
 	}
 }

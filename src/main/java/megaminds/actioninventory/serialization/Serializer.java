@@ -14,6 +14,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
+import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.gui.AccessableAnimatedGuiElement;
 import megaminds.actioninventory.gui.AccessableGuiElement;
 import megaminds.actioninventory.gui.NamedGuiBuilder;
@@ -71,11 +74,11 @@ public class Serializer {
 				.disableHtmlEscaping()
 				.setPrettyPrinting()
 				.enableComplexMapKeySerialization()
-				.setExclusionStrategies(new ExcludeStrategy())
+				.setExclusionStrategies(new ExcludeStrategy(), new SpecifiedExcluder())
 				
 				.registerTypeAdapter(AccessableGuiElement.class, new AccessableGuiElementSerializer())
 				.registerTypeAdapter(AccessableAnimatedGuiElement.class, new AccessableAnimatedGuiElementSerializer())
-				.registerTypeAdapter(NamedGuiBuilder.class, new NamedGuiBuilderSerializer())
+				.registerTypeAdapter(ClickCallback.class, delegate(BasicAction.class, ClickCallback.class::cast, BasicAction.class::cast))
 				.registerTypeHierarchyAdapter(NbtElement.class, new NbtElementAdapter().nullSafe())
 				.registerTypeAdapterFactory(new OptionalAdapterFactory())
 				

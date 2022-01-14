@@ -1,5 +1,6 @@
 package megaminds.actioninventory.consumables;
 
+import megaminds.actioninventory.misc.Validated;
 import megaminds.actioninventory.util.annotations.TypeName;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
@@ -57,5 +58,11 @@ public class XpConsumable extends BasicConsumable {
 	@Override
 	public String getStorageName() {
 		return "Xp";
+	}
+
+	@Override
+	public void validate() {
+		Validated.validate(level>=0, "Xp consumable requires level to be 0 or above, but it is: "+level);
+		Validated.validate(amount>=0, "Xp consumable requires amount to be 0 or above, but it is: "+amount);
 	}
 }

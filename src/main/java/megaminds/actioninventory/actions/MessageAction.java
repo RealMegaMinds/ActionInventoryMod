@@ -42,9 +42,6 @@ public final class MessageAction extends BasicAction {
 		MinecraftServer server = player.getServer();
 		if (sender==null) sender = player.getUuid();
 		
-		if (messageType==null) messageType = MessageType.CHAT;
-		if (message==null) message = LiteralText.EMPTY;
-		
 		if (receivers==null || receivers.isEmpty()) {
 			MessageHelper.broadcast(sender, message, messageType, server);
 			return;
@@ -58,5 +55,11 @@ public final class MessageAction extends BasicAction {
 			temp.add(player.getUuid());
 		}
 		MessageHelper.message(sender, temp, message, messageType, server);
+	}
+
+	@Override
+	public void validate() {
+		if (messageType==null) messageType = MessageType.CHAT;
+		if (message==null) message = LiteralText.EMPTY;		
 	}
 }

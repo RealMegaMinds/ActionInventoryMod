@@ -4,17 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.openers.BasicOpener;
+import megaminds.actioninventory.openers.BlockOpener;
+import megaminds.actioninventory.openers.EntityOpener;
+import megaminds.actioninventory.openers.ItemOpener;
 import megaminds.actioninventory.serialization.Serializer;
 
 public class BasicOpenerLoader {
-	private static final List<BasicOpener> loadedOpeners = new ArrayList<>();
-
 	private BasicOpenerLoader() {}
 	
 	public static void load(Path[] paths) {
@@ -29,14 +27,8 @@ public class BasicOpenerLoader {
 			files.filter(p->p.toString().endsWith(".json"))
 			.forEach(p->{
 				try (BufferedReader br = Files.newBufferedReader(p)) {
-					BasicOpener opener = Serializer.openerFromJson(br);
-					if (opener.addToMap()) {
-						loadedOpeners.add(opener);
-						count[0]++;
-					} else {
-						ActionInventoryMod.warn("An Opener with name: '"+opener.getName()+"' already exists.");
-						count[1]++;
-					}
+					Serializer.openerFromJson(br);
+					count[0]++;
 				} catch (IOException e) {
 					ActionInventoryMod.warn("Failed to read Opener from: "+p);
 					count[1]++;
@@ -50,7 +42,8 @@ public class BasicOpenerLoader {
 	}
 	
 	public static void clear() {
-		loadedOpeners.forEach(BasicOpener::removeFromMap);
-		loadedOpeners.clear();
+		BlockOpener.clearOpeners();
+		ItemOpener.clearOpeners();
+		EntityOpener.clearOpeners();
 	}
 }

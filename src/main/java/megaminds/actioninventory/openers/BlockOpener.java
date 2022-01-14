@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.misc.Constants.TagOption;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.TypeName;
@@ -27,7 +28,7 @@ public final class BlockOpener extends BasicOpener {
 	private BlockPos position;
 	private Optional<BlockEntityType<?>> entityType;
 	private Set<Identifier> tags;
-	private TagOption tagOption = TagOption.ALL;
+	private TagOption tagOption;
 
 	/**
 	 * context[0] = Block <br>
@@ -52,14 +53,6 @@ public final class BlockOpener extends BasicOpener {
 		return entityType==null || entityType.isEmpty()&&be==null || entityType.isPresent()&&be!=null&&entityType.get()==be.getType();
 	}
 	
-	public boolean addToMap() {
-		return OPENERS.contains(this) || OPENERS.add(this);
-	}
-	
-	public void removeFromMap() {
-		OPENERS.remove(this);
-	}
-	
 	public static boolean tryOpen(ServerPlayerEntity p, Block b, BlockPos bp, BlockEntity be) {
 		return Helper.getFirst(OPENERS, o->o.open(p, b, bp, be))!=null;
 	}
@@ -71,5 +64,16 @@ public final class BlockOpener extends BasicOpener {
 		AttackBlockCallback.EVENT.register((p,w,h,b,d)->
 			!w.isClient&&BlockOpener.tryOpen((ServerPlayerEntity)p, w.getBlockState(b).getBlock(), b, w.getBlockEntity(b)) ? ActionResult.SUCCESS : ActionResult.PASS
 		);		
+	}
+	
+	public static void clearOpeners() {
+		OPENERS.clear();
+	}
+	
+	@Override
+	public void validate() {
+		super.validate();
+		if (tagOption==null) tagOption = TagOption.ALL;
+		if (OPENERS.contains(this) || OPENERS.add(this)) ActionInventoryMod.warn("Failed to add Block opener to list.");
 	}
 }

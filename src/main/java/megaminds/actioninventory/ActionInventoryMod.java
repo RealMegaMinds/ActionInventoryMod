@@ -46,7 +46,7 @@ public class ActionInventoryMod implements ModInitializer {
 		BlockOpener.registerCallbacks();
 		EntityOpener.registerCallbacks();
 
-		Printer.dump(FabricLoader.getInstance().getGameDir());
+		//Printer.dump(FabricLoader.getInstance().getGameDir());
 		
 		info("Initialized");
 	}

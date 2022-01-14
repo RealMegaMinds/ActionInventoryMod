@@ -1,14 +1,19 @@
 package megaminds.actioninventory.gui;
 
+import java.util.Arrays;
+
 import com.google.gson.annotations.JsonAdapter;
 
 import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.misc.Validated;
 import megaminds.actioninventory.serialization.NamedGuiBuilderSerializer;
+import megaminds.actioninventory.util.annotations.Exclude;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -16,22 +21,39 @@ import net.minecraft.util.Identifier;
  * Originally cloned from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder} and then many changes made.
  */
 @JsonAdapter(NamedGuiBuilderSerializer.class)
-public final class NamedGuiBuilder {
-	private final int size;
-	private final ScreenHandlerType<?> type;
-	private final GuiElementInterface[] elements;
-	private final SlotFunction[] slotRedirects;
-	private final boolean includePlayer;
-	private boolean lockPlayerInventory;
-	private boolean hasRedirects;
+public final class NamedGuiBuilder implements Validated {
+	private ScreenHandlerType<?> type;
 	private Text title;
 	private Identifier name;
+	private boolean includePlayer;
+	private boolean lockPlayerInventory;
+	private SlotElement[] elements;
+	
+	@Exclude private GuiElementInterface[] guiElements;
+	@Exclude private SlotFunction[] slotRedirects;
+	@Exclude private boolean hasRedirects;
+	@Exclude private int size;
+	
+	@Override
+	public void validate() {
+		Validated.validate(type!=null, "NamedGuiBuilder requires type to be non-null.");
+		Validated.validate(name!=null, "NamedGuiBuilder requires name to be non-null.");
+		if (title==null) title = LiteralText.EMPTY;
+		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
+		if (guiElements==null) {
+			guiElements = new GuiElementInterface[size];
+		} else {
+			guiElements = Arrays.copyOf(guiElements, size);
+		}
+		if (slotRedirects==null) slotRedirects = new SlotFunction[size];
+	}
+	
+	public NamedGuiBuilder() {}
 
 	public NamedGuiBuilder(ScreenHandlerType<?> type, boolean includePlayerInventorySlots) {
 		this.type = type;
 
-		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayerInventorySlots ? 36 : 0);
-		this.elements = new GuiElementInterface[this.size];
+		this.guiElements = new GuiElementInterface[this.size];
 		this.slotRedirects = new SlotFunction[this.size];
 
 		this.includePlayer = includePlayerInventorySlots;
@@ -44,7 +66,7 @@ public final class NamedGuiBuilder {
 
 		int pos = 0;
 
-		for (GuiElementInterface element : this.elements) {
+		for (GuiElementInterface element : this.guiElements) {
 			if (element != null) {
 				gui.setSlot(pos, element);
 			}
@@ -64,11 +86,11 @@ public final class NamedGuiBuilder {
 	}
 
 	public void setSlot(int index, AccessableGuiElement element) {
-		this.elements[index] = element;
+		this.guiElements[index] = element;
 	}
 
 	public void setSlot(int index, AccessableAnimatedGuiElement element) {
-		this.elements[index] = element;
+		this.guiElements[index] = element;
 	}
 
 	public void addSlot(AccessableGuiElement element) {
@@ -96,8 +118,8 @@ public final class NamedGuiBuilder {
 	}
 
 	public int getFirstEmptySlot() {
-		for (int i = 0; i < this.elements.length; i++) {
-			if (this.elements[i] == null && this.slotRedirects[i] == null) {
+		for (int i = 0; i < this.guiElements.length; i++) {
+			if (this.guiElements[i] == null && this.slotRedirects[i] == null) {
 				return i;
 			}
 		}
@@ -110,7 +132,7 @@ public final class NamedGuiBuilder {
 
 	public GuiElementInterface getSlot(int index) {
 		if (index >= 0 && index < this.size) {
-			return this.elements[index];
+			return this.guiElements[index];
 		}
 		return null;
 	}
@@ -152,7 +174,7 @@ public final class NamedGuiBuilder {
 	}
 
 	public void setSlot(int index, SlotFunction slot) {
-		this.elements[index] = null;
+		this.guiElements[index] = null;
 		this.slotRedirects[index] = slot;
 		this.hasRedirects = true;
 	}

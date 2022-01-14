@@ -13,4 +13,9 @@ public final class CloseAction extends BasicAction {
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		gui.close();
 	}
+
+	@Override
+	public void validate() {
+		//No validation needed.
+	}
 }

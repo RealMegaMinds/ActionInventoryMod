@@ -6,6 +6,7 @@ import java.util.Set;
 
 import megaminds.actioninventory.util.annotations.TypeName;
 import megaminds.actioninventory.misc.ItemStackish;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.misc.Constants.TagOption;
 import megaminds.actioninventory.util.Helper;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -21,7 +22,7 @@ public final class ItemOpener extends BasicOpener {
 
 	private ItemStackish stack;
 	private Set<Identifier> tags;
-	private TagOption tagOption = TagOption.ALL;
+	private TagOption tagOption;
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
@@ -32,14 +33,6 @@ public final class ItemOpener extends BasicOpener {
 		return false;
 	}
 		
-	public boolean addToMap() {
-		return OPENERS.contains(this) || OPENERS.add(this);
-	}
-	
-	public void removeFromMap() {
-		OPENERS.remove(this);
-	}
-	
 	public static boolean tryOpen(ServerPlayerEntity p, ItemStack s) {
 		return Helper.getFirst(OPENERS, o->o.open(p, s))!=null;
 	}
@@ -48,5 +41,16 @@ public final class ItemOpener extends BasicOpener {
 		UseItemCallback.EVENT.register((p,w,h)->
 			!w.isClient&&ItemOpener.tryOpen((ServerPlayerEntity)p, p.getStackInHand(h)) ? TypedActionResult.success(ItemStack.EMPTY) : TypedActionResult.pass(ItemStack.EMPTY)
 		);		
+	}
+	
+	public static void clearOpeners() {
+		OPENERS.clear();
+	}
+	
+	@Override
+	public void validate() {
+		super.validate();
+		if (tagOption==null) tagOption = TagOption.ALL;
+		if (OPENERS.contains(this) || OPENERS.add(this)) ActionInventoryMod.warn("Failed to add Item opener to list.");
 	}
 }
