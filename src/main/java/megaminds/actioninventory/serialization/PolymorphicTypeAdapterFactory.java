@@ -18,10 +18,10 @@ import com.google.gson.stream.JsonWriter;
 
 import megaminds.actioninventory.util.annotations.TypeName;
 
-/*
- * Classes MUST be sealed. Subclasses must be sealed or final.<br>
- * Only the parent class requires @JsonAdapter annotation.<br>
- * Use @SerializedName to change the name of the type.
+/**
+ * This TypeAdapterFactory should only be used in @JsonAdapter annotation (Only the parent type requires it).<br>
+ * This recursively checks for subclasses of sealed classes. Subclasses of unsealed classes will be ignored.<br>
+ * Use @SerializedName on a subclass to change the name of the type (defaults to Class.getSimpleName()).
  */
 public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 	@SuppressWarnings("unchecked")
@@ -46,20 +46,14 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 	
 	private void retrieveClasses(Class<?> clazz, Map<Class<?>, String> map) {
 		int mod = clazz.getModifiers();
-		if (!(Modifier.isAbstract(mod) || Modifier.isInterface(mod))) {
-			map.put(clazz, getName(clazz));
-		}
+		if (!(Modifier.isAbstract(mod) || Modifier.isInterface(mod))) map.put(clazz, getName(clazz));
 		
-		if (Modifier.isFinal(clazz.getModifiers())) {
-			return;
-		} else if (clazz.isSealed()) {
+		if (clazz.isSealed()) {
 			Class<?>[] subclasses = clazz.getPermittedSubclasses();
 			for (Class<?> c : subclasses) {
 				retrieveClasses(c, map);
 			}
-			return;
 		}
-		throw new IllegalArgumentException("Classes using PolymorphicTypeAdapterFactory must be final or sealed.");
 	}
 	
 	
@@ -86,6 +80,9 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 		public void write(JsonWriter out, T value) throws IOException {
 			Class<?> raw = value.getClass();
 			TypeAdapter<T> adapter = ((TypeAdapter<T>)classToAdapter.get(raw));
+			if (adapter==null) {
+				throw new IllegalArgumentException("Failed to find TypeAdapter for class: "+raw);
+			}
 			JsonElement obj = adapter.toJsonTree(value);
 			obj.getAsJsonObject().addProperty("type", classToName.get(raw));
 			Streams.write(obj, out);
@@ -98,7 +95,7 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 			String type = obj.remove("type").getAsString();
 			TypeAdapter<T> adapter = (TypeAdapter<T>) nameToAdapter.get(type);
 			if (adapter==null) {
-				throw new IllegalArgumentException("Failed to find Class for: "+type);
+				throw new IllegalArgumentException("Failed to find TypeAdapter for name: "+type);
 			}
 			return adapter.fromJsonTree(obj);
 		}
