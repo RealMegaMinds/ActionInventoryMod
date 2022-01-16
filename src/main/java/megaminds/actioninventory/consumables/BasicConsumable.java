@@ -1,18 +1,23 @@
 package megaminds.actioninventory.consumables;
 
-import com.google.gson.annotations.JsonAdapter;
-
-import megaminds.actioninventory.misc.Validated;
-import megaminds.actioninventory.serialization.PolymorphicTypeAdapterFactory;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-@JsonAdapter(PolymorphicTypeAdapterFactory.class)
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Poly
 public abstract class BasicConsumable implements Validated {
 	private boolean requireFull;
 	
-	protected BasicConsumable() {}
-
 	/**
 	 * Returns true if the player has paid or can pay the full amount.
 	 */

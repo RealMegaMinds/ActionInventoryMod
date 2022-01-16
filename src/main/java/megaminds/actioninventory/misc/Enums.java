@@ -6,11 +6,11 @@ import java.util.Set;
 
 import net.minecraft.util.Identifier;
 
-public class Constants {
+public class Enums {
 	public enum GuiType {PLAYER, ENDER_CHEST, NAMED_GUI, GENERATED}
 	public enum MessagePlaceHolders {PLAYER, SERVER, BROADCAST}
-
-	private Constants() {}
+	
+	private Enums() {}
 	
 	public enum TagOption {
 		ALL {@Override public boolean matches(Set<Identifier> checkFor, Collection<Identifier> checkIn) {return checkIn.containsAll(checkFor);}},

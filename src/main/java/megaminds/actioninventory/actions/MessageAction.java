@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import eu.pb4.sgui.api.ClickType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
-import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.network.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.MinecraftServer;
@@ -19,7 +24,11 @@ import net.minecraft.util.Util;
 /**
  * Sends a message to specified players
  */
-@TypeName("Message")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Poly("Message")
 public final class MessageAction extends BasicAction {	
 	private Text message;
 	/**
@@ -34,8 +43,14 @@ public final class MessageAction extends BasicAction {
 	private List<UUID> receivers;
 	private MessageType messageType;
 	
-	private MessageAction() {}
-			
+	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
+		super(requiredIndex, clicktype, actionType, requiredGuiName);
+		this.message = message;
+		this.sender = sender;
+		this.receivers = receivers;
+		this.messageType = messageType;
+	}
+
 	@Override
 	public void internalClick(int index, ClickType cType, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();

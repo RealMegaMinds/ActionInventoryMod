@@ -1,28 +1,42 @@
-package megaminds.actioninventory.gui;
+package megaminds.actioninventory.gui.elements;
 
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.gui.GuiInterface;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.misc.Validated;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Exclude;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Adapted from {@link eu.pb4.sgui.api.elements.AnimatedGuiElement}
+ */
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@Poly("Animated")
 public final class AccessableAnimatedGuiElement extends AccessableElement {
+	private static final ItemStack[] EMPTY = {ItemStack.EMPTY};
+	
 	private ItemStack[] items;
 	private int interval;
 	private boolean random;
+	
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	@Exclude private int frame = 0;
+	@Getter(AccessLevel.NONE)
+	@Setter(AccessLevel.NONE)
 	@Exclude private int tick = 0;
 
-	public AccessableAnimatedGuiElement(BasicAction action, ItemStack[] items, int interval, boolean random) {
-		this.action = action;
+	public AccessableAnimatedGuiElement(int index, BasicAction action, ItemStack[] items, int interval, boolean random) {
+		super(index, action);
 		this.items = items;
 		this.interval = interval;
 		this.random = random;
@@ -32,29 +46,31 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 	public void validate() {
 		super.validate();
 		Validated.validate(interval>=0, "Animated gui element requires interval to be 0 or greater.");
-		if (items==null) items = new ItemStack[]{ItemStack.EMPTY};
+		if (items==null) items = EMPTY;
 	}
 	
+	@NotNull
 	@Override
 	public ItemStack getItemStack() {
-		return this.items[frame];
+		return this.items[frame].copy();
 	}
 
 	@Override
 	public ItemStack getItemStackForDisplay(GuiInterface gui) {
+		if (items.length==1) return items[0];
+		
 		int cFrame = frame;
 
 		tick += 1;
 		if (tick >= interval) {
 			tick = 0;
 			if (this.random) {
-				this.frame = (int) (Math.random() * this.items.length);
+				this.frame = ActionInventoryMod.RANDOM.nextInt(items.length);
 			} else {
 				frame += 1;
 				if (frame >= items.length) frame = 0;
 			}
 		}
-
 
 		return this.items[cFrame].copy();
 	}

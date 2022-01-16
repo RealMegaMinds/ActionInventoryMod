@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.misc.Constants.TagOption;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import megaminds.actioninventory.misc.Enums.TagOption;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
@@ -20,7 +23,10 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
-@TypeName("Block")
+@Getter
+@Setter
+@NoArgsConstructor
+@Poly("Block")
 public final class BlockOpener extends BasicOpener {
 	private static final List<BlockOpener> OPENERS = new ArrayList<>();
 	
@@ -29,6 +35,15 @@ public final class BlockOpener extends BasicOpener {
 	private Optional<BlockEntityType<?>> entityType;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
+
+	public BlockOpener(Identifier guiName, Block block, BlockPos position, Optional<BlockEntityType<?>> entityType, Set<Identifier> tags, TagOption tagOption) {
+		super(guiName);
+		this.block = block;
+		this.position = position;
+		this.entityType = entityType;
+		this.tags = tags;
+		this.tagOption = tagOption;
+	}
 
 	/**
 	 * context[0] = Block <br>
@@ -74,6 +89,6 @@ public final class BlockOpener extends BasicOpener {
 	public void validate() {
 		super.validate();
 		if (tagOption==null) tagOption = TagOption.ALL;
-		if (OPENERS.contains(this) || OPENERS.add(this)) ActionInventoryMod.warn("Failed to add Block opener to list.");
+		Validated.validate(!OPENERS.contains(this) && OPENERS.add(this), "Failed to add Block opener to list.");
 	}
 }

@@ -4,22 +4,36 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import eu.pb4.sgui.api.ClickType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.misc.LevelSetter;
 import megaminds.actioninventory.util.annotations.Exclude;
-import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.screen.slot.SlotActionType;
 
-@TypeName("Require")
+@NoArgsConstructor
+@Getter
+@Setter
+@Poly("Require")
 public final class RequirementAction extends GroupAction {	
 	private String entitySelector;
 
 	@Exclude private EntitySelector selector;
+
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, BasicAction[] actions, String entitySelector) {
+		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
+		this.entitySelector = entitySelector;
+	}
 	
-	private RequirementAction() {}
+	public RequirementAction(BasicAction[] actions, String entitySelector) {
+		super(actions);
+		this.entitySelector = entitySelector;
+	}
 
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {

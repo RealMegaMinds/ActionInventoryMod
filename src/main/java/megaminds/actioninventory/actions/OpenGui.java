@@ -3,21 +3,46 @@ package megaminds.actioninventory.actions;
 import java.util.UUID;
 
 import eu.pb4.sgui.api.ClickType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.loaders.NamedGuiLoader;
-import megaminds.actioninventory.misc.Constants.GuiType;
-import megaminds.actioninventory.misc.Validated;
-import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.misc.Enums.GuiType;
+import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
-@TypeName("OpenGui")
-public final class ChangeGuiAction extends BasicAction {
+@NoArgsConstructor
+@Getter
+@Setter
+public final class OpenGui extends BasicAction {
+	private GuiType guiType;
 	private Identifier guiName;
 	private UUID playerUUID;
-	private GuiType guiType;
 	
-	private ChangeGuiAction() {}
+	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, GuiType guiType, Identifier guiName) {
+		super(requiredIndex, clicktype, actionType, requiredGuiName);
+		this.guiName = guiName;
+		this.guiType = guiType;
+	}
+	
+	public OpenGui(GuiType guiType, Identifier guiName) {
+		this.guiType = guiType;
+		this.guiName = guiName;
+	}
+
+	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, GuiType guiType, UUID playerUUID) {
+		super(requiredIndex, clicktype, actionType, requiredGuiName);
+		this.playerUUID = playerUUID;
+		this.guiType = guiType;
+	}
+
+	public OpenGui(GuiType guiType, UUID playerUUID) {
+		this.guiType = guiType;
+		this.playerUUID = playerUUID;
+	}
 
 	@Override
 	public void internalClick(int index, ClickType cType, SlotActionType action, NamedSlotGuiInterface gui) {
@@ -44,7 +69,7 @@ public final class ChangeGuiAction extends BasicAction {
 	public void validate() {
 		if (guiType==null) return;
 		switch(guiType) {
-		case ENDER_CHEST, PLAYER -> guiName = null;
+		case ENDER_CHEST, PLAYER -> guiName = null; //NOSONAR
 		case NAMED_GUI -> {
 			Validated.validate(guiName!=null, "guiName cannot be null.");
 			playerUUID = null;

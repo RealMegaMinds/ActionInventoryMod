@@ -7,17 +7,23 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import eu.pb4.sgui.api.ClickType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
 import megaminds.actioninventory.misc.StoredConsumables;
-import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-@TypeName("Consume")
+@NoArgsConstructor
+@Getter
+@Setter
+@Poly("Consume")
 public final class ConsumeAction extends GroupAction {
 	private static final Map<UUID, StoredConsumables> STORED_CONSUMABLES = new HashMap<>();
 	private static final BasicConsumable[] EMPTY_C = new BasicConsumable[0];
@@ -29,8 +35,20 @@ public final class ConsumeAction extends GroupAction {
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
 	private boolean requireFull;
 	
-	private ConsumeAction() {}
+	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
+		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
+		this.consumables = consumables;
+		this.singlePay = singlePay;
+		this.requireFull = requireFull;
+	}
 	
+	public ConsumeAction(BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
+		super(actions);
+		this.consumables = consumables;
+		this.singlePay = singlePay;
+		this.requireFull = requireFull;
+	}
+
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity p = gui.getPlayer();

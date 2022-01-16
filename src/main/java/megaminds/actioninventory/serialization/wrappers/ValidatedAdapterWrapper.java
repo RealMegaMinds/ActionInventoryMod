@@ -1,29 +1,25 @@
-package megaminds.actioninventory.serialization;
+package megaminds.actioninventory.serialization.wrappers;
 
 import java.io.IOException;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import megaminds.actioninventory.misc.Validated;
-
-public class ValidatedAdapterFactory implements TypeAdapterFactory {
+public class ValidatedAdapterWrapper implements TypeAdapterWrapper {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-		Class<?> raw = type.getRawType();
-		if (!Validated.class.isAssignableFrom(raw)) return null;
-		
-		TypeAdapter<T> adapter = gson.getDelegateAdapter(this, type);
-		return (TypeAdapter<T>) new ValidatedAdapter(adapter);
+	public <T> TypeAdapter<T> wrapAdapter(@NotNull TypeAdapter<T> adapter, Gson gson, TypeToken<T> type) {
+		if (!Validated.class.isAssignableFrom(type.getRawType())) return adapter;
+		return new ValidatedAdapter(adapter);
 	}
 
 	private class ValidatedAdapter<T extends Validated> extends TypeAdapter<T> {
-		private TypeAdapter<T> delegate;
+		private final TypeAdapter<T> delegate;
 		
 		private ValidatedAdapter(TypeAdapter<T> delegate) {
 			this.delegate = delegate;

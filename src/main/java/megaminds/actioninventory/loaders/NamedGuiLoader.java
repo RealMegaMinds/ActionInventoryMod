@@ -15,6 +15,7 @@ import megaminds.actioninventory.gui.NamedGuiBuilder;
 import megaminds.actioninventory.gui.VirtualPlayerInventory;
 import megaminds.actioninventory.serialization.Serializer;
 import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.ValidationException;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -53,6 +54,7 @@ public class NamedGuiLoader {
 	public static boolean addBuilder(NamedGuiBuilder builder) {
 		Identifier name = builder.getName();
 		if (BUILDERS.containsKey(name)) {
+			ActionInventoryMod.warn("A NamedGuiBuilder with name: '"+builder.getName()+"' already exists.");
 			return false;
 		} else {
 			BUILDERS.put(name, builder);
@@ -86,16 +88,24 @@ public class NamedGuiLoader {
 	
 	private static void load(Path path, int[] count) {
 		try (BufferedReader br = Files.newBufferedReader(path)) {
-			NamedGuiBuilder builder = Serializer.builderFromJson(br);
-			if (addBuilder(builder)) {
+			NamedGuiBuilder builder = loadBuilder(br);
+			if (builder!=null && addBuilder(builder)) {
 				count[0]++;
 			} else {
-				ActionInventoryMod.warn("A NamedGuiBuilder with name: '"+builder.getName()+"' already exists.");
 				count[1]++;
 			}
 		} catch (IOException e) {
 			ActionInventoryMod.warn("Failed to read NamedGuiBuilder from: "+path);
 			count[1]++;
+		}
+	}
+	
+	private static NamedGuiBuilder loadBuilder(BufferedReader br) {
+		try {
+			return Serializer.builderFromJson(br);
+		} catch (ValidationException e) {
+			ActionInventoryMod.warn("NamedGuiBuilder Validation Exception: "+e.getMessage());
+			return null;
 		}
 	}
 

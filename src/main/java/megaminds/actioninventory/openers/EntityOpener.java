@@ -2,14 +2,18 @@ package megaminds.actioninventory.openers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import megaminds.actioninventory.ActionInventoryMod;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import megaminds.actioninventory.misc.LevelSetter;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.Exclude;
-import megaminds.actioninventory.util.annotations.TypeName;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.command.EntitySelector;
@@ -17,14 +21,21 @@ import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
 
-@TypeName("Entity")
+@NoArgsConstructor
+@Poly("Entity")
 public final class EntityOpener extends BasicOpener {
 	private static final List<EntityOpener> OPENERS = new ArrayList<>();
 
-	private String entitySelector;	
+	@Getter @Setter private String entitySelector;	
 	
 	@Exclude private EntitySelector selector;
+
+	public EntityOpener(Identifier guiName, String entitySelector) {
+		super(guiName);
+		this.entitySelector = entitySelector;
+	}
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
@@ -74,6 +85,6 @@ public final class EntityOpener extends BasicOpener {
 	public void validate() {
 		super.validate();
 		validateSelector();
-		if (OPENERS.contains(this) || OPENERS.add(this)) ActionInventoryMod.warn("Failed to add Item opener to list.");
+		Validated.validate(!OPENERS.contains(this) && OPENERS.add(this), "Failed to add Block opener to list.");
 	}
 }

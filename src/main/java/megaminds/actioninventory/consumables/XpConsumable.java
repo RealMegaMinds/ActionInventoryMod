@@ -1,20 +1,34 @@
 package megaminds.actioninventory.consumables;
 
-import megaminds.actioninventory.misc.Validated;
-import megaminds.actioninventory.util.annotations.TypeName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-@TypeName("Xp")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Poly("Xp")
 public class XpConsumable extends BasicConsumable {
 	private static final String LEVEL_KEY = "level";
 	private static final String AMOUNT_KEY = "amount";
 	
 	private int level;
 	private int amount;
-
+	
+	public XpConsumable(boolean requireFull, int level, int amount) {
+		super(requireFull);
+		this.level = level;
+		this.amount = amount;
+	}
+	
 	@Override
 	public boolean canConsumeFull(ServerPlayerEntity player, NbtElement storage) {
 		if (NbtByte.ONE.equals(storage)) return true;

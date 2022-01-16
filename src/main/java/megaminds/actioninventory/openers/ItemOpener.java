@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import megaminds.actioninventory.util.annotations.TypeName;
+import lombok.Setter;
+import lombok.Getter;
+import megaminds.actioninventory.util.annotations.Poly;
 import megaminds.actioninventory.misc.ItemStackish;
-import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.misc.Constants.TagOption;
+import megaminds.actioninventory.misc.Enums.TagOption;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.item.ItemStack;
@@ -16,13 +18,22 @@ import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 
-@TypeName("Item")
+@Getter
+@Setter
+@Poly("Item")
 public final class ItemOpener extends BasicOpener {
 	private static final List<ItemOpener> OPENERS = new ArrayList<>();
 
 	private ItemStackish stack;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
+	
+	public ItemOpener(Identifier guiName, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+		super(guiName);
+		this.stack = stack;
+		this.tags = tags;
+		this.tagOption = tagOption;
+	}
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
@@ -51,6 +62,6 @@ public final class ItemOpener extends BasicOpener {
 	public void validate() {
 		super.validate();
 		if (tagOption==null) tagOption = TagOption.ALL;
-		if (OPENERS.contains(this) || OPENERS.add(this)) ActionInventoryMod.warn("Failed to add Item opener to list.");
+		Validated.validate(!OPENERS.contains(this) && OPENERS.add(this), "Failed to add Block opener to list.");
 	}
 }

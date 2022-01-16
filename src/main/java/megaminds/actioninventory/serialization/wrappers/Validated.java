@@ -1,25 +1,22 @@
-package megaminds.actioninventory.misc;
+package megaminds.actioninventory.serialization.wrappers;
 
 import java.util.function.Supplier;
 
-import com.google.gson.annotations.JsonAdapter;
+import megaminds.actioninventory.util.ValidationException;
 
-import megaminds.actioninventory.serialization.ValidatedAdapterFactory;
-
-@JsonAdapter(ValidatedAdapterFactory.class)
 public interface Validated {
 	/**
 	 * b==true else throws an error
 	 */
 	public static void validate(boolean b, String message) {
-		if (!b) throw new IllegalArgumentException(message);
+		if (!b) throw new ValidationException(message);
 	}
 	
 	/**
 	 * b==true else throws an error
 	 */
 	public static void validate(boolean b, Supplier<String> message) {
-		if (!b) throw new IllegalArgumentException(message.get());
+		if (!b) throw new ValidationException(message.get());
 	}
 	
 	/**
