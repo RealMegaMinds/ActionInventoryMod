@@ -11,7 +11,7 @@ import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Exclude;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack;
 @Getter
 @Setter
 @NoArgsConstructor
-@Poly("Animated")
+@PolyName("Animated")
 public final class AccessableAnimatedGuiElement extends AccessableElement {
 	private static final ItemStack[] EMPTY = {ItemStack.EMPTY};
 	

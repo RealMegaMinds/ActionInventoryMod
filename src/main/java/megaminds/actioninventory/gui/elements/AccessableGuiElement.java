@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
  */
 @Setter
 @NoArgsConstructor
-@Poly("Normal")
+@PolyName("Normal")
 public final class AccessableGuiElement extends AccessableElement {
 	private ItemStack item;
 

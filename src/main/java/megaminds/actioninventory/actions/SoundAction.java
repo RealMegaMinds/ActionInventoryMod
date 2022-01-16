@@ -7,15 +7,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.serialization.wrappers.Validated;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 /**
@@ -25,7 +26,7 @@ import net.minecraft.util.math.Vec3d;
 @NoArgsConstructor
 @Getter
 @Setter
-@Poly("Sound")
+@PolyName("Sound")
 public final class SoundAction extends BasicAction {
 	private SoundEvent sound;
 	private SoundCategory category;
@@ -33,7 +34,7 @@ public final class SoundAction extends BasicAction {
 	private Float volume;
 	private Float pitch;
 	
-	public SoundAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
+	public SoundAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.sound = sound;
 		this.category = category;

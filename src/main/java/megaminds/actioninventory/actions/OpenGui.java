@@ -6,11 +6,10 @@ import eu.pb4.sgui.api.ClickType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.loaders.NamedGuiLoader;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
-import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
@@ -22,7 +21,7 @@ public final class OpenGui extends BasicAction {
 	private Identifier guiName;
 	private UUID playerUUID;
 	
-	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, GuiType guiType, Identifier guiName) {
+	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, GuiType guiType, Identifier guiName) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.guiName = guiName;
 		this.guiType = guiType;
@@ -33,7 +32,7 @@ public final class OpenGui extends BasicAction {
 		this.guiName = guiName;
 	}
 
-	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, GuiType guiType, UUID playerUUID) {
+	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, GuiType guiType, UUID playerUUID) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.playerUUID = playerUUID;
 		this.guiType = guiType;

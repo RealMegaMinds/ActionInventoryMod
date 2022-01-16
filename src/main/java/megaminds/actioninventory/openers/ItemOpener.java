@@ -6,7 +6,7 @@ import java.util.Set;
 
 import lombok.Setter;
 import lombok.Getter;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.serialization.wrappers.Validated;
@@ -20,7 +20,7 @@ import net.minecraft.util.TypedActionResult;
 
 @Getter
 @Setter
-@Poly("Item")
+@PolyName("Item")
 public final class ItemOpener extends BasicOpener {
 	private static final List<ItemOpener> OPENERS = new ArrayList<>();
 

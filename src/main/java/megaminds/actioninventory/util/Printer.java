@@ -51,6 +51,7 @@ import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.openers.BlockOpener;
 import megaminds.actioninventory.openers.EntityOpener;
 import megaminds.actioninventory.openers.ItemOpener;
+import megaminds.actioninventory.serialization.PolyAdapterFactory;
 import megaminds.actioninventory.serialization.Serializer;
 import megaminds.actioninventory.serialization.wrappers.InstancedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.TypeAdapterWrapper;
@@ -58,6 +59,8 @@ import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.serialization.wrappers.ValidatedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.WrapperAdapterFactory;
 import megaminds.actioninventory.util.annotations.Instanced;
+import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -72,16 +75,13 @@ import net.minecraft.util.Identifier;
 
 @SuppressWarnings("all")	//Testing only class
 public class Printer {
-	private static int i = 0;
 	public static void dump(Path gameDir) {
 		try {
-			Serializer.builderFromJson(Serializer.GSON.toJson(createFurnaceBuilder()));
-			if (i!=0) throw new IOException("I not 0");
-//			Files.writeString(nextFile(gameDir, "FurnaceBuilder"), Serializer.GSON.toJson(createFurnaceBuilder()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-//			Files.writeString(nextFile(gameDir, "9x9Builder"), Serializer.GSON.toJson(create9x6Builder()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-//			Files.writeString(nextFile(gameDir, "Bopener"), Serializer.GSON.toJson(createBlockOpener()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-//			Files.writeString(nextFile(gameDir, "Eopener"), Serializer.GSON.toJson(createEntityOpener()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-//			Files.writeString(nextFile(gameDir, "Iopener"), Serializer.GSON.toJson(createItemOpener()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.writeString(nextFile(gameDir, "FurnaceBuilder"), Serializer.GSON.toJson(createFurnaceBuilder()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.writeString(nextFile(gameDir, "9x9Builder"), Serializer.GSON.toJson(create9x6Builder()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.writeString(nextFile(gameDir, "Bopener"), Serializer.GSON.toJson(createBlockOpener()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.writeString(nextFile(gameDir, "Eopener"), Serializer.GSON.toJson(createEntityOpener()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.writeString(nextFile(gameDir, "Iopener"), Serializer.GSON.toJson(createItemOpener()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -169,24 +169,4 @@ public class Printer {
 	private static ItemOpener createItemOpener() {
 		return new ItemOpener(new Identifier("furnacegui"), null, Set.of(ItemTags.LOGS.getId(), ItemTags.WOOL.getId()), TagOption.ANY);
 	}
-	
-	
-	public static void main(String[] args) {
-		System.out.println(X.class.isAnnotationPresent(Z.class));
-		System.out.println(Y.class.isAnnotationPresent(Z.class));
-		System.out.println(Q.class.isAnnotationPresent(Z.class));
-		System.out.println(R.class.isAnnotationPresent(Z.class));
-	}
-	
-	@Z
-	static class X{}
-	static class Y extends X{}
-	@Z
-	static interface Q{}
-	static class R implements Q{}
-	@Inherited
-	@Documented
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.TYPE)
-	static @interface Z{}
 }

@@ -5,11 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 /**
  * This executes a command.
@@ -23,13 +24,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @NoArgsConstructor
 @Getter
 @Setter
-@Poly("Command")
+@PolyName("Command")
 public final class CommandAction extends BasicAction {
 	private String command;
 	private boolean fromServer;
 	private boolean makeTempOp;
 	
-	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, String command, boolean fromServer, boolean makeTempOp) {
+	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, String command, boolean fromServer, boolean makeTempOp) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.command = command;
 		this.fromServer = fromServer;

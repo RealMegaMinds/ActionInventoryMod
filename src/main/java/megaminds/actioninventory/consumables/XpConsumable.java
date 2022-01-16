@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.serialization.wrappers.Validated;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -15,8 +15,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @AllArgsConstructor
 @Getter
 @Setter
-@Poly("Xp")
-public class XpConsumable extends BasicConsumable {
+@PolyName("Xp")
+public final class XpConsumable extends BasicConsumable {
 	private static final String LEVEL_KEY = "level";
 	private static final String AMOUNT_KEY = "amount";
 	

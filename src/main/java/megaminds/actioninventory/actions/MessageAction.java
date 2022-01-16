@@ -10,15 +10,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.network.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 /**
@@ -28,7 +29,7 @@ import net.minecraft.util.Util;
 @NoArgsConstructor
 @Getter
 @Setter
-@Poly("Message")
+@PolyName("Message")
 public final class MessageAction extends BasicAction {	
 	private Text message;
 	/**
@@ -43,7 +44,7 @@ public final class MessageAction extends BasicAction {
 	private List<UUID> receivers;
 	private MessageType messageType;
 	
-	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
+	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.message = message;
 		this.sender = sender;

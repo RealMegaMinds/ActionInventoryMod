@@ -6,21 +6,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.serialization.wrappers.Validated;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Identifier;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Poly("SendProperty")
+@PolyName("SendProperty")
 public final class SendPropertyAction extends BasicAction {
 	private ScreenProperty property;
 	private int value;
 	
-	public SendPropertyAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, ScreenProperty property, int value) {
+	public SendPropertyAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, ScreenProperty property, int value) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.property = property;
 		this.value = value;

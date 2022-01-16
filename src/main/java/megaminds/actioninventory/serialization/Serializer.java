@@ -22,8 +22,6 @@ import megaminds.actioninventory.openers.BasicOpener;
 import megaminds.actioninventory.serialization.wrappers.InstancedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.ValidatedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.WrapperAdapterFactory;
-import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.JsonHelper;
 import megaminds.actioninventory.util.ValidationException;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -69,12 +67,8 @@ public class Serializer {
 				.enableComplexMapKeySerialization()
 				.setExclusionStrategies(new ExcludeStrategy())
 
-				.registerTypeAdapterFactory(new PolyAdapterFactory())
-				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
 				.registerTypeHierarchyAdapter(NbtElement.class, new NbtElementAdapter().nullSafe())
 				.registerTypeHierarchyAdapter(Text.class, basic(Text.Serializer::fromJson, Text.Serializer::toJsonTree))
-
-				.registerTypeAdapterFactory(new OptionalAdapterFactory())
 
 				.registerTypeAdapter(ClickCallback.class, delegate(BasicAction.class, ClickCallback.class::cast, BasicAction.class::cast))
 				.registerTypeAdapter(ItemStack.class, delegate(ItemStackish.class, ItemStackish::toStack, ItemStackish::new))
@@ -91,6 +85,10 @@ public class Serializer {
 				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registry.STATUS_EFFECT))
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registry.PARTICLE_TYPE))
 
+				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
+				.registerTypeAdapterFactory(new PolyAdapterFactory())
+				.registerTypeAdapterFactory(new OptionalAdapterFactory())
+
 				.create();
 	}
 
@@ -103,8 +101,13 @@ public class Serializer {
 
 	private static <T, D> Both<T> delegate(Class<D> delegate, Function<D, T> from, Function<T, D> to) {
 		return new Both<T>(){
-			@Override public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {return JsonHelper.notNull(json) ? Helper.apply(context.deserialize(json, delegate), from) : null;}
-			@Override public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {return Helper.apply(src, e2->Helper.apply(to.apply(e2), context::serialize, JsonNull.INSTANCE), JsonNull.INSTANCE);}
+			@Override public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+				D d = context.deserialize(json, delegate);
+				return d==null ? null : from.apply(d);
+			}
+			@Override public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
+				return src==null ? JsonNull.INSTANCE : context.serialize(to.apply(src), delegate);
+			}
 		};
 	}
 

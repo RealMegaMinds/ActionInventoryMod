@@ -13,7 +13,7 @@ import megaminds.actioninventory.misc.LevelSetter;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.Exclude;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.command.EntitySelector;
@@ -24,7 +24,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
-@Poly("Entity")
+@PolyName("Entity")
 public final class EntityOpener extends BasicOpener {
 	private static final List<EntityOpener> OPENERS = new ArrayList<>();
 

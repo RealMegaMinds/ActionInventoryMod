@@ -106,6 +106,9 @@ public class NamedGuiLoader {
 		} catch (ValidationException e) {
 			ActionInventoryMod.warn("NamedGuiBuilder Validation Exception: "+e.getMessage());
 			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

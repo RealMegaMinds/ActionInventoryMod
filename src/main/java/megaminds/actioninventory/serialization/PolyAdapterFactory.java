@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,9 +15,11 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.internal.Streams;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 
 /**
  * This returns the type adapter that is used for the first parent as the adapter for each subclass.
@@ -28,6 +31,9 @@ public class PolyAdapterFactory implements TypeAdapterFactory {
 		Class<?> raw = type.getRawType();
 		if (raw.isAnnotationPresent(Poly.class)) {
 			Class<?> root = findRoot(raw);
+			if (!root.isSealed()) throw new IllegalArgumentException("Classes must be sealed to use @Poly");
+			if (root.isInterface()) throw new IllegalArgumentException("Types cannot be an interface to use @Poly");
+			
 			if (root==raw) {
 				return new PolyAdapter(gson, root);
 			}
@@ -42,50 +48,57 @@ public class PolyAdapterFactory implements TypeAdapterFactory {
 	}
 	
 	private final class PolyAdapter<T> extends TypeAdapter<T> {
-		private final Map<Class<?>, String> classToName;
+		private final Gson gson;
+		private final BiMap<Class<?>, String> classToName;
 		private final Map<Class<?>, TypeAdapter<?>> classToAdapter;
-		private final Map<String, TypeAdapter<?>> nameToAdapter;
 		
 		private PolyAdapter(Gson gson, Class<?> root) {
-			this.classToName = new HashMap<>();
+			this.gson = gson;
+			this.classToName = HashBiMap.create();
 			this.classToAdapter = new HashMap<>();
-			this.nameToAdapter = new HashMap<>();
 			retrieveClasses(root);
-			loadAdapters(gson);
 		}
 		
-		@SuppressWarnings("unchecked")
 		@Override
 		public void write(JsonWriter out, T value) throws IOException {
-			Class<?> raw = value.getClass();
-			TypeAdapter<T> adapter = ((TypeAdapter<T>)classToAdapter.get(raw));
-			if (adapter==null) {
-				throw new IllegalArgumentException("Failed to find TypeAdapter for class: "+raw);
+			if (value==null) {
+				out.nullValue();
+				return;
 			}
-			JsonElement obj = adapter.toJsonTree(value);
+			Class<?> raw = value.getClass();
+			JsonElement obj = getAdapter(raw).toJsonTree(value);
 			obj.getAsJsonObject().addProperty("type", classToName.get(raw));
 			Streams.write(obj, out);
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public T read(JsonReader in) throws IOException {
+			if (in.peek()==JsonToken.NULL) return null;
 			JsonObject obj = Streams.parse(in).getAsJsonObject();
-			String type = obj.remove("type").getAsString();
-			TypeAdapter<T> adapter = (TypeAdapter<T>) nameToAdapter.get(type);
-			if (adapter==null) {
-				throw new IllegalArgumentException("Failed to find TypeAdapter for name: "+type);
+			JsonElement type = obj.remove("type");
+			if (type==null) {
+				throw new IllegalArgumentException("No type was specified!");
 			}
+			TypeAdapter<T> adapter = getAdapter(type.getAsString());
 			return adapter.fromJsonTree(obj);
 		}
 		
-		private void loadAdapters(Gson gson) {
-			for (Entry<Class<?>, String> e : classToName.entrySet()) {
-				TypeAdapter<?> adapter = gson.getDelegateAdapter(PolyAdapterFactory.this, TypeToken.get(e.getKey()));
-				
-				classToAdapter.put(e.getKey(), adapter);
-				nameToAdapter.put(e.getValue(), adapter);
+		@SuppressWarnings("unchecked")
+		private TypeAdapter<T> getAdapter(Class<?> clazz) {
+			TypeAdapter<?> adapter = classToAdapter.get(clazz);
+			if (adapter==null) {
+				adapter = gson.getDelegateAdapter(PolyAdapterFactory.this, TypeToken.get(clazz));
+				classToAdapter.put(clazz, adapter);
 			}
+			return (TypeAdapter<T>) adapter;
+		}
+		
+		private TypeAdapter<T> getAdapter(String name) {
+			Class<?> clazz = classToName.inverse().get(name);
+			if (clazz==null) {
+				throw new IllegalArgumentException("Unknown type: "+name);
+			}
+			return getAdapter(clazz);
 		}
 		
 		private void retrieveClasses(Class<?> clazz) {
@@ -99,8 +112,8 @@ public class PolyAdapterFactory implements TypeAdapterFactory {
 		}
 		
 		private static String getName(Class<?> clazz) {
-			String s = clazz.getAnnotation(Poly.class).value();
-			return s.isBlank() ? clazz.getSimpleName() : s;
+			PolyName n = clazz.getAnnotation(PolyName.class);
+			return n==null ? clazz.getSimpleName() : n.value();
 		}
 	}
 }

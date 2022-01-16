@@ -6,11 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedGuiCallback;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedGuiCallback;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Identifier;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public abstract sealed class BasicAction implements NamedGuiCallback, Validated 
 	private Integer requiredIndex;
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
-	private String requiredGuiName;
+	private Identifier requiredGuiName;
 
 	/**
 	 * index, type, action and guiName, have already been checked before this is called.

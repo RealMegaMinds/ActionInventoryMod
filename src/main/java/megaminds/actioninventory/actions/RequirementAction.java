@@ -7,25 +7,26 @@ import eu.pb4.sgui.api.ClickType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.misc.LevelSetter;
 import megaminds.actioninventory.util.annotations.Exclude;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
 @Getter
 @Setter
-@Poly("Require")
+@PolyName("Require")
 public final class RequirementAction extends GroupAction {	
 	private String entitySelector;
 
 	@Exclude private EntitySelector selector;
 
-	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, BasicAction[] actions, String entitySelector) {
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions, String entitySelector) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
 	}

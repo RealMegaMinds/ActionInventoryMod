@@ -11,7 +11,7 @@ import lombok.Setter;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
@@ -26,7 +26,7 @@ import net.minecraft.util.math.BlockPos;
 @Getter
 @Setter
 @NoArgsConstructor
-@Poly("Block")
+@PolyName("Block")
 public final class BlockOpener extends BasicOpener {
 	private static final List<BlockOpener> OPENERS = new ArrayList<>();
 	

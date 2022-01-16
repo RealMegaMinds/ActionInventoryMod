@@ -48,6 +48,9 @@ public class BasicOpenerLoader {
 		} catch (ValidationException e) {
 			ActionInventoryMod.warn("Opener Validation Exception: "+e.getMessage());
 			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 

@@ -11,19 +11,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.consumables.BasicConsumable;
-import megaminds.actioninventory.gui.NamedGui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.misc.StoredConsumables;
-import megaminds.actioninventory.util.annotations.Poly;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
 @Getter
 @Setter
-@Poly("Consume")
+@PolyName("Consume")
 public final class ConsumeAction extends GroupAction {
 	private static final Map<UUID, StoredConsumables> STORED_CONSUMABLES = new HashMap<>();
 	private static final BasicConsumable[] EMPTY_C = new BasicConsumable[0];
@@ -35,7 +36,7 @@ public final class ConsumeAction extends GroupAction {
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
 	private boolean requireFull;
 	
-	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, String requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
+	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
 		this.consumables = consumables;
 		this.singlePay = singlePay;
@@ -53,21 +54,22 @@ public final class ConsumeAction extends GroupAction {
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 		StoredConsumables s = getStore(p.getUuid());
-		NbtElement sc = s.getOrCreateSub(gui.getName(), index, NbtCompound::new);
+		String guiName = gui.getName().toString();
+		NbtElement sc = s.getOrCreateSub(guiName, index, NbtCompound::new);
 		
 		if (singlePay && sc.equals(NbtByte.ONE)) {
 			super.internalClick(index, type, action, gui);
 			return;
 		}
 		
-		Function<String, NbtElement> getSub = str->s.getDeepSub(gui.getName(), index, str);
+		Function<String, NbtElement> getSub = str->s.getDeepSub(guiName, index, str);
 		
 		if (requireFull && !checkConsumption(p, getSub)) {
 			return;
 		}
 		
-		consume(p, getSub, (str,e)->s.setDeepSub(gui.getName(), index, str, e));
-		if (singlePay) s.setSub(gui.getName(), index, NbtByte.ONE);
+		consume(p, getSub, (str,e)->s.setDeepSub(guiName, index, str, e));
+		if (singlePay) s.setSub(guiName, index, NbtByte.ONE);
 		super.internalClick(index, type, action, gui);
 	}
 	
