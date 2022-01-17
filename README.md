@@ -1,4 +1,4 @@
-# ActionInventoryMod
+# ActionInventoryMod (v3)
 **This is a server only mod** (works on both dedicated and single player servers)
 
 
