@@ -42,4 +42,9 @@ public final class GiveAction extends BasicAction {
 	public void validate() {
 		if (itemsToGive==null) itemsToGive = EMPTY;
 	}
+
+	@Override
+	public BasicAction copy() {
+		return new GiveAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(itemsToGive).map(ItemStack::copy).toArray(ItemStack[]::new));
+	}
 }

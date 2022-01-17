@@ -54,4 +54,9 @@ public final class CommandAction extends BasicAction {
 	public void validate() {
 		if (command==null) command = "";
 	}
+
+	@Override
+	public BasicAction copy() {
+		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), command, fromServer, makeTempOp);
+	}
 }

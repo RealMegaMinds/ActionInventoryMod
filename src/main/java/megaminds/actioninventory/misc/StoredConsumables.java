@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -37,20 +36,46 @@ public class StoredConsumables extends Saver {
 	}
 
 	/**
+	 * Returns the {@link NbtElement} for {@link BasicConsumable}s in the slot in the gui.
+	 */
+	public NbtElement getSub(String guiName, int slot) {
+		if (stores==null) return null;
+		NbtCompound c = stores.get(guiName);
+		if (c==null) return null;
+		return c.get(slot+"");
+	}
+	
+	/**
 	 * Returns the {@link NbtElement} (or gets from Supplier) for {@link BasicConsumable}s in the slot in the gui.
 	 */
 	public NbtElement getOrCreateSub(String guiName, int slot, Supplier<NbtElement> creator) {
-		NbtCompound c = Objects.requireNonNullElseGet(stores, ()->stores=new HashMap<>()).computeIfAbsent(guiName, n->new NbtCompound());
-    	return Objects.requireNonNullElseGet(c.get(slot+""), ()->c.put(slot+"", creator.get()));
+		if (stores==null) stores = new HashMap<>();
+		NbtCompound c = stores.computeIfAbsent(guiName, n->new NbtCompound());
+		NbtElement e = c.get(slot+"");
+		if (e==null) {
+			e = creator.get();
+			c.put(slot+"", e);
+		}
+    	return e;
 	}
 	
 	/**
 	 * Sets the element for the slot in the gui to the given one.
 	 */
 	public void setSub(String guiName, int slot, NbtElement el) {
-		if (el==null) return;
+		if (el==null) {
+			removeSub(guiName, slot);
+			return;
+		}
 		if (stores==null) stores = new HashMap<>();
-		Objects.requireNonNullElseGet(stores, ()->stores=new HashMap<>()).computeIfAbsent(guiName, n->new NbtCompound()).put(slot+"", el);
+		stores.computeIfAbsent(guiName, n->new NbtCompound()).put(slot+"", el);
+	}
+	
+	public void removeSub(String guiName, int slot) {
+		NbtCompound c;
+		if (stores!=null && (c=stores.get(guiName))!=null) {
+			c.remove(slot+"");
+		}
 	}
 	
 	/**

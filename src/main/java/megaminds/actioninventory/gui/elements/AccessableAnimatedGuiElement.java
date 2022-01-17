@@ -1,5 +1,7 @@
 package megaminds.actioninventory.gui.elements;
 
+import java.util.Arrays;
+
 import org.jetbrains.annotations.NotNull;
 
 import eu.pb4.sgui.api.gui.GuiInterface;
@@ -73,5 +75,15 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 		}
 
 		return this.items[cFrame].copy();
+	}
+
+	@Override
+	public SlotElement copy() {
+		AccessableAnimatedGuiElement copy = new AccessableAnimatedGuiElement();
+		copy.setAction(getGuiCallback().copy());
+		copy.items = Arrays.stream(items).map(ItemStack::copy).toArray(ItemStack[]::new);
+		copy.interval = interval;
+		copy.random = random;
+		return copy;
 	}
 }

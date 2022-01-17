@@ -76,4 +76,11 @@ public final class OpenGui extends BasicAction {
 		default-> throw new IllegalArgumentException("OpenGui action doesn't support guiType of: "+guiType);
 		}
 	}
+
+	@Override
+	public BasicAction copy() {
+		OpenGui copy = new OpenGui(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), guiName, guiType, guiName);
+		copy.playerUUID = playerUUID;
+		return copy;
+	}
 }

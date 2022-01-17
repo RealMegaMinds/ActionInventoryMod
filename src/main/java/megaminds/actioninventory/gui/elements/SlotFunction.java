@@ -47,4 +47,13 @@ public non-sealed class SlotFunction extends SlotElement implements Validated {
 	public void apply(NamedGui gui, ServerPlayerEntity p) {
 		gui.setSlotRedirect(getCheckedIndex(gui), getSlot(p));
 	}
+
+	@Override
+	public SlotElement copy() {
+		SlotFunction copy = new SlotFunction();
+		copy.guiType = guiType;
+		copy.name = name;
+		copy.slotIndex = slotIndex;
+		return copy;
+	}
 }

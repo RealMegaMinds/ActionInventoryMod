@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -28,6 +29,14 @@ public class NamedGuiLoader {
 
 	private NamedGuiLoader() {}
 
+	public static List<Identifier> builderNames() {
+		return List.copyOf(BUILDERS.keySet());
+	}
+	
+	public static NamedGuiBuilder getBuilder(Identifier name) {
+		return BUILDERS.get(name);
+	}
+	
 	public static boolean openGui(ServerPlayerEntity player, Identifier name) {
 		return Helper.notNullAnd(getGui(player, name), SimpleGui::open);
 	}

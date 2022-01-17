@@ -33,4 +33,12 @@ public final class AccessableGuiElement extends AccessableElement {
 		super.validate();
 		if (item==null) item = ItemStack.EMPTY;
 	}
+
+	@Override
+	public SlotElement copy() {
+		AccessableGuiElement copy = new AccessableGuiElement();
+		copy.item = item.copy();
+		copy.setAction(getGuiCallback().copy());
+		return copy;
+	}
 }

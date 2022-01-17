@@ -20,7 +20,6 @@ import megaminds.actioninventory.misc.Saver;
 import megaminds.actioninventory.openers.BlockOpener;
 import megaminds.actioninventory.openers.EntityOpener;
 import megaminds.actioninventory.openers.ItemOpener;
-import megaminds.actioninventory.util.Printer;
 
 public class ActionInventoryMod implements ModInitializer {
 
@@ -52,8 +51,6 @@ public class ActionInventoryMod implements ModInitializer {
 		BlockOpener.registerCallbacks();
 		EntityOpener.registerCallbacks();
 		CommandRegistrationCallback.EVENT.register(Commands::register);
-
-		Printer.dump(FabricLoader.getInstance().getGameDir());
 		
 		info("Initialized");
 	}

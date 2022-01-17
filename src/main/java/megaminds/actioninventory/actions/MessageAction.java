@@ -78,4 +78,9 @@ public final class MessageAction extends BasicAction {
 		if (messageType==null) messageType = MessageType.CHAT;
 		if (message==null) message = LiteralText.EMPTY;		
 	}
+
+	@Override
+	public BasicAction copy() {
+		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), message.shallowCopy(), sender, new ArrayList<>(receivers), messageType);
+	}
 }

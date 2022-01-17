@@ -28,11 +28,23 @@ public abstract class Saver {
 		s.load(savesDir);
 	}
 	
+	public static void save(Saver s) {
+		s.save(savesDir);
+	}
+	
 	public static void clear() {
 		SAVERS.clear();
 		savesDir = null;
 	}
+	
+	public void load() {
+		Saver.load(this);
+	}
 
-	public abstract void load(Path saveDir);
+	public void save() {
+		Saver.save(this);
+	}
+
+	public abstract void load(Path loadDir);
 	public abstract void save(Path saveDir);
 }

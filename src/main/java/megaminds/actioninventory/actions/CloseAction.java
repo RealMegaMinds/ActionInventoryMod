@@ -23,4 +23,9 @@ public final class CloseAction extends BasicAction {
 	public void validate() {
 		//Unused
 	}
+
+	@Override
+	public BasicAction copy() {
+		return new CloseAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName());
+	}
 }

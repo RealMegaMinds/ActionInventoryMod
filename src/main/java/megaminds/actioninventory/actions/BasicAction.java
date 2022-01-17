@@ -42,4 +42,13 @@ public abstract sealed class BasicAction implements NamedGuiCallback, Validated 
 	protected static <E> boolean check(E o, E e) {
 		return o==null || o==e;
 	}
+
+	public abstract BasicAction copy();
+	
+	public static void copyFields(BasicAction from, BasicAction to) {
+		to.requiredIndex = from.requiredIndex;
+		to.requiredClickType = from.requiredClickType;
+		to.requiredSlotActionType = from.requiredSlotActionType;
+		to.requiredGuiName = from.requiredGuiName;
+	}
 }

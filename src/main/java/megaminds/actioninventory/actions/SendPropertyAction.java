@@ -37,4 +37,9 @@ public final class SendPropertyAction extends BasicAction {
 		if (property==null) property = ScreenProperty.FIRE_LEVEL;
 		Validated.validate(value>=0, "SendProperty action requires value to be 0 or above, but it is: "+value);
 	}
+
+	@Override
+	public BasicAction copy() {
+		return new SendPropertyAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), property, value);
+	}
 }

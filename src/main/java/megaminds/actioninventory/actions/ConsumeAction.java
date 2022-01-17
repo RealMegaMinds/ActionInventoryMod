@@ -1,11 +1,9 @@
 package megaminds.actioninventory.actions;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
 import eu.pb4.sgui.api.ClickType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,33 +50,47 @@ public final class ConsumeAction extends GroupAction {
 
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
-		ServerPlayerEntity p = gui.getPlayer();
-		StoredConsumables s = getStore(p.getUuid());
+		ServerPlayerEntity player = gui.getPlayer();
+		StoredConsumables store = getStore(player.getUuid());
 		String guiName = gui.getName().toString();
-		NbtElement sc = s.getOrCreateSub(guiName, index, NbtCompound::new);
+		NbtElement topElement = store.getSub(guiName, index);
+
+		//NbtByte.ONE means the full price has been paid
+		boolean hasPaid = singlePay && NbtByte.ONE.equals(topElement);
+		if (!hasPaid) {
+			NbtCompound subStore = ((NbtCompound)topElement);
+			boolean canPay = checkConsumption(player, subStore);
+			
+			if (canPay || !requireFull) {
+				if (!canPay&&subStore==null) {
+					subStore = new NbtCompound();
+					store.setSub(guiName, index, subStore);
+				}
+				consume(player, subStore, !canPay);
+				store.save();
+				hasPaid = canPay;
+			}
+		}
 		
-		if (singlePay && sc.equals(NbtByte.ONE)) {
+		if (hasPaid) {
 			super.internalClick(index, type, action, gui);
-			return;
-		}
-		
-		Function<String, NbtElement> getSub = str->s.getDeepSub(guiName, index, str);
-		
-		if (requireFull && !checkConsumption(p, getSub)) {
-			return;
-		}
-		
-		consume(p, getSub, (str,e)->s.setDeepSub(guiName, index, str, e));
-		if (singlePay) s.setSub(guiName, index, NbtByte.ONE);
-		super.internalClick(index, type, action, gui);
+			if (singlePay) {
+				store.setSub(guiName, index, NbtByte.ONE);
+			} else {
+				store.removeSub(guiName, index);
+			}
+		}		
 	}
 	
 	/**
 	 * Checks if the player can consume the full amount from all consumables
 	 */
-	private boolean checkConsumption(ServerPlayerEntity p, Function<String, NbtElement> func) {
+	private boolean checkConsumption(ServerPlayerEntity p, NbtCompound subStore) {
 		for (BasicConsumable c : consumables) {
-			if (!c.canConsumeFull(p, func.apply(c.getStorageName()))) return false;
+			NbtElement current = null;
+			if (subStore!=null) current = subStore.get(c.getStorageName());
+			if (current!=null) current = current.copy();	//current is copied because it should not be altered in this method
+			if (!c.canConsumeFull(p, current)) return false;
 		}
 		return true;
 	}
@@ -86,10 +98,13 @@ public final class ConsumeAction extends GroupAction {
 	/**
 	 * Actually does consuming
 	 */
-	private void consume(ServerPlayerEntity p, Function<String, NbtElement> func, BiConsumer<String, NbtElement> resultConsumer) {
+	private void consume(ServerPlayerEntity p, NbtCompound subStore, boolean saveAmount) {
 		for (BasicConsumable c : consumables) {
-			String type = c.getStorageName();
-			resultConsumer.accept(type, c.consume(p, func.apply(type)));
+			String cName = c.getStorageName();
+			NbtElement og = null;
+			if (subStore!=null) og = subStore.get(cName);
+			NbtElement result = c.consume(p, og, saveAmount);
+			if (saveAmount) subStore.put(cName, result);	//NOSONAR Not null here
 		}
 	}
 
@@ -101,5 +116,10 @@ public final class ConsumeAction extends GroupAction {
 	public void validate() {
 		super.validate();
 		if (consumables==null) consumables = EMPTY_C;
+	}
+	
+	@Override
+	public BasicAction copy() {
+		return new ConsumeAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), Arrays.stream(consumables).map(BasicConsumable::copy).toArray(BasicConsumable[]::new), singlePay, requireFull);
 	}
 }

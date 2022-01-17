@@ -59,4 +59,9 @@ public final class SoundAction extends BasicAction {
 		Validated.validate(volume>=0, "Sound action requires volume to be 0 or above, but it is: "+volume);
 		Validated.validate(pitch>=0, "Sound action requires pitch to be 0 or above, but it is: "+pitch);
 	}
+
+	@Override
+	public BasicAction copy() {
+		return new SoundAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), sound, category, position, volume, pitch);
+	}
 }

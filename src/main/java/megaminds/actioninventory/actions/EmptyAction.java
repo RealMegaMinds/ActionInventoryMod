@@ -23,4 +23,9 @@ public final class EmptyAction extends BasicAction {
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		//Unused
 	}
+
+	@Override
+	public BasicAction copy() {
+		return INSTANCE;
+	}
 }

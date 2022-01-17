@@ -19,6 +19,8 @@ public abstract sealed class SlotElement permits SlotFunction, AccessableElement
 	 * Use {@link NamedGui#setSlot}
 	 */
 	public abstract void apply(NamedGui gui, ServerPlayerEntity player);
+	
+	public abstract SlotElement copy();
 		
 	/**
 	 * @throws IllegalArgumentException If {@code test} is negative and {@code gui} has no empty slots.

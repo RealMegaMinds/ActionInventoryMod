@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import java.util.Arrays;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -67,5 +69,12 @@ public final class RequirementAction extends GroupAction {
 	public void validate() {
 		super.validate();
 		validateSelector();
+	}
+	
+	@Override
+	public BasicAction copy() {
+		RequirementAction copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector);
+		copy.selector = selector;
+		return copy;
 	}
 }

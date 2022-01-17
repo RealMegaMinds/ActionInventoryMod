@@ -28,6 +28,10 @@ public class Helper {
 	private static final String WORLD = "WORLD";
 	
 	private Helper() {}
+	
+	public static <E> boolean containsAny(Collection<E> col, Predicate<E> tester) {
+		return getFirst(col, tester)!=null;
+	}
 		
 	/**
 	 * Returns the first object in the given collection that matches the given predicate.<br>
@@ -119,6 +123,7 @@ public class Helper {
 			return true;
 		} catch (IOException e) {
 			ActionInventoryMod.warn("Couldn't create directory: "+p);
+			e.printStackTrace();
 			return false;
 		}
 	}

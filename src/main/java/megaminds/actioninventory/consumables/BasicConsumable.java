@@ -15,7 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
-public sealed abstract class BasicConsumable implements Validated permits XpConsumable {
+public abstract sealed class BasicConsumable implements Validated permits XpConsumable {
 	private boolean requireFull;
 	
 	/**
@@ -23,13 +23,18 @@ public sealed abstract class BasicConsumable implements Validated permits XpCons
 	 */
 	public abstract boolean canConsumeFull(ServerPlayerEntity player, NbtElement storage);
 	/**
-	 * Consumes from the player, and returns the corrected storage.
+	 * Consumes from the player, and corrects storage if saveAmount is true.
+	 * @param storage
+	 * The current storage.
+	 * @return The corrected storage if saveAmount is true otherwise null
 	 */
-	public abstract NbtElement consume(ServerPlayerEntity player, NbtElement storage);
+	public abstract NbtElement consume(ServerPlayerEntity player, NbtElement storage, boolean saveAmount);
 	/**
 	 * Returns the name of the storage this consumable accesses
 	 */
 	public abstract String getStorageName();
+	
+	public abstract BasicConsumable copy();
 	
 	public final boolean getRequireFull() {
 		return requireFull;

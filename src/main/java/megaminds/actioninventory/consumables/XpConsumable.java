@@ -35,17 +35,19 @@ public final class XpConsumable extends BasicConsumable {
 		int[] saved = {player.experienceLevel, player.totalExperience};
 		if (storage!=null) {
 			NbtCompound c = (NbtCompound) storage;
-			saved[0] += c.contains(LEVEL_KEY) ? c.getInt(LEVEL_KEY) : 0;
-			saved[1] += c.contains(AMOUNT_KEY) ? c.getInt(AMOUNT_KEY) : 0;
+			if (c.contains(LEVEL_KEY)) saved[0] += c.getInt(LEVEL_KEY);
+			if (c.contains(AMOUNT_KEY)) saved[1] += c.getInt(AMOUNT_KEY);
 		}
 		return (saved[0] >= level) && (saved[1] >= amount);
 	}
 
 	@Override
-	public NbtElement consume(ServerPlayerEntity player, NbtElement storage) {
+	public NbtElement consume(ServerPlayerEntity player, NbtElement storage, boolean saveAmount) {
 		if (NbtByte.ONE.equals(storage)) return storage;
 
-		NbtCompound c = storage!=null ? (NbtCompound) storage : new NbtCompound();
+		NbtCompound c = (NbtCompound) storage;
+		if (c==null) c = new NbtCompound();
+		
 		int[] paid = {
 				c.contains(LEVEL_KEY) ? c.getInt(LEVEL_KEY) : 0,
 				c.contains(AMOUNT_KEY) ? c.getInt(AMOUNT_KEY) : 0
@@ -61,11 +63,14 @@ public final class XpConsumable extends BasicConsumable {
 		paid[0] += toPay[0];
 		paid[1] += toPay[1];
 		
+		if (!saveAmount) return null;
+		
 		if (paid[0]>=level && paid[1]>=amount) {
 			return NbtByte.ONE;
 		}
-		c.putInt(LEVEL_KEY, level);
-		c.putInt(AMOUNT_KEY, amount);
+
+		c.putInt(LEVEL_KEY, paid[0]);
+		c.putInt(AMOUNT_KEY, paid[1]);
 		return c;
 	}
 
@@ -78,5 +83,10 @@ public final class XpConsumable extends BasicConsumable {
 	public void validate() {
 		Validated.validate(level>=0, "Xp consumable requires level to be 0 or above, but it is: "+level);
 		Validated.validate(amount>=0, "Xp consumable requires amount to be 0 or above, but it is: "+amount);
+	}
+
+	@Override
+	public BasicConsumable copy() {
+		return new XpConsumable(getRequireFull(), level, amount);
 	}
 }

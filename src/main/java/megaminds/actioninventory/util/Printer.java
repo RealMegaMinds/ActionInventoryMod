@@ -75,6 +75,18 @@ import net.minecraft.util.Identifier;
 
 @SuppressWarnings("all")	//Testing only class
 public class Printer {
+	public static void print(NamedGuiBuilder builder, Path folder) {
+		if (Helper.checkDir(folder)) {
+			try {
+				Files.writeString(nextFile(folder, builder.getName().toUnderscoreSeparatedString()), Serializer.GSON.toJson(builder), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			} catch (IOException e) {
+				ActionInventoryMod.warn("Failed to save builder");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
 	public static void dump(Path gameDir) {
 		try {
 			Files.writeString(nextFile(gameDir, "FurnaceBuilder"), Serializer.GSON.toJson(createFurnaceBuilder()), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
@@ -112,7 +124,7 @@ public class Printer {
 
 		BasicAction[] actions3 = {
 				new MessageAction(new LiteralText("Helooo"), null, null, MessageType.CHAT),
-				new SendPropertyAction(ScreenProperty.CURRENT_PROGRESS, 100)
+				new CloseAction()
 		};
 
 		BasicAction[] actions4 = {
@@ -120,7 +132,7 @@ public class Printer {
 				new CommandAction("/kill @p", true, false)
 		};
 
-		ConsumeAction ca2 = new ConsumeAction(actions2, null, false, true);
+		ConsumeAction ca2 = new ConsumeAction(actions2, consumables, false, true);
 		GroupAction ga = new GroupAction(actions3);
 		RequirementAction ra = new RequirementAction(actions4, "[gamemode=spectator]");
 		
@@ -142,7 +154,7 @@ public class Printer {
 		
 		BasicAction[] actions1 = {
 				new CommandAction("/give @s minecraft:diamond 64", false, true),
-				new CloseAction()
+				new SendPropertyAction(ScreenProperty.CURRENT_PROGRESS, 100)
 		};
 
 		OpenGui cga = new OpenGui(GuiType.PLAYER, (UUID)null);
@@ -153,7 +165,7 @@ public class Printer {
 				Arrays.asList(
 						new AccessableGuiElement(0, cga, new ItemStack(Items.PORKCHOP, 12)),
 						new AccessableGuiElement(1, cga2, new ItemStack(Items.COAL, 1)),
-						new AccessableGuiElement(2, ca, new ItemStack(Items.ACACIA_PLANKS, 13))
+						new AccessableGuiElement(2, ca, new ItemStack(Items.ACACIA_PLANKS, 10))
 						));
 
 		NamedGuiBuilder builder = new NamedGuiBuilder(ScreenHandlerType.FURNACE, new Identifier("furnacegui"), new LiteralText("Furnace Builder"), false, elements.toArray(SlotElement[]::new));

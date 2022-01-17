@@ -1,5 +1,7 @@
 package megaminds.actioninventory.gui;
 
+import java.util.Arrays;
+
 import eu.pb4.sgui.api.GuiHelpers;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -94,5 +96,19 @@ public final class NamedGuiBuilder implements Validated {
 	
 	public void setLockPlayerInventory(boolean lockPlayerInventory) {
 		if (!includePlayer) this.lockPlayerInventory = lockPlayerInventory;
+	}
+
+	public NamedGuiBuilder copy() {
+		NamedGuiBuilder builder = new NamedGuiBuilder();
+		builder.type = type;
+		builder.name = name;
+		builder.title = title.shallowCopy();
+		builder.includePlayer = includePlayer;
+		builder.lockPlayerInventory = lockPlayerInventory;
+		builder.elements = Arrays.stream(elements).map(SlotElement::copy).toArray(SlotElement[]::new);
+		
+		builder.size = size;
+		builder.hasRedirects = hasRedirects;
+		return builder;
 	}
 }

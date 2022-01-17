@@ -85,12 +85,7 @@ public class PolyAdapterFactory implements TypeAdapterFactory {
 		
 		@SuppressWarnings("unchecked")
 		private TypeAdapter<T> getAdapter(Class<?> clazz) {
-			TypeAdapter<?> adapter = classToAdapter.get(clazz);
-			if (adapter==null) {
-				adapter = gson.getDelegateAdapter(PolyAdapterFactory.this, TypeToken.get(clazz));
-				classToAdapter.put(clazz, adapter);
-			}
-			return (TypeAdapter<T>) adapter;
+			return (TypeAdapter<T>) classToAdapter.computeIfAbsent(clazz, c->gson.getDelegateAdapter(PolyAdapterFactory.this, TypeToken.get(c)));
 		}
 		
 		private TypeAdapter<T> getAdapter(String name) {

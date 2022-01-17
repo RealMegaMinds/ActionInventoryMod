@@ -17,6 +17,7 @@ public class Commands {
 //		root.redirect(null);	//redirect to help
 		
 		root.then(literal("reload").executes(new ReloadCommand()));
+		root.then(literal("save").executes(new SaveCommand()));
 		dispatcher.register(root);
 	}
 }
