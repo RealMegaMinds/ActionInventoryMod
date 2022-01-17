@@ -1,0 +1,9 @@
+{
+	"type": "ITEM",
+	"guiName": "test1",
+	"item": "minecraft:oak_log",
+	"customName": "Example Opener",
+	"textOnly": true,
+	"nbt": "{}",
+	"tags": ["minecraft:logs"]
+}

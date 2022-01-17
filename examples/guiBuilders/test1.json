@@ -1,0 +1,55 @@
+{
+	"name": "test1",
+	"type": "minecraft:generic_9x6",
+	"includePlayerSlots": false,
+	"title": "Test 1 Gui",
+	"lockPlayerSlots": false,
+	"slots": [
+		{
+			"type": "normal",
+			"index": 0,
+			"callback": {
+				"type": "CLOSE",
+				"index": 0,
+				"clickType": "MOUSE_LEFT",
+				"actionType": "PICKUP"
+			},
+			"items": {
+				"item": "minecraft:stick",
+				"count": 7,
+				"name": "Example Slot",
+				"lore": "This is just an example"
+			}
+		},
+		{
+			"type": "normal",
+			"index": 5,
+			"callback": {
+				"type": "REQUIRE_XP",
+				"index": 5,
+				"clickType": "MOUSE_LEFT",
+				"actionType": "PICKUP",
+				"kind": "LEVEL",
+				"amount": 1
+			},
+			"items": [
+				{
+					"item": "minecraft:diamond",
+					"count": 1,
+					"name": "Animation Example!",
+					"lore": "This is just an example"
+				},
+				{
+					"item": "minecraft:emerald",
+					"count": 1,
+					"name": "Wait for it...",
+					"lore": "Any moment..."
+				}
+			],
+			"isRandom": false,
+			"interval": 100
+		},
+		{
+		}
+	]
+}
