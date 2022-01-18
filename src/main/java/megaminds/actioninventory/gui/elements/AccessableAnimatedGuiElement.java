@@ -32,10 +32,10 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 	
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
-	@Exclude private int frame = 0;
+	@Exclude private int frame;
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
-	@Exclude private int tick = 0;
+	@Exclude private int tick;
 
 	public AccessableAnimatedGuiElement(int index, BasicAction action, ItemStack[] items, int interval, boolean random) {
 		super(index, action);

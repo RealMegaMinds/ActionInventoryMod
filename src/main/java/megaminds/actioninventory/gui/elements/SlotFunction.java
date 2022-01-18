@@ -18,10 +18,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @PolyName("Redirect")
 public non-sealed class SlotFunction extends SlotElement implements Validated {	
 	private GuiType guiType;
-	private String name;
+	private UUID name;
 	private int slotIndex;
 	
-	public SlotFunction(int index, GuiType guiType, String name, int slotIndex) {
+	public SlotFunction(int index, GuiType guiType, UUID name, int slotIndex) {
 		super(index);
 		this.guiType = guiType;
 		this.name = name;
@@ -29,7 +29,7 @@ public non-sealed class SlotFunction extends SlotElement implements Validated {
 	}
 
 	public Slot getSlot(ServerPlayerEntity p) {
-		ServerPlayerEntity real = name==null ? p : p.getServer().getPlayerManager().getPlayer(UUID.fromString(name));
+		ServerPlayerEntity real = name==null ? p : p.getServer().getPlayerManager().getPlayer(name);
 		return switch (guiType) {
 		case PLAYER -> new Slot(real.getInventory(), slotIndex, 0, 0);
 		case ENDER_CHEST -> new Slot(real.getEnderChestInventory(), slotIndex, 0, 0);
