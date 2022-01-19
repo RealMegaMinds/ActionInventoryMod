@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.gui.NamedSlotGuiInterface;
-import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
@@ -35,7 +34,6 @@ public final class SendPropertyAction extends BasicAction {
 	@Override
 	public void validate() {
 		if (property==null) property = ScreenProperty.FIRE_LEVEL;
-		Validated.validate(value>=0, "SendProperty action requires value to be 0 or above, but it is: "+value);
 	}
 
 	@Override
