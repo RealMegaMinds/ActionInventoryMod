@@ -1,6 +1,7 @@
 package megaminds.actioninventory.actions;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import eu.pb4.sgui.api.ClickType;
@@ -11,7 +12,11 @@ import lombok.Setter;
 import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -23,28 +28,49 @@ import net.minecraft.util.Identifier;
 @Setter
 @PolyName("Give")
 public final class GiveAction extends BasicAction {
-	private static final ItemStack[] EMPTY = new ItemStack[0];
-	
-	private ItemStack[] itemsToGive;
-	
-	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, ItemStack[] itemsToGive) {
+	private static final Identifier[] EMPTY = new Identifier[0];
+
+	private Identifier[] lootTables;
+	private boolean giveDisplayed;
+
+	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, Identifier[] lootTables, boolean giveDisplayed) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
-		this.itemsToGive = itemsToGive;
+		this.lootTables = lootTables;
+		this.giveDisplayed = giveDisplayed;
 	}
 
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
-		ItemStack current = Objects.requireNonNullElse(gui.getStack(index), ItemStack.EMPTY);
-		Arrays.stream(itemsToGive).map(s->Objects.requireNonNullElse(s, current)).forEach(s->gui.getPlayer().getInventory().offerOrDrop(s.copy()));
+		ServerPlayerEntity p = gui.getPlayer();
+
+		if (giveDisplayed) {
+			ItemStack current = gui.getStack(index);
+			if (current!=null) p.getInventory().offerOrDrop(current);
+		}
+
+		LootContext lootContext = new LootContext.Builder(p.getWorld())
+				.parameter(LootContextParameters.THIS_ENTITY, p)
+				.parameter(LootContextParameters.ORIGIN, p.getPos())
+				.random(p.getRandom())
+				.luck(p.getLuck())
+				.build(LootContextTypes.EMPTY);
+		
+		Arrays.stream(lootTables)
+		.map(id->p.server.getLootManager().getTable(id).generateLoot(lootContext))
+		.<ItemStack>mapMulti(List::forEach)
+		.filter(Objects::nonNull)
+		.forEach(p.getInventory()::offerOrDrop);
+		
+		p.currentScreenHandler.sendContentUpdates();
 	}
 
 	@Override
 	public void validate() {
-		if (itemsToGive==null) itemsToGive = EMPTY;
+		if (lootTables==null) lootTables = EMPTY;
 	}
 
 	@Override
 	public BasicAction copy() {
-		return new GiveAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(itemsToGive).map(ItemStack::copy).toArray(ItemStack[]::new));
+		return new GiveAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.copyOf(lootTables, lootTables.length), giveDisplayed);
 	}
 }
