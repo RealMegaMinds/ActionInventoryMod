@@ -15,31 +15,35 @@ import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
+import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
-@Getter
-@Setter
 @PolyName("Require")
 public final class RequirementAction extends GroupAction {	
-	private String entitySelector;
+	@Getter @Setter private String entitySelector;
+	@Getter @Setter private EntityPredicate entityPredicate;
 
 	@Exclude private EntitySelector selector;
 
-	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions, String entitySelector) {
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
+		this.entityPredicate = entityPredicate;
 	}
 	
-	public RequirementAction(BasicAction[] actions, String entitySelector) {
+	public RequirementAction(BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(actions);
 		this.entitySelector = entitySelector;
+		this.entityPredicate = entityPredicate;
 	}
 
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
-		if (selector==null || matches(gui.getPlayer())) {
+		ServerPlayerEntity p = gui.getPlayer();
+		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
 			super.internalClick(index, type, action, gui);
 		}
 	}
@@ -68,11 +72,12 @@ public final class RequirementAction extends GroupAction {
 	public void validate() {
 		super.validate();
 		validateSelector();
+		if (entityPredicate==null) entityPredicate = EntityPredicate.ANY;
 	}
 	
 	@Override
 	public BasicAction copy() {
-		RequirementAction copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector);
+		RequirementAction copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
 		copy.selector = selector;
 		return copy;
 	}

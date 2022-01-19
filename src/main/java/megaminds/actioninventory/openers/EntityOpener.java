@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
+import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -28,6 +29,7 @@ public final class EntityOpener extends BasicOpener {
 	private static final List<EntityOpener> OPENERS = new ArrayList<>();
 
 	@Getter @Setter private String entitySelector;	
+	@Getter @Setter private EntityPredicate entityPredicate;
 	
 	@Exclude private EntitySelector selector;
 
@@ -38,7 +40,8 @@ public final class EntityOpener extends BasicOpener {
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
-		if (selector==null || matches((Entity)context[0])) {
+		Entity e = (Entity) context[0];
+		if (selector==null || entityPredicate.test(player, e) && matches(e)) {
 			return super.open(player, context);
 		}
 		return false;

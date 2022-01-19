@@ -15,7 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
-public abstract sealed class BasicConsumable implements Validated permits XpConsumable {
+public abstract sealed class BasicConsumable implements Validated permits XpConsumable, ItemConsumable {
 	private boolean requireFull;
 	
 	/**

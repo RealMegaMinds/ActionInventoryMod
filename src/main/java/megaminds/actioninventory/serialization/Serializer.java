@@ -33,6 +33,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
@@ -84,6 +85,7 @@ public class Serializer {
 				.registerTypeAdapter(ScreenHandlerType.class, registryDelegate(Registry.SCREEN_HANDLER))
 				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registry.STATUS_EFFECT))
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registry.PARTICLE_TYPE))
+				.registerTypeAdapter(EntityPredicate.class, basic(EntityPredicate::fromJson, EntityPredicate::toJson))
 
 				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
 				.registerTypeAdapterFactory(new PolyAdapterFactory())
