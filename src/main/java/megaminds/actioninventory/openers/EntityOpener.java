@@ -33,9 +33,10 @@ public final class EntityOpener extends BasicOpener {
 	
 	@Exclude private EntitySelector selector;
 
-	public EntityOpener(Identifier guiName, String entitySelector) {
+	public EntityOpener(Identifier guiName, String entitySelector, EntityPredicate entityPredicate) {
 		super(guiName);
 		this.entitySelector = entitySelector;
+		this.entityPredicate = entityPredicate;
 	}
 
 	@Override
@@ -46,6 +47,7 @@ public final class EntityOpener extends BasicOpener {
 		}
 		return false;
 	}
+
 	private boolean matches(Entity e) {
 		try {
 			return e.equals(selector.getEntity(e.getCommandSource().withMaxLevel(2)));
@@ -87,6 +89,7 @@ public final class EntityOpener extends BasicOpener {
 	public void validate() {
 		super.validate();
 		validateSelector();
+		if (entityPredicate==null) entityPredicate = EntityPredicate.ANY;
 		Validated.validate(!OPENERS.contains(this) && OPENERS.add(this), "Failed to add Block opener to list.");
 	}
 }
