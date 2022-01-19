@@ -4,8 +4,7 @@
   "package": "megaminds.actioninventory.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "NbtCompoundMixin",
-    "ServerCommandSourceMixin"
+    "NbtCompoundMixin"
   ],
   "injectors": {
     "defaultRequire": 1

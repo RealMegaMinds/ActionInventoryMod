@@ -9,7 +9,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.misc.LevelSetter;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.Exclude;
@@ -46,7 +45,7 @@ public final class EntityOpener extends BasicOpener {
 	}
 	private boolean matches(Entity e) {
 		try {
-			return e.equals(selector.getEntity(((LevelSetter)e.getCommandSource()).withHigherLevel(2)));
+			return e.equals(selector.getEntity(e.getCommandSource().withMaxLevel(2)));
 		} catch (CommandSyntaxException e1) {
 			return false;
 		}

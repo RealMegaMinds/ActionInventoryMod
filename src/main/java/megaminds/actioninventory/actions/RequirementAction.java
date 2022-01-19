@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.gui.NamedSlotGuiInterface;
-import megaminds.actioninventory.misc.LevelSetter;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.command.EntitySelector;
@@ -47,7 +46,7 @@ public final class RequirementAction extends GroupAction {
 	
 	private boolean matches(Entity e) {
 		try {
-			return e.equals(selector.getEntity(((LevelSetter)e.getCommandSource()).withHigherLevel(2)));
+			return e.equals(selector.getEntity(e.getCommandSource().withMaxLevel(2)));
 		} catch (CommandSyntaxException e1) {
 			return false;
 		}
