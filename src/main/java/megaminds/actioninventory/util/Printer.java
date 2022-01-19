@@ -86,6 +86,9 @@ public class Printer {
 		}
 	}
 	
+	public static void print(ItemStack stack) {
+		System.err.println(Serializer.GSON.toJson(stack));
+	}
 	
 	public static void dump(Path gameDir) {
 		try {

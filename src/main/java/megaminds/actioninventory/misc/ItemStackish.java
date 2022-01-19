@@ -9,6 +9,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -30,6 +35,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemStackish {
 	private static final String HIDE_FLAG_KEY = "HideFlags";
 	private static final String ATTRIBUTE_KEY = "AttributeModifiers";
@@ -44,8 +53,6 @@ public class ItemStackish {
 	private Map<Enchantment, Integer> enchantments;	//enchantmentsMatch
 	private EnumSet<TooltipSection> hideFlags;	//displayMatches
 	private Set<AttributeValues> attributes;	//attributesMatch
-
-	public ItemStackish() {}
 	
 	public ItemStackish(ItemStack i) {
 		item = i.getItem();
@@ -196,87 +203,11 @@ public class ItemStackish {
 		return true;
 	}
 
-	public Item getItem() {
-		return item;
-	}
-
-	public void setItem(Item item) {
-		this.item = item;
-	}
-
-	public Integer getCount() {
-		return count;
-	}
-
-	public void setCount(Integer count) {
-		this.count = count;
-	}
-
-	public Integer getDamage() {
-		return damage;
-	}
-
-	public void setDamage(Integer damage) {
-		this.damage = damage;
-	}
-
-	public Optional<NbtCompound> getCustomNbt() {
-		return customNbt;
-	}
-
-	public void setCustomNbt(Optional<NbtCompound> customNbt) {
-		this.customNbt = customNbt;
-	}
-
-	public Optional<Text> getCustomName() {
-		return customName;
-	}
-
-	public void setCustomName(Optional<Text> customName) {
-		this.customName = customName;
-	}
-
-	public Text[] getLore() {
-		return lore;
-	}
-
-	public void setLore(Text[] lore) {
-		this.lore = lore;
-	}
-
-	public Optional<Integer> getColor() {
-		return color;
-	}
-
-	public void setColor(Optional<Integer> color) {
-		this.color = color;
-	}
-
-	public Map<Enchantment, Integer> getEnchantments() {
-		return enchantments;
-	}
-
-	public void setEnchantments(Map<Enchantment, Integer> enchantments) {
-		this.enchantments = enchantments;
-	}
-
-	public Set<TooltipSection> getHideFlags() {
-		return hideFlags;
-	}
-
-	public void setHideFlags(Set<TooltipSection> hideFlags) {
-		this.hideFlags = EnumSet.copyOf(hideFlags);
-	}
-
-	public Set<AttributeValues> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Set<AttributeValues> attributes) {
-		this.attributes = attributes;
-	}
-
-	public class AttributeValues {
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public class AttributeValues implements Validated {
 		private EntityAttribute attribute;
 		private Operation operation;
 		private double value;
@@ -284,8 +215,13 @@ public class ItemStackish {
 		private UUID uuid;
 		private EquipmentSlot slot;
 		
-		private AttributeValues() {}
-		private AttributeValues(NbtCompound c) {
+		@Override
+		public void validate() {
+			Validated.validate(attribute!=null, "Attribute modifiers need attribute to be non-null");
+			Validated.validate(name!=null, "Attribute modifiers need name to be non-null");
+			Validated.validate(operation!=null, "Attribute modifiers need operation to be non-null");
+		}
+		public AttributeValues(NbtCompound c) {
 			EntityAttributeModifier mod = EntityAttributeModifier.fromNbt(c);
 			attribute = Registry.ATTRIBUTE.get(new Identifier(c.getString("AttributeName")));
 			operation = mod.getOperation();
@@ -296,45 +232,10 @@ public class ItemStackish {
 		}
 
 		public void apply(ItemStack stack) {
-			stack.addAttributeModifier(attribute, new EntityAttributeModifier(name, value, operation), slot);
+			EntityAttributeModifier mod = uuid==null ? new EntityAttributeModifier(name, value, operation) : new EntityAttributeModifier(uuid, name, value, operation);
+			stack.addAttributeModifier(attribute, mod, slot);
 		}
 
-		public EntityAttribute getAttribute() {
-			return attribute;
-		}
-		public void setAttribute(EntityAttribute attribute) {
-			this.attribute = attribute;
-		}
-		public Operation getOperation() {
-			return operation;
-		}
-		public void setOperation(Operation operation) {
-			this.operation = operation;
-		}
-		public double getValue() {
-			return value;
-		}
-		public void setValue(double value) {
-			this.value = value;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public UUID getUuid() {
-			return uuid;
-		}
-		public void setUuid(UUID uuid) {
-			this.uuid = uuid;
-		}
-		public EquipmentSlot getSlot() {
-			return slot;
-		}
-		public void setSlot(EquipmentSlot slot) {
-			this.slot = slot;
-		}
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
@@ -346,6 +247,7 @@ public class ItemStackish {
 					&& slot == other.slot
 					&& Objects.equals(uuid, other.uuid);
 		}
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -354,5 +256,6 @@ public class ItemStackish {
 			result = prime * result + Objects.hash(attribute, name, operation, slot, uuid, value);
 			return result;
 		}
+
 	}
 }

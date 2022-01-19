@@ -4,7 +4,13 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.WorldSavePath;
 
 import java.util.Random;
@@ -20,6 +26,7 @@ import megaminds.actioninventory.misc.Saver;
 import megaminds.actioninventory.openers.BlockOpener;
 import megaminds.actioninventory.openers.EntityOpener;
 import megaminds.actioninventory.openers.ItemOpener;
+import megaminds.actioninventory.util.Printer;
 
 public class ActionInventoryMod implements ModInitializer {
 
@@ -51,6 +58,11 @@ public class ActionInventoryMod implements ModInitializer {
 		BlockOpener.registerCallbacks();
 		EntityOpener.registerCallbacks();
 		CommandRegistrationCallback.EVENT.register(Commands::register);
+		
+		ItemStack stack = new ItemStack(Items.DIAMOND_SWORD);
+		stack.addEnchantment(Enchantments.SHARPNESS, 5);
+		stack.setCustomName(new LiteralText("Doom Slayer").styled(s->s.withColor(Formatting.AQUA)));
+		Printer.print(stack);
 		
 		info("Initialized");
 	}
