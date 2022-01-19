@@ -9,6 +9,7 @@ import megaminds.actioninventory.gui.NamedSlotGuiInterface;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
@@ -28,26 +29,26 @@ import net.minecraft.util.Identifier;
 public final class CommandAction extends BasicAction {
 	private String command;
 	private boolean fromServer;
-	private boolean makeTempOp;
+	private boolean silent;
+	private Integer higherLevel;
 	
-	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, String command, boolean fromServer, boolean makeTempOp) {
+	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, String command, boolean fromServer, boolean silent, Integer higherLevel) {
 		super(requiredIndex, clicktype, actionType, requiredGuiName);
 		this.command = command;
 		this.fromServer = fromServer;
-		this.makeTempOp = makeTempOp;
+		this.silent = silent;
+		this.higherLevel = higherLevel;
 	}
 
 	@Override
 	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		
-		if (fromServer) {
-			MessageHelper.executeCommand(player.getServer(), command);
-		} else if (makeTempOp) {
-			MessageHelper.executeOppedCommand(player, command);
-		} else {
-			MessageHelper.executeCommand(player, command);
-		}
+		ServerCommandSource source = fromServer ? player.getServer().getCommandSource() : player.getCommandSource();
+		if (silent) source = source.withSilent();
+		if (higherLevel!=null) source = source.withMaxLevel(higherLevel);
+		
+		MessageHelper.executeCommand(source, command);
 	}
 
 	@Override
@@ -57,6 +58,6 @@ public final class CommandAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), command, fromServer, makeTempOp);
+		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), command, fromServer, silent, higherLevel);
 	}
 }

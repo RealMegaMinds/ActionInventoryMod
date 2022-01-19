@@ -10,6 +10,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -76,6 +77,10 @@ public class MessageHelper {
 	 */
 	public static int executeCommand(ServerPlayerEntity player, String command) {
     	return player.getServer().getCommandManager().execute(player.getCommandSource(), command);
+	}
+	
+	public static int executeCommand(ServerCommandSource source, String command) {
+		return source.getServer().getCommandManager().execute(source, command);
 	}
 	
 	/**
