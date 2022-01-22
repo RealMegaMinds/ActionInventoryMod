@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.actions.EmptyAction;
 import megaminds.actioninventory.gui.elements.SlotElement;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.ValidationException;
@@ -21,23 +23,30 @@ import net.minecraft.util.registry.Registry;
 /**
  * Adapted from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder}.
  */
+@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NamedGuiBuilder implements Validated {
-	@Getter 		private ScreenHandlerType<?> type;
-	@Getter			private Identifier name;
-	@Getter @Setter private Text title;
-	@Getter 		private boolean includePlayer;
-	@Getter			private boolean lockPlayerInventory;
-	@Getter			private SlotElement[] elements;
+	private ScreenHandlerType<?> type;
+	private Identifier name;
+	@Setter
+	private Text title;
+	private boolean includePlayer;
+	private boolean lockPlayerInventory;
+	private SlotElement[] elements;
+	private BasicAction openAction;
+	private BasicAction closeAction;
+	private BasicAction anyClickAction;
 	
-	@Exclude@Getter private int size;
-	@Exclude@Getter private boolean hasRedirects;
+	@Exclude private int size;
 		
 	@Override
 	public void validate() {
 		Validated.validate(type!=null, "NamedGuiBuilder requires type to be non-null.");
 		Validated.validate(name!=null, "NamedGuiBuilder requires name to be non-null.");
 		if (title==null) title = LiteralText.EMPTY;
+		if (openAction==null) openAction = EmptyAction.INSTANCE;
+		if (closeAction==null) closeAction = EmptyAction.INSTANCE;
+		if (anyClickAction==null) anyClickAction = EmptyAction.INSTANCE;
 		
 		size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
 		
@@ -60,20 +69,30 @@ public final class NamedGuiBuilder implements Validated {
 		this.type = type;
 		this.name = name;
 		this.includePlayer = includePlayerInventorySlots;
+		this.lockPlayerInventory = includePlayerInventorySlots;
 		
+		this.title = LiteralText.EMPTY;
+		this.closeAction = EmptyAction.INSTANCE;
+		this.openAction = EmptyAction.INSTANCE;
+		this.anyClickAction = EmptyAction.INSTANCE;
+
 		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
+		this.elements = new SlotElement[this.size];
 	}
 
 	/**
 	 * {@link #validate()} is called when using this constructor
 	 */
-	public NamedGuiBuilder(ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, SlotElement[] elements) throws ValidationException {
+	public NamedGuiBuilder(ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
 		this.type = type;
 		this.name = name;
 		this.title = title;
 		this.includePlayer = includePlayerInventorySlots;
 		this.lockPlayerInventory = includePlayerInventorySlots;
 		this.elements = elements;
+		this.closeAction = closeAction;
+		this.openAction = openAction;
+		this.anyClickAction = anyClickAction;
 		
 		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
 		
@@ -108,7 +127,6 @@ public final class NamedGuiBuilder implements Validated {
 		builder.elements = Arrays.stream(elements).map(SlotElement::copy).toArray(SlotElement[]::new);
 		
 		builder.size = size;
-		builder.hasRedirects = hasRedirects;
 		return builder;
 	}
 }
