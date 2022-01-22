@@ -31,20 +31,20 @@ public final class GiveAction extends BasicAction {
 	private static final Identifier[] EMPTY = new Identifier[0];
 
 	private Identifier[] lootTables;
-	private boolean giveDisplayed;
+	private boolean giveClicked;
 
-	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, Identifier[] lootTables, boolean giveDisplayed) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Identifier[] lootTables, boolean giveClicked) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.lootTables = lootTables;
-		this.giveDisplayed = giveDisplayed;
+		this.giveClicked = giveClicked;
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 
-		if (giveDisplayed) {
-			ItemStack current = gui.getStack(index);
+		if (giveClicked) {
+			ItemStack current = gui.getLastClickedStack().copy();
 			if (current!=null) p.getInventory().offerOrDrop(current);
 		}
 
@@ -71,6 +71,6 @@ public final class GiveAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new GiveAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.copyOf(lootTables, lootTables.length), giveDisplayed);
+		return new GiveAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.copyOf(lootTables, lootTables.length), giveClicked);
 	}
 }
