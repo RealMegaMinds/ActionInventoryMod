@@ -32,10 +32,17 @@ public final class NamedGuiBuilder implements Validated {
 	private Text title;
 	private boolean includePlayer;
 	private boolean lockPlayerInventory;
-	private SlotElement[] elements;
-	private BasicAction openAction;
-	private BasicAction closeAction;
-	private BasicAction anyClickAction;
+	
+	@Setter private SlotElement[] elements;
+	/**@since 3.1*/
+	@Setter private BasicAction openAction;
+	/**@since 3.1*/
+	@Setter private BasicAction closeAction;
+	/**@since 3.1*/
+	@Setter private BasicAction anyClickAction;
+	/**@since 3.1*/
+	@Setter private BasicAction recipeAction;
+
 	
 	@Exclude private int size;
 		
@@ -47,6 +54,7 @@ public final class NamedGuiBuilder implements Validated {
 		if (openAction==null) openAction = EmptyAction.INSTANCE;
 		if (closeAction==null) closeAction = EmptyAction.INSTANCE;
 		if (anyClickAction==null) anyClickAction = EmptyAction.INSTANCE;
+		if (recipeAction==null) recipeAction = EmptyAction.INSTANCE;
 		
 		size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
 		
@@ -100,9 +108,9 @@ public final class NamedGuiBuilder implements Validated {
 	}
 
 	public NamedGui build(ServerPlayerEntity player) {
-		NamedGui gui = new NamedGui(type, player, includePlayer, name);
+		NamedGui gui = new NamedGui(type, player, includePlayer, name, openAction, closeAction, anyClickAction, recipeAction);
 		gui.setTitle(title);
-		gui.setLockPlayerInventory(true);
+		gui.setLockPlayerInventory(lockPlayerInventory);
 
 		for (SlotElement element : elements) {
 			if (element != null) {
@@ -125,6 +133,10 @@ public final class NamedGuiBuilder implements Validated {
 		builder.includePlayer = includePlayer;
 		builder.lockPlayerInventory = lockPlayerInventory;
 		builder.elements = Arrays.stream(elements).map(SlotElement::copy).toArray(SlotElement[]::new);
+		builder.anyClickAction = anyClickAction;
+		builder.closeAction = closeAction;
+		builder.openAction = openAction;
+		builder.recipeAction = recipeAction;
 		
 		builder.size = size;
 		return builder;

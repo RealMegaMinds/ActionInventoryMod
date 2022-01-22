@@ -8,6 +8,9 @@ import net.minecraft.util.Identifier;
 
 public interface NamedSlotGuiInterface extends SlotGuiInterface {
 	Identifier getName();
+	
+	/**@since 3.1*/
+	ItemStack getLastClickedStack();
 
 	default ItemStack getStack(int slot) {
 		GuiElementInterface e = getSlot(slot);

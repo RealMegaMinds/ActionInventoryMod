@@ -34,8 +34,8 @@ public final class ConsumeAction extends GroupAction {
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
 	private boolean requireFull;
 	
-	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
+	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.consumables = consumables;
 		this.singlePay = singlePay;
 		this.requireFull = requireFull;
@@ -49,10 +49,11 @@ public final class ConsumeAction extends GroupAction {
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		StoredConsumables store = getStore(player.getUuid());
 		String guiName = gui.getName().toString();
+		int index = getRequiredIndex();
 		NbtElement topElement = store.getSub(guiName, index);
 
 		//NbtByte.ONE means the full price has been paid
@@ -73,7 +74,7 @@ public final class ConsumeAction extends GroupAction {
 		}
 		
 		if (hasPaid) {
-			super.internalClick(index, type, action, gui);
+			super.execute(gui);
 			if (singlePay) {
 				store.setSub(guiName, index, NbtByte.ONE);
 			} else {
@@ -120,6 +121,6 @@ public final class ConsumeAction extends GroupAction {
 	
 	@Override
 	public BasicAction copy() {
-		return new ConsumeAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), Arrays.stream(consumables).map(BasicConsumable::copy).toArray(BasicConsumable[]::new), singlePay, requireFull);
+		return new ConsumeAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), Arrays.stream(consumables).map(BasicConsumable::copy).toArray(BasicConsumable[]::new), singlePay, requireFull);
 	}
 }

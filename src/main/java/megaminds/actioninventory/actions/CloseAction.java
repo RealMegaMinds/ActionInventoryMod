@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.gui.NamedSlotGuiInterface;
@@ -15,23 +17,17 @@ public final class CloseAction extends BasicAction {
 	}
 	
 	@Override
-	public void onRecipe(Identifier recipe, boolean shift, NamedSlotGuiInterface gui) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void execute(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
-		gui.close();
-	}
-
-	@Override
 	public void validate() {
 		//Unused
 	}
 
 	@Override
 	public BasicAction copy() {
-		return new CloseAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName());
+		return new CloseAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName());
+	}
+
+	@Override
+	public void execute(@NotNull NamedSlotGuiInterface gui) {
+		gui.close();
 	}
 }

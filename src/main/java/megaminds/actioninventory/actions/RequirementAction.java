@@ -28,8 +28,8 @@ public final class RequirementAction extends GroupAction {
 
 	@Exclude private EntitySelector selector;
 
-	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName, actions);
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
 		this.entityPredicate = entityPredicate;
 	}
@@ -41,10 +41,10 @@ public final class RequirementAction extends GroupAction {
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
-			super.internalClick(index, type, action, gui);
+			super.execute(gui);
 		}
 	}
 	
@@ -77,7 +77,7 @@ public final class RequirementAction extends GroupAction {
 	
 	@Override
 	public BasicAction copy() {
-		RequirementAction copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
+		RequirementAction copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
 		copy.selector = selector;
 		return copy;
 	}

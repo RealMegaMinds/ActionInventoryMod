@@ -20,14 +20,14 @@ public final class SendPropertyAction extends BasicAction {
 	private ScreenProperty property;
 	private int value;
 	
-	public SendPropertyAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, ScreenProperty property, int value) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public SendPropertyAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, ScreenProperty property, int value) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.property = property;
 		this.value = value;
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		gui.sendProperty(property, value);
 	}
 
@@ -38,6 +38,6 @@ public final class SendPropertyAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new SendPropertyAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), property, value);
+		return new SendPropertyAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), property, value);
 	}
 }

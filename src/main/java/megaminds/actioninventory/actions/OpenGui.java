@@ -21,21 +21,16 @@ public final class OpenGui extends BasicAction {
 	private Identifier guiName;
 	private UUID playerUUID;
 	
-	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, GuiType guiType, Identifier guiName) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, GuiType guiType, Identifier guiName, UUID playerUUID) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.guiName = guiName;
 		this.guiType = guiType;
+		this.playerUUID = playerUUID;
 	}
 	
 	public OpenGui(GuiType guiType, Identifier guiName) {
 		this.guiType = guiType;
 		this.guiName = guiName;
-	}
-
-	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, GuiType guiType, UUID playerUUID) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
-		this.playerUUID = playerUUID;
-		this.guiType = guiType;
 	}
 
 	public OpenGui(GuiType guiType, UUID playerUUID) {
@@ -44,7 +39,7 @@ public final class OpenGui extends BasicAction {
 	}
 
 	@Override
-	public void internalClick(int index, ClickType cType, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		if (guiType==null) {
 			gui.close();
 			return;
@@ -79,7 +74,7 @@ public final class OpenGui extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		OpenGui copy = new OpenGui(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), guiName, guiType, guiName);
+		OpenGui copy = new OpenGui(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), guiType, guiName, playerUUID);
 		copy.playerUUID = playerUUID;
 		return copy;
 	}

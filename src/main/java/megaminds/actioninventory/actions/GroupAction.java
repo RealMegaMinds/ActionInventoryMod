@@ -22,8 +22,8 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 
 	private BasicAction[] actions;
 
-	public GroupAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, BasicAction[] actions) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public GroupAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.actions = actions;
 	}
 
@@ -33,14 +33,14 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		for (BasicAction a : actions) {
-			a.internalClick(index, type, action, gui);
+			a.execute(gui);
 		}
 	}
 
 	@Override
 	public BasicAction copy() {
-		return new GroupAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), Arrays.stream(actions).map(BasicAction::copy).toArray(BasicAction[]::new));
+		return new GroupAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(actions).map(BasicAction::copy).toArray(BasicAction[]::new));
 	}
 }
