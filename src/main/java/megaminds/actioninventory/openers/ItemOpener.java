@@ -38,7 +38,7 @@ public final class ItemOpener extends BasicOpener {
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
 		ItemStack s = (ItemStack) context[0];
-		if ((stack==null || stack.specifiedEquals(s)) && (tags==null || tagOption.matches(tags, ItemTags.getTagGroup().getTagsFor(s.getItem())))) {
+		if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, ItemTags.getTagGroup().getTagsFor(s.getItem())))) {
 			return super.open(player, context);
 		}
 		return false;
@@ -61,6 +61,7 @@ public final class ItemOpener extends BasicOpener {
 	@Override
 	public void validate() {
 		super.validate();
+		if (stack==null) stack = ItemStackish.MATCH_ALL;
 		if (tagOption==null) tagOption = TagOption.ALL;
 		Validated.validate(!OPENERS.contains(this) && OPENERS.add(this), "Failed to add Block opener to list.");
 	}

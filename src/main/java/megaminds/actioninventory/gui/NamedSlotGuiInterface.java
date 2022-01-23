@@ -11,6 +11,9 @@ public interface NamedSlotGuiInterface extends SlotGuiInterface {
 	
 	/**@since 3.1*/
 	ItemStack getLastClickedStack();
+	
+	/**@since 3.1*/
+	String lastAction();
 
 	default ItemStack getStack(int slot) {
 		GuiElementInterface e = getSlot(slot);

@@ -53,7 +53,7 @@ public final class GiveAction extends BasicAction {
 				.parameter(LootContextParameters.ORIGIN, p.getPos())
 				.random(p.getRandom())
 				.luck(p.getLuck())
-				.build(LootContextTypes.EMPTY);
+				.build(LootContextTypes.ADVANCEMENT_REWARD);
 		
 		Arrays.stream(lootTables)
 		.map(id->p.server.getLootManager().getTable(id).generateLoot(lootContext))

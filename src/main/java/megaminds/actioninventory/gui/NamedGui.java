@@ -30,6 +30,8 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	private final BasicAction recipeAction;
 	/**@since 3.1*/
 	private ItemStack lastClicked;
+	/**@since 3.1*/
+	private String lastAction;
 	
 	public NamedGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name) {
 		super(type, player, includePlayerInventorySlots);
@@ -53,6 +55,7 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	@Override
 	public void onClose() {
 		lastClicked = ItemStack.EMPTY;
+		lastAction = "onClose";
 		closeAction.execute(this);
 	}
 	
@@ -60,6 +63,7 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	@Override
 	public void onOpen() {
 		lastClicked = ItemStack.EMPTY;
+		lastAction = "onOpen";
 		openAction.execute(this);
 	}
 	
@@ -67,7 +71,9 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	@Override
 	public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
 		lastClicked = getStack(index).copy();
+		lastAction = "onAnyClick";
 		anyClickAction.click(index, type, action, this);
+		lastAction = "click"+index;
 		return super.onAnyClick(index, type, action);
 	}
 	
@@ -75,6 +81,7 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	@Override
 	public void onCraftRequest(Identifier recipe, boolean shift) {
 		lastClicked = player.getServer().getRecipeManager().get(recipe).map(Recipe::getOutput).orElse(ItemStack.EMPTY).copy();
+		lastAction = "onCraft";
 		recipeAction.onRecipe(recipe, shift, this);
 	}
 
@@ -82,5 +89,11 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	@Override
 	public ItemStack getLastClickedStack() {
 		return lastClicked.copy();
+	}
+
+	/**@since 3.1*/
+	@Override
+	public String lastAction() {
+		return lastAction;
 	}
 }

@@ -53,8 +53,8 @@ public final class ConsumeAction extends GroupAction {
 		ServerPlayerEntity player = gui.getPlayer();
 		StoredConsumables store = getStore(player.getUuid());
 		String guiName = gui.getName().toString();
-		int index = getRequiredIndex();
-		NbtElement topElement = store.getSub(guiName, index);
+		String lastAction = gui.lastAction();
+		NbtElement topElement = store.getSub(guiName, lastAction);
 
 		//NbtByte.ONE means the full price has been paid
 		boolean hasPaid = singlePay && NbtByte.ONE.equals(topElement);
@@ -65,7 +65,7 @@ public final class ConsumeAction extends GroupAction {
 			if (canPay || !requireFull) {
 				if (!canPay&&subStore==null) {
 					subStore = new NbtCompound();
-					store.setSub(guiName, index, subStore);
+					store.setSub(guiName, lastAction, subStore);
 				}
 				consume(player, subStore, !canPay);
 				store.save();
@@ -76,9 +76,9 @@ public final class ConsumeAction extends GroupAction {
 		if (hasPaid) {
 			super.execute(gui);
 			if (singlePay) {
-				store.setSub(guiName, index, NbtByte.ONE);
+				store.setSub(guiName, lastAction, NbtByte.ONE);
 			} else {
-				store.removeSub(guiName, index);
+				store.removeSub(guiName, lastAction);
 			}
 		}		
 	}

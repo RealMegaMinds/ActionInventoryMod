@@ -38,23 +38,23 @@ public class StoredConsumables extends Saver {
 	/**
 	 * Returns the {@link NbtElement} for {@link BasicConsumable}s in the slot in the gui.
 	 */
-	public NbtElement getSub(String guiName, int slot) {
+	public NbtElement getSub(String guiName, String lastAction) {
 		if (stores==null) return null;
 		NbtCompound c = stores.get(guiName);
 		if (c==null) return null;
-		return c.get(slot+"");
+		return c.get(lastAction);
 	}
 	
 	/**
 	 * Returns the {@link NbtElement} (or gets from Supplier) for {@link BasicConsumable}s in the slot in the gui.
 	 */
-	public NbtElement getOrCreateSub(String guiName, int slot, Supplier<NbtElement> creator) {
+	public NbtElement getOrCreateSub(String guiName, String lastAction, Supplier<NbtElement> creator) {
 		if (stores==null) stores = new HashMap<>();
 		NbtCompound c = stores.computeIfAbsent(guiName, n->new NbtCompound());
-		NbtElement e = c.get(slot+"");
+		NbtElement e = c.get(lastAction);
 		if (e==null) {
 			e = creator.get();
-			c.put(slot+"", e);
+			c.put(lastAction, e);
 		}
     	return e;
 	}
@@ -62,34 +62,34 @@ public class StoredConsumables extends Saver {
 	/**
 	 * Sets the element for the slot in the gui to the given one.
 	 */
-	public void setSub(String guiName, int slot, NbtElement el) {
+	public void setSub(String guiName, String lastAction, NbtElement el) {
 		if (el==null) {
-			removeSub(guiName, slot);
+			removeSub(guiName, lastAction);
 			return;
 		}
 		if (stores==null) stores = new HashMap<>();
-		stores.computeIfAbsent(guiName, n->new NbtCompound()).put(slot+"", el);
+		stores.computeIfAbsent(guiName, n->new NbtCompound()).put(lastAction, el);
 	}
 	
-	public void removeSub(String guiName, int slot) {
+	public void removeSub(String guiName, String lastAction) {
 		NbtCompound c;
 		if (stores!=null && (c=stores.get(guiName))!=null) {
-			c.remove(slot+"");
+			c.remove(lastAction);
 		}
 	}
 	
 	/**
 	 * Returns the {@link NbtElement} for the {@link BasicConsumable} in the slot in the gui.
 	 */
-	public NbtElement getDeepSub(String guiName, int slot, String consumable) {
-		return ((NbtCompound)getOrCreateSub(guiName, slot, NbtCompound::new)).get(consumable);
+	public NbtElement getDeepSub(String guiName, String lastAction, String consumable) {
+		return ((NbtCompound)getOrCreateSub(guiName, lastAction, NbtCompound::new)).get(consumable);
 	}
 
 	/**
 	 * Sets the {@link NbtElement} for the {@link BasicConsumable} in the slot in the gui.
 	 */
-	public void setDeepSub(String guiName, int slot, String consumable, NbtElement el) {
-		((NbtCompound)getOrCreateSub(guiName, slot, NbtCompound::new)).put(consumable, el);
+	public void setDeepSub(String guiName, String lastAction, String consumable, NbtElement el) {
+		((NbtCompound)getOrCreateSub(guiName, lastAction, NbtCompound::new)).put(consumable, el);
 	}
 
 	@Override

@@ -40,6 +40,15 @@ import net.minecraft.util.registry.Registry;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemStackish {
+	public static final ItemStackish MATCH_ALL = new ItemStackish() {
+		@Override public boolean specifiedEquals(ItemStack s) {return true;}
+		@Override public boolean specifiedEquals(ItemStackish s) {return true;}
+	};
+	public static final ItemStackish MATCH_NONE = new ItemStackish() {
+		@Override public boolean specifiedEquals(ItemStack s) {return false;}
+		@Override public boolean specifiedEquals(ItemStackish s) {return false;}
+	};
+	
 	private static final String HIDE_FLAG_KEY = "HideFlags";
 	private static final String ATTRIBUTE_KEY = "AttributeModifiers";
 	
@@ -55,6 +64,8 @@ public class ItemStackish {
 	private Set<AttributeValues> attributes;	//attributesMatch
 	
 	public ItemStackish(ItemStack i) {
+		if (ItemStack.EMPTY.equals(i)) return;
+		
 		item = i.getItem();
 		count = i.getCount();
 		damage = i.getDamage();
