@@ -1,10 +1,7 @@
-import com.modrinth.minotaur.TaskModrinthUpload
-
 plugins {
 	id 'fabric-loom' version '0.10-SNAPSHOT'
 	id "io.freefair.lombok" version "6.3.0"
 	id 'maven-publish'
-	id "com.modrinth.minotaur" version "1.2.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -13,27 +10,6 @@ targetCompatibility = JavaVersion.VERSION_17
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
-
-task PublishModrinth (type: TaskModrinthUpload) {
-	onlyIf {
-		System.getenv("MODRINTH")
-	}
-	
-	token = System.getenv("MODRINTH")
-	projectId = project.modrinthId
-	versionNumber = version
-	uploadFile = remapJar
-	addGameVersion('1.18.1')
-	addLoader('fabric')
-	
-	if (wasUploadSuccessful()) {
-		def versionId = uploadInfo.id
-		Desktop.getDesktop().browse(new URI('https://modrinth.com/mod/'+archivesBaseName+'/version/'+versionId+'/edit'))
-	} else {
-		println(errorInfo.error)
-		println(errorInfo.description)
-	}
-}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
