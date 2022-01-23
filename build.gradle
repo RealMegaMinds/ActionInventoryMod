@@ -23,6 +23,8 @@ task PublishModrinth (type: TaskModrinthUpload) {
 	projectId = project.modrinthId
 	versionNumber = version
 	uploadFile = remapJar
+	addGameVersion('1.18.1')
+	addLoader('fabric')
 	
 	if (wasUploadSuccessful()) {
 		def versionId = uploadInfo.id
