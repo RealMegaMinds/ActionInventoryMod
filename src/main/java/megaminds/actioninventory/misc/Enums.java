@@ -4,9 +4,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
 
+/**
+ * Enums/constants/whatever else I put here
+ */
 public class Enums {
+	public static final NbtString COMPLETE = NbtString.of("COMPLETE");
+	
 	public enum GuiType {PLAYER, ENDER_CHEST, NAMED_GUI, GENERATED}
 	public enum MessagePlaceHolders {PLAYER, SERVER, BROADCAST}
 	

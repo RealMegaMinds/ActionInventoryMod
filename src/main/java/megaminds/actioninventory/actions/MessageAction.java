@@ -44,8 +44,8 @@ public final class MessageAction extends BasicAction {
 	private List<UUID> receivers;
 	private MessageType messageType;
 	
-	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.message = message;
 		this.sender = sender;
 		this.receivers = receivers;
@@ -53,7 +53,7 @@ public final class MessageAction extends BasicAction {
 	}
 
 	@Override
-	public void internalClick(int index, ClickType cType, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		MinecraftServer server = player.getServer();
 		if (sender==null) sender = player.getUuid();
@@ -81,6 +81,6 @@ public final class MessageAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), message.shallowCopy(), sender, new ArrayList<>(receivers), messageType);
+		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), message.shallowCopy(), sender, new ArrayList<>(receivers), messageType);
 	}
 }

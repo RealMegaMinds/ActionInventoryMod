@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,26 +24,37 @@ public abstract sealed class BasicAction implements NamedGuiCallback, Validated 
 	private Integer requiredIndex;
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
+	/**@since 3.1*/
+	private Boolean requireShift;
+	/**@since 3.1*/
+	private Identifier requiredRecipe;
 	private Identifier requiredGuiName;
 
 	/**
-	 * index, type, action and guiName, have already been checked before this is called.
+	 * Fields have been checked before calling this method.
 	 */
-	public abstract void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui);
-
+	/**@since 3.1*/
+	public abstract void execute(@NotNull NamedSlotGuiInterface gui);
+	public abstract BasicAction copy();
+	
 	/**
 	 * Checks if all given arguments match this instance's fields. If so, calls internalClick. Null fields are ignored.
 	 */
 	@Override
 	public void click(int indexA, ClickType typeA, SlotActionType actionA, NamedSlotGuiInterface guiA) {
 		if (check(requiredIndex, indexA) && check(requiredClickType, typeA) && check(requiredSlotActionType, actionA) && check(requiredGuiName, guiA.getName())) {
-			internalClick(indexA, typeA, actionA, guiA);
+			execute(guiA);
 		}
 	}
 	
-	protected static <E> boolean check(E o, E e) {
-		return o==null || o==e;
+	/**@since 3.1*/
+	public void onRecipe(Identifier recipe, boolean shift, NamedSlotGuiInterface gui) {
+		if (check(requiredRecipe, recipe) && check(requireShift, shift) && check(requiredGuiName, gui.getName())) {
+			execute(gui);
+		}
 	}
 
-	public abstract BasicAction copy();
+	private static <E> boolean check(E o, E e) {
+		return o==null || o==e;
+	}
 }

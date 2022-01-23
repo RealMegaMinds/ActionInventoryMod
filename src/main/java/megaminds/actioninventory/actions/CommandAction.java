@@ -32,8 +32,8 @@ public final class CommandAction extends BasicAction {
 	private boolean silent;
 	private Integer higherLevel;
 	
-	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, String command, boolean fromServer, boolean silent, Integer higherLevel) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, boolean fromServer, boolean silent, Integer higherLevel) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.command = command;
 		this.fromServer = fromServer;
 		this.silent = silent;
@@ -41,7 +41,7 @@ public final class CommandAction extends BasicAction {
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		
 		ServerCommandSource source = fromServer ? player.getServer().getCommandSource() : player.getCommandSource();
@@ -50,7 +50,7 @@ public final class CommandAction extends BasicAction {
 		
 		MessageHelper.executeCommand(source, command);
 	}
-
+	
 	@Override
 	public void validate() {
 		if (command==null) command = "";
@@ -58,6 +58,6 @@ public final class CommandAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), command, fromServer, silent, higherLevel);
+		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), command, fromServer, silent, higherLevel);
 	}
 }

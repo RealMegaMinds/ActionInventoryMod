@@ -34,8 +34,8 @@ public final class SoundAction extends BasicAction {
 	private Float volume;
 	private Float pitch;
 	
-	public SoundAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Identifier requiredGuiName, SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
-		super(requiredIndex, clicktype, actionType, requiredGuiName);
+	public SoundAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
+		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.sound = sound;
 		this.category = category;
 		this.position = position;
@@ -44,7 +44,7 @@ public final class SoundAction extends BasicAction {
 	}
 
 	@Override
-	public void internalClick(int index, ClickType type, SlotActionType action, NamedSlotGuiInterface gui) {
+	public void execute(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		
 		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound.getId(), category, Objects.requireNonNullElseGet(position, player::getPos), volume, pitch));
@@ -62,6 +62,6 @@ public final class SoundAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new SoundAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequiredGuiName(), sound, category, position, volume, pitch);
+		return new SoundAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), sound, category, position, volume, pitch);
 	}
 }
