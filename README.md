@@ -17,9 +17,9 @@ This mod is similar to the [Chest Commands](https://dev.bukkit.org/projects/ches
     * energy
     * liquids
 * more action types
-     * rewards
-      * xp
-      * choice
-      * random
+     * xp
+     * choice
+     * random
+     * other rewards
 * command system
 * action inventory builder action inventory
