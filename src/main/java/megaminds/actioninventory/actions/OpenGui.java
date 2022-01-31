@@ -39,7 +39,7 @@ public final class OpenGui extends BasicAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		if (guiType==null) {
 			gui.close();
 			return;

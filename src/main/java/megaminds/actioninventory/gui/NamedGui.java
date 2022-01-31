@@ -56,7 +56,7 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	public void onClose() {
 		lastClicked = ItemStack.EMPTY;
 		lastAction = "onClose";
-		closeAction.execute(this);
+		closeAction.accept(this);
 	}
 	
 	/**@since 3.1*/
@@ -64,7 +64,7 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	public void onOpen() {
 		lastClicked = ItemStack.EMPTY;
 		lastAction = "onOpen";
-		openAction.execute(this);
+		openAction.accept(this);
 	}
 	
 	/**@since 3.1*/

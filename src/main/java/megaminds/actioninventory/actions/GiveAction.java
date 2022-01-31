@@ -40,7 +40,7 @@ public final class GiveAction extends BasicAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 
 		if (giveClicked) {

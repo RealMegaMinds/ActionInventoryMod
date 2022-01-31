@@ -53,7 +53,7 @@ public final class MessageAction extends BasicAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		MinecraftServer server = player.getServer();
 		if (sender==null) sender = player.getUuid();

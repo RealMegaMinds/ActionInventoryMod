@@ -29,7 +29,9 @@ import net.minecraft.util.Identifier;
 public final class CommandAction extends BasicAction {
 	private String command;
 	private boolean fromServer;
+	/**@since 3.1*/
 	private boolean silent;
+	/**@since 3.1*/
 	private Integer higherLevel;
 	
 	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, boolean fromServer, boolean silent, Integer higherLevel) {
@@ -41,7 +43,7 @@ public final class CommandAction extends BasicAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		
 		ServerCommandSource source = fromServer ? player.getServer().getCommandSource() : player.getCommandSource();

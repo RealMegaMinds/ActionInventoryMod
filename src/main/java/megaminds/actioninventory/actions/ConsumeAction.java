@@ -49,7 +49,7 @@ public final class ConsumeAction extends GroupAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		StoredConsumables store = getStore(player.getUuid());
 		String guiName = gui.getName().toString();
@@ -74,7 +74,7 @@ public final class ConsumeAction extends GroupAction {
 		}
 		
 		if (hasPaid) {
-			super.execute(gui);
+			super.accept(gui);
 			if (singlePay) {
 				store.setSub(guiName, lastAction, NbtByte.ONE);
 			} else {

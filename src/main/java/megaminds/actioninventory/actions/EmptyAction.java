@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import java.util.function.Consumer;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.gui.NamedSlotGuiInterface;
@@ -9,7 +11,7 @@ import megaminds.actioninventory.util.annotations.PolyName;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @PolyName("Empty")
 @Instanced
-public final class EmptyAction extends BasicAction {
+public non-sealed class EmptyAction extends BasicAction {
 	public static final EmptyAction INSTANCE = new EmptyAction();
 	
 	@Override
@@ -18,12 +20,21 @@ public final class EmptyAction extends BasicAction {
 	}
 	
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		//Unused
 	}
 
 	@Override
 	public BasicAction copy() {
 		return INSTANCE;
+	}
+	
+	public static EmptyAction getNew(Consumer<NamedSlotGuiInterface> consumer) {
+		return new EmptyAction() {
+			@Override
+			public void accept(NamedSlotGuiInterface gui) {
+				consumer.accept(gui);
+			}
+		};
 	}
 }

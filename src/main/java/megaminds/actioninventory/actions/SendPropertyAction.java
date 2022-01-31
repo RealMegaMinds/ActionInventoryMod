@@ -27,7 +27,7 @@ public final class SendPropertyAction extends BasicAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		gui.sendProperty(property, value);
 	}
 

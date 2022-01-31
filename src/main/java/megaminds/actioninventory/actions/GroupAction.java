@@ -33,9 +33,9 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		for (BasicAction a : actions) {
-			a.execute(gui);
+			a.accept(gui);
 		}
 	}
 

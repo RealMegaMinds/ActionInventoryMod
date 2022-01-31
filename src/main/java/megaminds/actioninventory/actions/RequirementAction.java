@@ -41,10 +41,10 @@ public final class RequirementAction extends GroupAction {
 	}
 
 	@Override
-	public void execute(NamedSlotGuiInterface gui) {
+	public void accept(NamedSlotGuiInterface gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
-			super.execute(gui);
+			super.accept(gui);
 		}
 	}
 	

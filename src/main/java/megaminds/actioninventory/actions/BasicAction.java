@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import java.util.function.Consumer;
+
 import org.jetbrains.annotations.NotNull;
 
 import eu.pb4.sgui.api.ClickType;
@@ -20,7 +22,7 @@ import net.minecraft.util.Identifier;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
-public abstract sealed class BasicAction implements NamedGuiCallback, Validated permits EmptyAction, OpenGui, CloseAction, CommandAction, GiveAction, MessageAction, SendPropertyAction, SoundAction, GroupAction {
+public abstract sealed class BasicAction implements NamedGuiCallback, Validated, Consumer<NamedSlotGuiInterface> permits EmptyAction, OpenGui, CloseAction, CommandAction, GiveAction, MessageAction, SendPropertyAction, SoundAction, GroupAction {
 	private Integer requiredIndex;
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
@@ -34,7 +36,7 @@ public abstract sealed class BasicAction implements NamedGuiCallback, Validated 
 	 * Fields have been checked before calling this method.
 	 */
 	/**@since 3.1*/
-	public abstract void execute(@NotNull NamedSlotGuiInterface gui);
+	public abstract void accept(@NotNull NamedSlotGuiInterface gui);
 	public abstract BasicAction copy();
 	
 	/**
@@ -43,14 +45,14 @@ public abstract sealed class BasicAction implements NamedGuiCallback, Validated 
 	@Override
 	public void click(int indexA, ClickType typeA, SlotActionType actionA, NamedSlotGuiInterface guiA) {
 		if (check(requiredIndex, indexA) && check(requiredClickType, typeA) && check(requiredSlotActionType, actionA) && check(requiredGuiName, guiA.getName())) {
-			execute(guiA);
+			accept(guiA);
 		}
 	}
 	
 	/**@since 3.1*/
 	public void onRecipe(Identifier recipe, boolean shift, NamedSlotGuiInterface gui) {
 		if (check(requiredRecipe, recipe) && check(requireShift, shift) && check(requiredGuiName, gui.getName())) {
-			execute(gui);
+			accept(gui);
 		}
 	}
 

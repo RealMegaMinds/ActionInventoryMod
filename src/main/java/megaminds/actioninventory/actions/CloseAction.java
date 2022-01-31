@@ -27,7 +27,7 @@ public final class CloseAction extends BasicAction {
 	}
 
 	@Override
-	public void execute(@NotNull NamedSlotGuiInterface gui) {
+	public void accept(@NotNull NamedSlotGuiInterface gui) {
 		gui.close();
 	}
 }
