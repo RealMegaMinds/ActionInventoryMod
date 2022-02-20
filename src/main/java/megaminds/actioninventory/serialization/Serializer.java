@@ -16,7 +16,7 @@ import com.google.gson.JsonSerializer;
 
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
 import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.gui.NamedGuiBuilder;
+import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.openers.BasicOpener;
 import megaminds.actioninventory.serialization.wrappers.InstancedAdapterWrapper;
@@ -45,12 +45,12 @@ public class Serializer {
 
 	private Serializer() {}
 
-	public static NamedGuiBuilder builderFromJson(Reader json) throws ValidationException {
-		return GSON.fromJson(json, NamedGuiBuilder.class);
+	public static ActionInventoryBuilder builderFromJson(Reader json) throws ValidationException {
+		return GSON.fromJson(json, ActionInventoryBuilder.class);
 	}
 
-	public static NamedGuiBuilder builderFromJson(String json) throws ValidationException {
-		return GSON.fromJson(json, NamedGuiBuilder.class);
+	public static ActionInventoryBuilder builderFromJson(String json) throws ValidationException {
+		return GSON.fromJson(json, ActionInventoryBuilder.class);
 	}
 
 	public static BasicOpener openerFromJson(Reader json) throws ValidationException {
@@ -93,7 +93,7 @@ public class Serializer {
 
 				.create();
 	}
-
+	
 	private static <T> Both<T> basic(Function<JsonElement, T> from, Function<T, JsonElement> to) {
 		return new Both<T>() {
 			@Override public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {return from.apply(json);}

@@ -8,7 +8,7 @@ import lombok.Setter;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.PolyName;
-import megaminds.actioninventory.gui.NamedGui;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -44,7 +44,7 @@ public non-sealed class SlotFunction extends SlotElement implements Validated {
 	}
 
 	@Override
-	public void apply(NamedGui gui, ServerPlayerEntity p) {
+	public void apply(ActionInventoryGui gui, ServerPlayerEntity p) {
 		gui.setSlotRedirect(getCheckedIndex(gui), getSlot(p));
 	}
 

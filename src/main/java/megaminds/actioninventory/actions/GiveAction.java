@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
@@ -40,7 +40,7 @@ public final class GiveAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 
 		if (giveClicked) {

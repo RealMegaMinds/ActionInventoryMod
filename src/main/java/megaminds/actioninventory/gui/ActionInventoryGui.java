@@ -1,7 +1,8 @@
 package megaminds.actioninventory.gui;
 
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.gui.SimpleGui;
+import eu.pb4.sgui.api.elements.GuiElementInterface;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import megaminds.actioninventory.actions.BasicAction;
@@ -9,17 +10,14 @@ import megaminds.actioninventory.actions.EmptyAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @Getter
 @Setter
-public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
-	/**
-	 * Just a copy of the builder's name.
-	 */
-	private final Identifier name;
+public class ActionInventoryGui extends BetterGui {
 	/**@since 3.1*/
 	private final BasicAction openAction;
 	/**@since 3.1*/
@@ -29,22 +27,19 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 	/**@since 3.1*/
 	private final BasicAction recipeAction;
 	/**@since 3.1*/
+	@Setter(AccessLevel.NONE)
 	private ItemStack lastClicked;
 	/**@since 3.1*/
+	@Setter(AccessLevel.NONE)
 	private String lastAction;
 	
-	public NamedGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name) {
-		super(type, player, includePlayerInventorySlots);
-		this.name = name;
-		this.closeAction = EmptyAction.INSTANCE;
-		this.openAction = EmptyAction.INSTANCE;
-		this.anyClickAction = EmptyAction.INSTANCE;
-		this.recipeAction = EmptyAction.INSTANCE;
+	public ActionInventoryGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name) {
+		this(type, player, includePlayerInventorySlots, name, EmptyAction.INSTANCE, EmptyAction.INSTANCE, EmptyAction.INSTANCE, EmptyAction.INSTANCE);
 	}
 	
-	public NamedGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction, BasicAction recipeAction) {
+	public ActionInventoryGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction, BasicAction recipeAction) {
 		super(type, player, includePlayerInventorySlots);
-		this.name = name;
+		this.setId(name);
 		this.openAction = openAction;
 		this.closeAction = closeAction;
 		this.anyClickAction = anyClickAction;
@@ -85,15 +80,30 @@ public class NamedGui extends SimpleGui implements NamedSlotGuiInterface {
 		recipeAction.onRecipe(recipe, shift, this);
 	}
 
-	/**@since 3.1*/
-	@Override
+	/**
+	 * Returns the last clicked stack. Currently only used for GiveAction.
+	 */
 	public ItemStack getLastClickedStack() {
 		return lastClicked.copy();
 	}
 
-	/**@since 3.1*/
-	@Override
+	/**
+	 * Returns the name of the last action. Currently only used for ConsumableAction.
+	 */
 	public String lastAction() {
 		return lastAction;
+	}
+	
+	/**
+	 * Returns the stack at the current slot.
+	 */
+	private ItemStack getStack(int slot) {
+		GuiElementInterface e = getSlot(slot);
+		if (e!=null) return e.getItemStack().copy();
+
+		Slot r = getSlotRedirect(slot);
+		if (r!=null) return r.getStack().copy();
+
+		return ItemStack.EMPTY;
 	}
 }

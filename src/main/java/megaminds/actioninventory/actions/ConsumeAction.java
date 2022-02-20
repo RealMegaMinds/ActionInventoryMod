@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.consumables.BasicConsumable;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.misc.StoredConsumables;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.nbt.NbtByte;
@@ -49,10 +49,10 @@ public final class ConsumeAction extends GroupAction {
 	}
 
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		StoredConsumables store = getStore(player.getUuid());
-		String guiName = gui.getName().toString();
+		String guiName = gui.getId().toString();
 		String lastAction = gui.lastAction();
 		NbtElement topElement = store.getSub(guiName, lastAction);
 

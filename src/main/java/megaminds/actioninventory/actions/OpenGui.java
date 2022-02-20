@@ -6,7 +6,7 @@ import eu.pb4.sgui.api.ClickType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.loaders.NamedGuiLoader;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
@@ -39,7 +39,7 @@ public final class OpenGui extends BasicAction {
 	}
 
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		if (guiType==null) {
 			gui.close();
 			return;
@@ -50,7 +50,7 @@ public final class OpenGui extends BasicAction {
 			UUID uuid = playerUUID!=null ? playerUUID : gui.getPlayer().getUuid();
 			NamedGuiLoader.openEnderChest(gui.getPlayer(), uuid);
 		}
-		case NAMED_GUI -> NamedGuiLoader.openGui(gui.getPlayer(), guiName);
+		case NAMED_GUI -> NamedGuiLoader.openGui(gui.getPlayer(), guiName, gui);
 		case PLAYER -> {
 			UUID uuid = playerUUID!=null ? playerUUID : gui.getPlayer().getUuid();
 			NamedGuiLoader.openInventory(gui.getPlayer(), uuid);

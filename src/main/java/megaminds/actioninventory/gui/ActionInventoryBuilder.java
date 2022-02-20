@@ -25,7 +25,7 @@ import net.minecraft.util.registry.Registry;
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NamedGuiBuilder implements Validated {
+public final class ActionInventoryBuilder implements Validated {
 	private ScreenHandlerType<?> type;
 	private Identifier name;
 	@Setter
@@ -42,14 +42,15 @@ public final class NamedGuiBuilder implements Validated {
 	@Setter private BasicAction anyClickAction;
 	/**@since 3.1*/
 	@Setter private BasicAction recipeAction;
-
+	/**@since 3.2*/
+	private boolean chained;
 	
 	@Exclude private int size;
 		
 	@Override
 	public void validate() {
-		Validated.validate(type!=null, "NamedGuiBuilder requires type to be non-null.");
-		Validated.validate(name!=null, "NamedGuiBuilder requires name to be non-null.");
+		Validated.validate(type!=null, "ActionInventories requires type to be non-null.");
+		Validated.validate(name!=null, "ActionInventories requires name to be non-null.");
 		if (title==null) title = LiteralText.EMPTY;
 		if (openAction==null) openAction = EmptyAction.INSTANCE;
 		if (closeAction==null) closeAction = EmptyAction.INSTANCE;
@@ -58,6 +59,7 @@ public final class NamedGuiBuilder implements Validated {
 		
 		size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
 		
+		if (elements==null) return;
 		int len = elements.length;
 		Validated.validate(len<=size, ()->"Too many elements. Screen handler type "+Registry.SCREEN_HANDLER.getId(type)+" requires there to be a maximum of "+size+" SlotElements");
 		boolean[] test = new boolean[size];
@@ -73,7 +75,7 @@ public final class NamedGuiBuilder implements Validated {
 		}
 	}
 
-	public NamedGuiBuilder(ScreenHandlerType<?> type, Identifier name, boolean includePlayerInventorySlots) {
+	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, boolean includePlayerInventorySlots) {
 		this.type = type;
 		this.name = name;
 		this.includePlayer = includePlayerInventorySlots;
@@ -91,7 +93,7 @@ public final class NamedGuiBuilder implements Validated {
 	/**
 	 * {@link #validate()} is called when using this constructor
 	 */
-	public NamedGuiBuilder(ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
+	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
 		this.type = type;
 		this.name = name;
 		this.title = title;
@@ -107,10 +109,11 @@ public final class NamedGuiBuilder implements Validated {
 		validate();
 	}
 
-	public NamedGui build(ServerPlayerEntity player) {
-		NamedGui gui = new NamedGui(type, player, includePlayer, name, openAction, closeAction, anyClickAction, recipeAction);
+	public ActionInventoryGui build(ServerPlayerEntity player) {
+		ActionInventoryGui gui = new ActionInventoryGui(type, player, includePlayer, name, openAction, closeAction, anyClickAction, recipeAction);
 		gui.setTitle(title);
 		gui.setLockPlayerInventory(lockPlayerInventory);
+		gui.setChained(chained);
 
 		for (SlotElement element : elements) {
 			if (element != null) {
@@ -125,8 +128,8 @@ public final class NamedGuiBuilder implements Validated {
 		if (!includePlayer) this.lockPlayerInventory = lockPlayerInventory;
 	}
 
-	public NamedGuiBuilder copy() {
-		NamedGuiBuilder builder = new NamedGuiBuilder();
+	public ActionInventoryBuilder copy() {
+		ActionInventoryBuilder builder = new ActionInventoryBuilder();
 		builder.type = type;
 		builder.name = name;
 		builder.title = title.shallowCopy();

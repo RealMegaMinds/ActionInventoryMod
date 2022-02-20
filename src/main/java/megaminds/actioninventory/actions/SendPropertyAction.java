@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
@@ -27,7 +27,7 @@ public final class SendPropertyAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		gui.sendProperty(property, value);
 	}
 

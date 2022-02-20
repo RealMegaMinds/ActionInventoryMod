@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.Instanced;
 import megaminds.actioninventory.util.annotations.PolyName;
 
@@ -20,7 +20,7 @@ public non-sealed class EmptyAction extends BasicAction {
 	}
 	
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		//Unused
 	}
 
@@ -29,10 +29,10 @@ public non-sealed class EmptyAction extends BasicAction {
 		return INSTANCE;
 	}
 	
-	public static EmptyAction getNew(Consumer<NamedSlotGuiInterface> consumer) {
+	public static EmptyAction getNew(Consumer<ActionInventoryGui> consumer) {
 		return new EmptyAction() {
 			@Override
-			public void accept(NamedSlotGuiInterface gui) {
+			public void accept(ActionInventoryGui gui) {
 				consumer.accept(gui);
 			}
 		};

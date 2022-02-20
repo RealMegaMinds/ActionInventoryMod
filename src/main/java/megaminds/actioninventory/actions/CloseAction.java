@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import eu.pb4.sgui.api.ClickType;
 import lombok.NoArgsConstructor;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
@@ -27,7 +27,7 @@ public final class CloseAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(@NotNull NamedSlotGuiInterface gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		gui.close();
 	}
 }

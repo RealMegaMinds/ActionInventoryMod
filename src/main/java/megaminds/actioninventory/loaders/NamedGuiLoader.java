@@ -12,7 +12,9 @@ import java.util.stream.Stream;
 
 import eu.pb4.sgui.api.gui.SimpleGui;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.gui.NamedGuiBuilder;
+import megaminds.actioninventory.gui.ActionInventoryGui;
+import megaminds.actioninventory.gui.BetterGuiI;
+import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.gui.VirtualPlayerInventory;
 import megaminds.actioninventory.serialization.Serializer;
 import megaminds.actioninventory.util.Helper;
@@ -25,7 +27,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class NamedGuiLoader {
-	private static final Map<Identifier, NamedGuiBuilder> BUILDERS = new HashMap<>();
+	private static final Map<Identifier, ActionInventoryBuilder> BUILDERS = new HashMap<>();
 
 	private NamedGuiLoader() {}
 
@@ -33,12 +35,12 @@ public class NamedGuiLoader {
 		return List.copyOf(BUILDERS.keySet());
 	}
 	
-	public static NamedGuiBuilder getBuilder(Identifier name) {
+	public static ActionInventoryBuilder getBuilder(Identifier name) {
 		return BUILDERS.get(name);
 	}
 	
-	public static boolean openGui(ServerPlayerEntity player, Identifier name) {
-		return Helper.notNullAnd(getGui(player, name), SimpleGui::open);
+	public static boolean openGui(ServerPlayerEntity player, Identifier name, BetterGuiI old) {
+		return Helper.notNullAnd(getGui(player, name), g->g.open(old));
 	}
 
 	public static void openEnderChest(ServerPlayerEntity openFor, UUID toOpen) {
@@ -52,7 +54,7 @@ public class NamedGuiLoader {
 		gui.open();
 	}
 
-	public static SimpleGui getGui(ServerPlayerEntity player, Identifier name) {
+	public static ActionInventoryGui getGui(ServerPlayerEntity player, Identifier name) {
 		if (!BUILDERS.containsKey(name)) {
 			ActionInventoryMod.warn("No NamedGui with name: "+name);
 			return null;
@@ -60,7 +62,7 @@ public class NamedGuiLoader {
 		return BUILDERS.get(name).build(player);
 	}
 
-	public static boolean addBuilder(NamedGuiBuilder builder) {
+	public static boolean addBuilder(ActionInventoryBuilder builder) {
 		Identifier name = builder.getName();
 		if (BUILDERS.containsKey(name)) {
 			ActionInventoryMod.warn("A NamedGuiBuilder with name: '"+builder.getName()+"' already exists.");
@@ -97,7 +99,7 @@ public class NamedGuiLoader {
 	
 	private static void load(Path path, int[] count) {
 		try (BufferedReader br = Files.newBufferedReader(path)) {
-			NamedGuiBuilder builder = loadBuilder(br);
+			ActionInventoryBuilder builder = loadBuilder(br);
 			if (builder!=null && addBuilder(builder)) {
 				count[0]++;
 			} else {
@@ -109,7 +111,7 @@ public class NamedGuiLoader {
 		}
 	}
 	
-	private static NamedGuiBuilder loadBuilder(BufferedReader br) {
+	private static ActionInventoryBuilder loadBuilder(BufferedReader br) {
 		try {
 			return Serializer.builderFromJson(br);
 		} catch (ValidationException e) {

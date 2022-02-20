@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.network.MessageType;
@@ -53,7 +53,7 @@ public final class MessageAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		ServerPlayerEntity player = gui.getPlayer();
 		MinecraftServer server = player.getServer();
 		if (sender==null) sender = player.getUuid();

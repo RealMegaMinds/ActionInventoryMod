@@ -9,7 +9,7 @@ import eu.pb4.sgui.api.ClickType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.gui.NamedSlotGuiInterface;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.command.EntitySelector;
@@ -41,7 +41,7 @@ public final class RequirementAction extends GroupAction {
 	}
 
 	@Override
-	public void accept(NamedSlotGuiInterface gui) {
+	public void accept(ActionInventoryGui gui) {
 		ServerPlayerEntity p = gui.getPlayer();
 		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
 			super.accept(gui);

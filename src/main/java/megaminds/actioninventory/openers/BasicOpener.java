@@ -19,7 +19,7 @@ public abstract sealed class BasicOpener implements Validated permits BlockOpene
 	private Identifier guiName;
 	
 	public boolean open(ServerPlayerEntity player, Object... context) {	//NOSONAR Used by subclasses
-		return NamedGuiLoader.openGui(player, guiName);
+		return NamedGuiLoader.openGui(player, guiName, null);
 	}
 	
 	@Override

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.actions.EmptyAction;
-import megaminds.actioninventory.gui.NamedGui;
+import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -30,7 +30,7 @@ public abstract sealed class AccessableElement extends SlotElement implements Gu
 	}
 	
 	@Override
-	public void apply(NamedGui gui, ServerPlayerEntity p) {
+	public void apply(ActionInventoryGui gui, ServerPlayerEntity p) {
 		gui.setSlot(getCheckedIndex(gui), this);
 	}
 }
