@@ -51,7 +51,7 @@ public class ActionInventoryMod implements ModInitializer {
 		BlockOpener.registerCallbacks();
 		EntityOpener.registerCallbacks();
 		CommandRegistrationCallback.EVENT.register(Commands::register);
-			
+		
 		info("Initialized");
 	}
 	

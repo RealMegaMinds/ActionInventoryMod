@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.mixin.NbtCompoundMixin;
 import net.minecraft.nbt.NbtCompound;
@@ -28,7 +29,7 @@ public class Helper {
 	private static final String WORLD = "WORLD";
 	
 	private Helper() {}
-	
+
 	public static <E> boolean containsAny(Collection<E> col, Predicate<E> tester) {
 		return getFirst(col, tester)!=null;
 	}
