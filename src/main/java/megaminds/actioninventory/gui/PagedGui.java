@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import megaminds.actioninventory.gui.elements.Element;
 import megaminds.actioninventory.util.ElementHelper;
-import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.GuiHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -76,7 +76,7 @@ public class PagedGui implements SlotGuiInterface, BetterGuiI {
 		this.height = rowCount;
 		this.virtualSize = WIDTH*height;
 		this.size = virtualSize+(includePlayerInventorySlots ? 36 : 0);
-		this.type = Helper.getHandler(rowCount);
+		this.type = GuiHelper.getHandler(rowCount);
 		this.includingPlayer = includePlayerInventorySlots;
 		this.redirectingSlots = hasRedirects;
 	}
