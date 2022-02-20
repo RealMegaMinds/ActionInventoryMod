@@ -10,16 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.mixin.NbtCompoundMixin;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtNull;
 
 /**
  * Just some random helper methods.
@@ -94,8 +93,23 @@ public class Helper {
 		return o!=null && func.test(o);
 	}
 	
-	public static <K, V extends NbtElement> NbtCompound createNbtCompound(Map<K, V> map) {
-		return NbtCompoundMixin.createNbtCompound(Helper.mapEach(map, Object::toString, i->NbtNull.INSTANCE.equals(i)?null:i, null, null, false));
+	public static <V extends NbtElement> NbtCompound mapToCompound(Map<String, V> map) {
+		NbtCompound c = new NbtCompound();
+		map.forEach(c::put);
+		return c;
+	}
+	
+	/**
+	 * Assumes contents of compound are all of type V.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <V extends NbtElement> Map<String, V> compoundToMap(NbtCompound c) {
+		Set<String> keys = c.getKeys();
+		Map<String, V> map =  new HashMap<>(keys.size());
+		for (String s : keys) {
+			map.put(s, (V)c.get(s));
+		}
+		return map;
 	}
 	
 	public static List<Path> resolvePaths(List<String> paths, Path global, Path server) {

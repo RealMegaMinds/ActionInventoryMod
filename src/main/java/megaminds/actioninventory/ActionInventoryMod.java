@@ -27,34 +27,34 @@ public class ActionInventoryMod implements ModInitializer {
 	public static final Random RANDOM = new Random();
 	public static final String MOD_ID = "actioninventory";
 	public static final String MOD_NAME = "Action Inventory Mod";
-	
+
 	private static final ActionInventoryConfig CONFIG = new ActionInventoryConfig();
 
 	@Override
 	public void onInitialize() {
 		CONFIG.load();
-		
+
 		ServerLifecycleEvents.SERVER_STARTED.register(server->{
 			Saver.setSavesDir(ActionInventoryConfig.getSavePath(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)));
 			ActionInventoryConfig.getGuiBuilderPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(NamedGuiLoader::load);
 			ActionInventoryConfig.getOpenerPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(BasicOpenerLoader::load);
 		});
-		
+
 		ServerLifecycleEvents.SERVER_STOPPED.register(server->{
 			NamedGuiLoader.clear();
 			BasicOpenerLoader.clear();
 			Saver.saveAll();
 			Saver.clear();
 		});
-		
+
 		ItemOpener.registerCallbacks();
 		BlockOpener.registerCallbacks();
 		EntityOpener.registerCallbacks();
 		CommandRegistrationCallback.EVENT.register(Commands::register);
-		
+
 		info("Initialized");
 	}
-	
+
 	public static void reload(MinecraftServer server) {
 		NamedGuiLoader.clear();
 		BasicOpenerLoader.clear();
@@ -64,11 +64,11 @@ public class ActionInventoryMod implements ModInitializer {
 		ActionInventoryConfig.getGuiBuilderPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(NamedGuiLoader::load);
 		ActionInventoryConfig.getOpenerPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(BasicOpenerLoader::load);
 	}
-	
+
 	public static void info(String message) {
 		LOGGER.info(message);
 	}
-	
+
 	public static void warn(String message) {
 		LOGGER.warn(message);
 	}

@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.consumables.BasicConsumable;
-import megaminds.actioninventory.mixin.NbtCompoundMixin;
 import megaminds.actioninventory.util.Helper;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -96,8 +95,8 @@ public class StoredConsumables extends Saver {
 	public void load(Path loadDir) {
 		try {
 			File file = loadDir.resolve(owner.toString()+".dat").toFile();
-			if (file.exists() && file.isFile()) {
-				stores = Helper.mapEach(((NbtCompoundMixin)NbtIo.readCompressed(file)).invokeToMap(), NbtCompound.class::cast, null, false);
+			if (file.exists() && file.isFile()) {	
+				stores = Helper.compoundToMap(NbtIo.readCompressed(file));
 			}
 		} catch (IOException file) {
 			ActionInventoryMod.warn("Failed to load RequirementStore for: "+owner);
@@ -110,7 +109,7 @@ public class StoredConsumables extends Saver {
 
 		try {
 			File newFile = Files.createTempFile(saveDir, owner.toString() + "-", ".dat").toFile();
-			NbtCompound compound = Helper.createNbtCompound(stores);
+			NbtCompound compound = Helper.mapToCompound(stores);
 			NbtIo.writeCompressed(compound, newFile);
 			File current = saveDir.resolve(owner.toString() + ".dat").toFile();
 			File backup = saveDir.resolve(owner.toString() + ".dat_old").toFile();
