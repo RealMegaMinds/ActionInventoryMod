@@ -26,6 +26,8 @@ import net.minecraft.util.registry.Registry;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ActionInventoryBuilder implements Validated {
+	private static final SlotElement[] EMPTY = new SlotElement[0];
+	
 	private ScreenHandlerType<?> type;
 	private Identifier name;
 	@Setter
@@ -59,7 +61,10 @@ public final class ActionInventoryBuilder implements Validated {
 		
 		size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
 		
-		if (elements==null) return;
+		if (elements==null) {
+			elements = EMPTY; 
+			return;
+		}
 		int len = elements.length;
 		Validated.validate(len<=size, ()->"Too many elements. Screen handler type "+Registry.SCREEN_HANDLER.getId(type)+" requires there to be a maximum of "+size+" SlotElements");
 		boolean[] test = new boolean[size];
