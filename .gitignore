@@ -31,3 +31,8 @@ bin/
 # fabric
 
 run/
+
+# other
+
+ignored/
+logs/
