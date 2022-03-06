@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import megaminds.actioninventory.loaders.NamedGuiLoader;
+import megaminds.actioninventory.loaders.ActionInventoryLoader;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,7 +19,7 @@ public abstract sealed class BasicOpener implements Validated permits BlockOpene
 	private Identifier guiName;
 	
 	public boolean open(ServerPlayerEntity player, Object... context) {	//NOSONAR Used by subclasses
-		return NamedGuiLoader.openGui(player, guiName, null);
+		return ActionInventoryLoader.openGui(player, guiName, null);
 	}
 	
 	@Override

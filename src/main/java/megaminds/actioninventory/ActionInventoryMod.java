@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import megaminds.actioninventory.commands.Commands;
 import megaminds.actioninventory.loaders.BasicOpenerLoader;
-import megaminds.actioninventory.loaders.NamedGuiLoader;
+import megaminds.actioninventory.loaders.ActionInventoryLoader;
 import megaminds.actioninventory.misc.Saver;
 import megaminds.actioninventory.openers.BlockOpener;
 import megaminds.actioninventory.openers.EntityOpener;
@@ -36,12 +36,12 @@ public class ActionInventoryMod implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server->{
 			Saver.setSavesDir(ActionInventoryConfig.getSavePath(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)));
-			ActionInventoryConfig.getGuiBuilderPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(NamedGuiLoader::load);
+			ActionInventoryConfig.getGuiBuilderPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(ActionInventoryLoader::load);
 			ActionInventoryConfig.getOpenerPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(BasicOpenerLoader::load);
 		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server->{
-			NamedGuiLoader.clear();
+			ActionInventoryLoader.clear();
 			BasicOpenerLoader.clear();
 			Saver.saveAll();
 			Saver.clear();
@@ -56,12 +56,12 @@ public class ActionInventoryMod implements ModInitializer {
 	}
 
 	public static void reload(MinecraftServer server) {
-		NamedGuiLoader.clear();
+		ActionInventoryLoader.clear();
 		BasicOpenerLoader.clear();
 		Saver.saveAll();
 		Saver.clear();
 		Saver.setSavesDir(ActionInventoryConfig.getSavePath(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)));
-		ActionInventoryConfig.getGuiBuilderPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(NamedGuiLoader::load);
+		ActionInventoryConfig.getGuiBuilderPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(ActionInventoryLoader::load);
 		ActionInventoryConfig.getOpenerPaths(FabricLoader.getInstance().getGameDir(), server.getSavePath(WorldSavePath.ROOT)).forEach(BasicOpenerLoader::load);
 	}
 

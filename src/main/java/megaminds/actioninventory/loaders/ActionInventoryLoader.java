@@ -26,19 +26,19 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
-public class NamedGuiLoader {
+public class ActionInventoryLoader {
 	private static final Map<Identifier, ActionInventoryBuilder> BUILDERS = new HashMap<>();
 
-	private NamedGuiLoader() {}
+	private ActionInventoryLoader() {}
 
 	public static List<Identifier> builderNames() {
 		return List.copyOf(BUILDERS.keySet());
 	}
-	
+
 	public static ActionInventoryBuilder getBuilder(Identifier name) {
 		return BUILDERS.get(name);
 	}
-	
+
 	public static boolean openGui(ServerPlayerEntity player, Identifier name, BetterGuiI old) {
 		return Helper.notNullAnd(getGui(player, name), g->g.open(old));
 	}
@@ -56,7 +56,7 @@ public class NamedGuiLoader {
 
 	public static ActionInventoryGui getGui(ServerPlayerEntity player, Identifier name) {
 		if (!BUILDERS.containsKey(name)) {
-			ActionInventoryMod.warn("No NamedGui with name: "+name);
+			ActionInventoryMod.warn("No Action Inventory with name: "+name);
 			return null;
 		}
 		return BUILDERS.get(name).build(player);
@@ -65,7 +65,7 @@ public class NamedGuiLoader {
 	public static boolean addBuilder(ActionInventoryBuilder builder) {
 		Identifier name = builder.getName();
 		if (BUILDERS.containsKey(name)) {
-			ActionInventoryMod.warn("A NamedGuiBuilder with name: '"+builder.getName()+"' already exists.");
+			ActionInventoryMod.warn("An Action Inventory with name: '"+builder.getName()+"' already exists.");
 			return false;
 		} else {
 			BUILDERS.put(name, builder);
@@ -83,6 +83,10 @@ public class NamedGuiLoader {
 		}
 	}
 
+	public static boolean hasBuilder(Identifier name) {
+		return BUILDERS.containsKey(name);
+	}
+
 	public static int[] load(Path path) {
 		int[] count = new int[2];
 		try (Stream<Path> files = Files.list(path)) {
@@ -93,10 +97,10 @@ public class NamedGuiLoader {
 		} catch (IOException e) {
 			ActionInventoryMod.warn("Cannot read files from: "+path);
 		}
-		ActionInventoryMod.info("Loaded "+count[0]+" NamedGuiBuilders. Failed to load "+count[1]+". ("+path+")");
+		ActionInventoryMod.info("Loaded "+count[0]+" Action Inventories. Failed to load "+count[1]+". ("+path+")");
 		return count;
 	}
-	
+
 	private static void load(Path path, int[] count) {
 		try (BufferedReader br = Files.newBufferedReader(path)) {
 			ActionInventoryBuilder builder = loadBuilder(br);
@@ -106,16 +110,16 @@ public class NamedGuiLoader {
 				count[1]++;
 			}
 		} catch (IOException e) {
-			ActionInventoryMod.warn("Failed to read NamedGuiBuilder from: "+path);
+			ActionInventoryMod.warn("Failed to read Action Inventory from: "+path);
 			count[1]++;
 		}
 	}
-	
+
 	private static ActionInventoryBuilder loadBuilder(BufferedReader br) {
 		try {
 			return Serializer.builderFromJson(br);
 		} catch (ValidationException e) {
-			ActionInventoryMod.warn("NamedGuiBuilder Validation Exception: "+e.getMessage());
+			ActionInventoryMod.warn("Action Inventory Validation Exception: "+e.getMessage());
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();

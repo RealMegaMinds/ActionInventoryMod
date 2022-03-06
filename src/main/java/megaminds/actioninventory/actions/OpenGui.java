@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
-import megaminds.actioninventory.loaders.NamedGuiLoader;
+import megaminds.actioninventory.loaders.ActionInventoryLoader;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import net.minecraft.screen.slot.SlotActionType;
@@ -48,12 +48,12 @@ public final class OpenGui extends BasicAction {
 		switch (guiType) {
 		case ENDER_CHEST -> {
 			UUID uuid = playerUUID!=null ? playerUUID : gui.getPlayer().getUuid();
-			NamedGuiLoader.openEnderChest(gui.getPlayer(), uuid);
+			ActionInventoryLoader.openEnderChest(gui.getPlayer(), uuid);
 		}
-		case NAMED_GUI -> NamedGuiLoader.openGui(gui.getPlayer(), guiName, gui);
+		case NAMED_GUI -> ActionInventoryLoader.openGui(gui.getPlayer(), guiName, gui);
 		case PLAYER -> {
 			UUID uuid = playerUUID!=null ? playerUUID : gui.getPlayer().getUuid();
-			NamedGuiLoader.openInventory(gui.getPlayer(), uuid);
+			ActionInventoryLoader.openInventory(gui.getPlayer(), uuid);
 		}
 		default -> throw new IllegalArgumentException("Unimplemented case: " + guiType);
 		}
