@@ -26,9 +26,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack.TooltipSection;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtEnd;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtNull;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -145,7 +145,7 @@ public class ItemStackish {
 	private void loreFrom(NbtCompound display) {
 		if (display.contains(ItemStack.LORE_KEY)) {
 			lore = display.getList(ItemStack.LORE_KEY, NbtType.STRING).stream()
-					.map(l->l==null||l==NbtNull.INSTANCE?"":l.asString())
+					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
 					.map(Text.Serializer::fromJson)
 					.toArray(Text[]::new);
 			display.remove(ItemStack.LORE_KEY);

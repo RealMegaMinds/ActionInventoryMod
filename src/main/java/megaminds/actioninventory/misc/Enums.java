@@ -1,44 +1,48 @@
 package megaminds.actioninventory.misc;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import net.minecraft.nbt.NbtString;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 /**
  * Enums/constants/whatever else I put here
  */
 public class Enums {
-	public static final NbtString COMPLETE = NbtString.of("COMPLETE");
-	
+	public static final String COMPLETE = "COMPLETE";
 	public enum GuiType {PLAYER, ENDER_CHEST, NAMED_GUI, GENERATED}
 	public enum MessagePlaceHolders {PLAYER, SERVER, BROADCAST}
-	
+
 	private Enums() {}
-	
+
 	public enum TagOption {
-		ALL {@Override public boolean matches(Set<Identifier> checkFor, Collection<Identifier> checkIn) {return checkIn.containsAll(checkFor);}},
-		NONE {
+		ALL {
 			@Override
-			public boolean matches(Set<Identifier> checkFor, Collection<Identifier> checkIn) {
-				for (Identifier id : checkFor) {
-					if (checkIn.contains(id)) return false;
-				}
-				return true;
+			public <E> boolean matches(Set<Identifier> checkFor, Stream<TagKey<E>> checkIn) {
+				return checkIn.map(TagKey::id).collect(HashSet::new, Set::add, Set::addAll).containsAll(checkFor);
 			}
 		},
-		EXACT {@Override public boolean matches(Set<Identifier> checkFor, Collection<Identifier> checkIn) {return new HashSet<>(checkIn).equals(checkFor);}},
+		NONE {
+			@Override
+			public <E> boolean matches(Set<Identifier> checkFor, Stream<TagKey<E>> checkIn) {
+				return checkIn.map(TagKey::id).noneMatch(checkFor::contains);
+			}
+		},
+		EXACT {
+			@Override
+			public <E> boolean matches(Set<Identifier> checkFor, Stream<TagKey<E>> checkIn) {
+				return checkIn.map(TagKey::id).collect(HashSet::new, Set::add, Set::addAll).equals(checkFor);
+			}
+		},
 		ANY {
 			@Override
-			public boolean matches(Set<Identifier> checkFor, Collection<Identifier> checkIn) {
-				for (Identifier id : checkFor) {
-					if (checkIn.contains(id)) return true;
-				}
-				return false;
+			public <E> boolean matches(Set<Identifier> checkFor, Stream<TagKey<E>> checkIn) {
+				return checkIn.map(TagKey::id).anyMatch(checkFor::contains);
 			}
 		};
-		public abstract boolean matches(Set<Identifier> checkFor, Collection<Identifier> checkIn);
+
+		public abstract <E> boolean matches(Set<Identifier> checkFor, Stream<TagKey<E>> checkIn);
 	}
 }
