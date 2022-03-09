@@ -7,12 +7,9 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
-import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -20,13 +17,11 @@ import net.minecraft.text.LiteralText;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OpenCommand {
-	private static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b)->CommandSource.suggestIdentifiers(ActionInventoryMod.INVENTORY_LOADER.builderNames(), b);
-
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
 				.then(argument("targets", EntityArgumentType.players())
 						.then(argument("guiName", IdentifierArgumentType.identifier())
-								.suggests(NAME_SUGGESTIONS)
+								.suggests(Commands.NAME_SUGGESTIONS)
 								.executes(c->open(c, false))
 								.then(argument("silent", BoolArgumentType.bool())
 										.executes(c->open(c, BoolArgumentType.getBool(c, "silent")))))));
