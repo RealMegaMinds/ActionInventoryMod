@@ -26,13 +26,34 @@ import net.minecraft.nbt.NbtElement;
 public class Helper {
 	private static final String GLOBAL = "GLOBAL";
 	private static final String WORLD = "WORLD";
-	
+
 	private Helper() {}
+
+	public static int getTotalExperienceForLevel(int level) {
+		if (level<17) {
+			return level*level + 6*level;
+		} else if (level<32) {
+			return (int) (2.5*level*level - 40.5*level + 360);
+		} else {
+			return (int) (4.5*level*level - 162.5*level + 2220);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <R extends NbtElement> R computeIfAbsent(NbtCompound holder, Function<String, R> creator, String key) {
+		if (holder.contains(key)) {
+			return (R) holder.get(key);
+		} else {
+			var r = creator.apply(key);
+			holder.put(key, r);
+			return r;
+		}
+	}
 
 	public static <E> boolean containsAny(Collection<E> col, Predicate<E> tester) {
 		return getFirst(col, tester)!=null;
 	}
-		
+
 	/**
 	 * Returns the first object in the given collection that matches the given predicate.<br>
 	 * Returns null if none match.
@@ -45,7 +66,7 @@ public class Helper {
 		}
 		return null;
 	}
-	
+
 	public static <E> boolean ifDo(E e, Consumer<E> consumer) {
 		if (e!=null) {
 			consumer.accept(e);
@@ -53,7 +74,7 @@ public class Helper {
 		}
 		return false;
 	}
-	
+
 	public static <E> boolean ifOrDo(E e, Predicate<E> test, Consumer<E> consumer) {
 		if (e!=null || test.test(e)) {
 			consumer.accept(e);
@@ -64,7 +85,7 @@ public class Helper {
 
 	public static <K, V, R> Map<K, R> mapEach(Map<K, V> m, Function<V, R> func, R defaultObj, boolean allowNull) {
 		if (m==null) return null;	//NOSONAR Part of contract
-		
+
 		Map<K, R> map = new HashMap<>();
 		for (Entry<K, V> e : m.entrySet()) {
 			R r = apply(e.getValue(), func, defaultObj);
@@ -74,10 +95,10 @@ public class Helper {
 		}
 		return map;
 	}
-	
+
 	public static <K, V, R1, R2> Map<R1, R2> mapEach(Map<K, V> m, Function<K, R1> keyFunc, Function<V, R2> valueFunc, R1 defaultKey, R2 defaultValue, boolean allowNull) {
 		if (m==null) return null;	//NOSONAR Part of contract
-		
+
 		Map<R1, R2> map = new HashMap<>();
 		for (Entry<K, V> e : m.entrySet()) {
 			R1 rk = apply(e.getKey(), keyFunc, defaultKey);
@@ -92,13 +113,13 @@ public class Helper {
 	public static <E> boolean notNullAnd(E o, Predicate<E> func) {
 		return o!=null && func.test(o);
 	}
-	
+
 	public static <V extends NbtElement> NbtCompound mapToCompound(Map<String, V> map) {
 		NbtCompound c = new NbtCompound();
 		map.forEach(c::put);
 		return c;
 	}
-	
+
 	/**
 	 * Assumes contents of compound are all of type V.
 	 */
@@ -111,11 +132,11 @@ public class Helper {
 		}
 		return map;
 	}
-	
+
 	public static List<Path> resolvePaths(List<String> paths, Path global, Path server) {
 		return paths.stream().map(s->resolvePath(s, global, server)).filter(Objects::nonNull).toList();
 	}
-	
+
 	public static Path resolvePath(String path, Path global, Path server) {
 		Path p;
 		if (path.startsWith(GLOBAL)) {
@@ -131,7 +152,7 @@ public class Helper {
 		}
 		return p!=null&&checkDir(p) ? p : null;
 	}
-	
+
 	public static boolean checkDir(Path p) {
 		try {
 			Files.createDirectories(p);
@@ -149,14 +170,14 @@ public class Helper {
 	public static <E, R> R apply(E from, Function<E, R> func) {
 		return apply(from, func, (R)null);
 	}
-	
+
 	/**
 	 * Returns def if from is null.
 	 */
 	public static <E, R> R apply(E from, Function<E, R> func, R def) {
 		return from!=null ? func.apply(from) : def;
 	}
-	
+
 	/**
 	 * Returns def.get() if from is null
 	 */

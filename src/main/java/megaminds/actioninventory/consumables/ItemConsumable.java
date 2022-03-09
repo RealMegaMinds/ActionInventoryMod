@@ -1,6 +1,8 @@
 package megaminds.actioninventory.consumables;
 
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +11,7 @@ import lombok.Setter;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.util.annotations.PolyName;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.tag.ItemTags;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
@@ -24,39 +23,45 @@ public final class ItemConsumable extends NumberConsumable {
 	private ItemStackish stack;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
-	
-	@Override
-	public boolean canConsume(ServerPlayerEntity player, long left) {
-		PlayerInventory inv = player.getInventory();
-		final int size = inv.size();
-		int available = 0;
-		for (int i = 0; i < size; i++) {
-			ItemStack s = inv.getStack(i);
-			
-			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, ItemTags.getTagGroup().getTagsFor(s.getItem())))) {
-				available += Math.min(s.getCount(), left);
-			}
-			if (available>=left) return true;
-		}
-		return available>=left;
+
+	public ItemConsumable(boolean requireFull, long amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+		super(requireFull, amount);
+		this.stack = stack!=null ? stack : ItemStackish.MATCH_ALL;
+		this.tags = tags;
+		this.tagOption = tagOption!=null ? tagOption : TagOption.ANY;
 	}
 
 	@Override
-	public long consume(ServerPlayerEntity player, long left) {
-		PlayerInventory inv = player.getInventory();
-		final int size = inv.size();
-		for (int i = 0; i < size; i++) {
-			ItemStack s = inv.getStack(i);
-			
-			if (stack.specifiedEquals(s) 
-					&& (tags==null || 
-					tagOption.matches(tags, ItemTags.getTagGroup().getTagsFor(s.getItem())))) {
-				int can = (int) Math.min(s.getCount(), left);
-				s.setCount(s.getCount()-can);
-				left-=can;
+	public boolean canConsume(MinecraftServer server, UUID player, long left) {
+		var p = server.getPlayerManager().getPlayer(player);
+		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
+
+		var inv = p.getInventory();
+		var available = 0;
+		for (int i = 0, size = inv.size(); i < size; i++) {
+			var s = inv.getStack(i);
+			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
+				available += s.getCount();
+				if (available >= left) return true;
 			}
-			
-			if (left<=0) break;
+		}
+		return false;
+	}
+
+	@Override
+	public long consume(MinecraftServer server, UUID player, long left) {
+		var p = server.getPlayerManager().getPlayer(player);
+		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
+
+		var inv = p.getInventory();
+		for (int i = 0, size = inv.size(); i < size; i++) {
+			var s = inv.getStack(i);
+			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
+				var count = Math.min(s.getCount(), left);
+				left -= count;
+				s.setCount(s.getCount()-(int)count);
+				if (left<=0) break;
+			}
 		}
 		return left;
 	}
