@@ -1,20 +1,17 @@
 package megaminds.actioninventory.openers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import lombok.Setter;
 import lombok.Getter;
 import megaminds.actioninventory.util.annotations.PolyName;
 import megaminds.actioninventory.misc.ItemStackish;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.misc.Enums.TagOption;
-import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 
@@ -22,12 +19,12 @@ import net.minecraft.util.TypedActionResult;
 @Setter
 @PolyName("Item")
 public final class ItemOpener extends BasicOpener {
-	private static final List<ItemOpener> OPENERS = new ArrayList<>();
+	private static final Identifier TYPE = new Identifier(ActionInventoryMod.MOD_ID, "item");
 
 	private ItemStackish stack;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
-	
+
 	public ItemOpener(Identifier guiName, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
 		super(guiName);
 		this.stack = stack;
@@ -37,32 +34,31 @@ public final class ItemOpener extends BasicOpener {
 
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
-		ItemStack s = (ItemStack) context[0];
-		if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, ItemTags.getTagGroup().getTagsFor(s.getItem())))) {
+		var s = (ItemStack) context[0];
+		if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
 			return super.open(player, context);
 		}
 		return false;
 	}
-		
+
 	public static boolean tryOpen(ServerPlayerEntity p, ItemStack s) {
-		return Helper.getFirst(OPENERS, o->o.open(p, s))!=null;
+		return Helper.getFirst(ActionInventoryMod.OPENER_LOADER.getOpeners(TYPE), o->o.open(p, s))!=null;
 	}
 
 	public static void registerCallbacks() {
 		UseItemCallback.EVENT.register((p,w,h)->
-			!w.isClient&&ItemOpener.tryOpen((ServerPlayerEntity)p, p.getStackInHand(h)) ? TypedActionResult.success(ItemStack.EMPTY) : TypedActionResult.pass(ItemStack.EMPTY)
-		);		
+		!w.isClient&&ItemOpener.tryOpen((ServerPlayerEntity)p, p.getStackInHand(h)) ? TypedActionResult.success(ItemStack.EMPTY) : TypedActionResult.pass(ItemStack.EMPTY));		
 	}
-	
-	public static void clearOpeners() {
-		OPENERS.clear();
-	}
-	
+
 	@Override
 	public void validate() {
 		super.validate();
 		if (stack==null) stack = ItemStackish.MATCH_ALL;
 		if (tagOption==null) tagOption = TagOption.ALL;
-		Validated.validate(!OPENERS.contains(this) && OPENERS.add(this), "Failed to add Block opener to list.");
+	}
+
+	@Override
+	public Identifier getType() {
+		return TYPE;
 	}
 }

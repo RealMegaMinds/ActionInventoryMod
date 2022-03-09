@@ -11,7 +11,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import megaminds.actioninventory.loaders.ActionInventoryLoader;
+import megaminds.actioninventory.ActionInventoryMod;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
@@ -20,7 +20,7 @@ import net.minecraft.text.LiteralText;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OpenCommand {
-	private static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b)->CommandSource.suggestIdentifiers(ActionInventoryLoader.builderNames(), b);
+	private static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b)->CommandSource.suggestIdentifiers(ActionInventoryMod.INVENTORY_LOADER.builderNames(), b);
 
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
@@ -35,7 +35,7 @@ public class OpenCommand {
 	private static int open(CommandContext<ServerCommandSource> context, boolean silent) throws CommandSyntaxException {
 		var targets = EntityArgumentType.getOptionalPlayers(context, "targets");
 		var name = IdentifierArgumentType.getIdentifier(context, "guiName");
-		var builder = ActionInventoryLoader.getBuilder(name);
+		var builder = ActionInventoryMod.INVENTORY_LOADER.getBuilder(name);
 
 		if (builder==null) {
 			context.getSource().sendError(new LiteralText("No Action Inventory with name: "+name));

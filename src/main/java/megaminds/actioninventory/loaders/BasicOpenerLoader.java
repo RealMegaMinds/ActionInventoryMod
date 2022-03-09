@@ -1,62 +1,57 @@
 package megaminds.actioninventory.loaders;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.openers.BlockOpener;
-import megaminds.actioninventory.openers.EntityOpener;
-import megaminds.actioninventory.openers.ItemOpener;
+import megaminds.actioninventory.openers.BasicOpener;
 import megaminds.actioninventory.serialization.Serializer;
 import megaminds.actioninventory.util.ValidationException;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.Identifier;
 
-public class BasicOpenerLoader {
-	private BasicOpenerLoader() {}
+public class BasicOpenerLoader implements SimpleSynchronousResourceReloadListener {
+	private static final Identifier LOADER_ID = new Identifier(ActionInventoryMod.MOD_ID, "openers");
 
-	public static void load(Path[] paths) {
-		for (Path p : paths) {
-			load(p);
+	private final Map<Identifier, List<BasicOpener>> openers = new HashMap<>();
+
+	@Override
+	public void reload(ResourceManager manager) {
+		openers.clear();
+
+		var count = new int[2];
+		var paths = Set.copyOf(manager.findResources(ActionInventoryMod.MOD_ID+"/openers", s->s.endsWith(".json")));
+		for (var path : paths) {
+			try (var res = manager.getResource(path).getInputStream()) {
+				var opener = Serializer.openerFromJson(new InputStreamReader(res));
+				addOpener(opener);
+				count[0]++;	//success
+				continue;
+			} catch (ValidationException e) {
+				ActionInventoryMod.warn("Opener Validation Exception: "+e.getMessage());
+			} catch (IOException e) {
+				ActionInventoryMod.warn("Failed to read Opener from: "+path);
+			}
+			count[1]++;	//fail
 		}
+		ActionInventoryMod.info("Loaded "+count[0]+" Openers. Failed to load "+count[1]+".");
 	}
 
-	public static int[] load(Path path) {
-		int[] count = new int[2];
-		try (Stream<Path> files = Files.list(path)) {
-			files.filter(p->p.toString().endsWith(".json"))
-			.forEach(p->{
-				try (BufferedReader br = Files.newBufferedReader(p)) {
-					count[loadOpener(br) ? 0 : 1]++;
-				} catch (IOException e) {
-					ActionInventoryMod.warn("Failed to read Opener from: "+p);
-					count[1]++;
-				}
-			});
-		} catch (IOException e) {
-			ActionInventoryMod.warn("Cannot read files from: "+path);
-		}
-		ActionInventoryMod.info("Loaded "+count[0]+" Openers. Failed to load "+count[1]+". ("+path+")");
-		return count;
+	public void addOpener(BasicOpener opener) {
+		openers.computeIfAbsent(opener.getType(), t->new ArrayList<>()).add(opener);
 	}
 
-	private static boolean loadOpener(BufferedReader br) {
-		try {
-			Serializer.openerFromJson(br);
-			return true;
-		} catch (ValidationException e) {
-			ActionInventoryMod.warn("Opener Validation Exception: "+e.getMessage());
-			return false;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public List<BasicOpener> getOpeners(Identifier type) {
+		return openers.get(type);
 	}
 
-	public static void clear() {
-		BlockOpener.clearOpeners();
-		ItemOpener.clearOpeners();
-		EntityOpener.clearOpeners();
+	@Override
+	public Identifier getFabricId() {
+		return LOADER_ID;
 	}
 }

@@ -1,24 +1,18 @@
 package megaminds.actioninventory.loaders;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
-
-import eu.pb4.sgui.api.gui.SimpleGui;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.gui.ActionInventoryGui;
-import megaminds.actioninventory.gui.BetterGuiI;
 import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.gui.VirtualPlayerInventory;
 import megaminds.actioninventory.serialization.Serializer;
-import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.ValidationException;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,108 +20,65 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
-public class ActionInventoryLoader {
-	private static final Map<Identifier, ActionInventoryBuilder> BUILDERS = new HashMap<>();
+public class ActionInventoryLoader implements SimpleSynchronousResourceReloadListener {
+	private static final Identifier LOADER_ID = new Identifier(ActionInventoryMod.MOD_ID, "inventories");
 
-	private ActionInventoryLoader() {}
+	private final Map<Identifier, ActionInventoryBuilder> builders = new HashMap<>();
 
-	public static List<Identifier> builderNames() {
-		return List.copyOf(BUILDERS.keySet());
+	@Override
+	public void reload(ResourceManager manager) {
+		builders.clear();
+
+		var count = new int[2];
+		var paths = Set.copyOf(manager.findResources(ActionInventoryMod.MOD_ID+"/inventories", s->s.endsWith(".json")));
+		for (var path : paths) {
+			try (var res = manager.getResource(path).getInputStream()) {
+				var builder = Serializer.builderFromJson(new InputStreamReader(res));
+				addBuilder(builder);
+				count[0]++;	//success
+				continue;
+			} catch (ValidationException e) {
+				ActionInventoryMod.warn("Action Inventory Validation Exception: "+e.getMessage());
+			} catch (IOException e) {
+				ActionInventoryMod.warn("Failed to read Action Inventory from: "+path);
+			}
+			count[1]++;	//fail
+		}
+		ActionInventoryMod.info("Loaded "+count[0]+" Action Inventories. Failed to load "+count[1]+".");
 	}
 
-	public static ActionInventoryBuilder getBuilder(Identifier name) {
-		return BUILDERS.get(name);
+	@Override
+	public Identifier getFabricId() {
+		return LOADER_ID;
 	}
 
-	public static boolean openGui(ServerPlayerEntity player, Identifier name, BetterGuiI old) {
-		return Helper.notNullAnd(getGui(player, name), g->g.open(old));
-	}
-
-	public static void openEnderChest(ServerPlayerEntity openFor, UUID toOpen) {
-		ServerPlayerEntity p = openFor.getServer().getPlayerManager().getPlayer(toOpen);
+	public void openEnderChest(ServerPlayerEntity openFor, UUID toOpen) {
+		var p = openFor.getServer().getPlayerManager().getPlayer(toOpen);
 		openFor.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, p.getEnderChestInventory()), p.getName().shallowCopy().append(new LiteralText("'s ").append(new TranslatableText("container.enderchest")))));
 	}
 
-	public static void openInventory(ServerPlayerEntity openFor, UUID toOpen) {
-		ServerPlayerEntity p = openFor.getServer().getPlayerManager().getPlayer(toOpen);
-		SimpleGui gui = new VirtualPlayerInventory(openFor, false, p);
-		gui.open();
+	public void openInventory(ServerPlayerEntity openFor, UUID toOpen) {
+		var p = openFor.getServer().getPlayerManager().getPlayer(toOpen);
+		new VirtualPlayerInventory(openFor, false, p).open();
 	}
 
-	public static ActionInventoryGui getGui(ServerPlayerEntity player, Identifier name) {
-		if (!BUILDERS.containsKey(name)) {
-			ActionInventoryMod.warn("No Action Inventory with name: "+name);
-			return null;
-		}
-		return BUILDERS.get(name).build(player);
+	public ActionInventoryBuilder getBuilder(Identifier name) {
+		return builders.get(name);
 	}
 
-	public static boolean addBuilder(ActionInventoryBuilder builder) {
-		Identifier name = builder.getName();
-		if (BUILDERS.containsKey(name)) {
-			ActionInventoryMod.warn("An Action Inventory with name: '"+builder.getName()+"' already exists.");
-			return false;
-		} else {
-			BUILDERS.put(name, builder);
-			return true;
-		}
+	public void addBuilder(ActionInventoryBuilder builder) {
+		builders.put(builder.getName(), builder);
 	}
 
-	public static void removeBuilder(Identifier name) {
-		BUILDERS.remove(name);
+	public void removeBuilder(Identifier name) {
+		builders.remove(name);
 	}
 
-	public static void load(Path[] paths) {
-		for (Path p : paths) {
-			load(p);
-		}
+	public boolean hasBuilder(Identifier name) {
+		return builders.containsKey(name);
 	}
 
-	public static boolean hasBuilder(Identifier name) {
-		return BUILDERS.containsKey(name);
-	}
-
-	public static int[] load(Path path) {
-		int[] count = new int[2];
-		try (Stream<Path> files = Files.list(path)) {
-			Path[] paths = files.filter(p->p.toString().endsWith(".json")).toArray(Path[]::new);
-			for (Path p : paths) {
-				load(p, count);
-			}
-		} catch (IOException e) {
-			ActionInventoryMod.warn("Cannot read files from: "+path);
-		}
-		ActionInventoryMod.info("Loaded "+count[0]+" Action Inventories. Failed to load "+count[1]+". ("+path+")");
-		return count;
-	}
-
-	private static void load(Path path, int[] count) {
-		try (BufferedReader br = Files.newBufferedReader(path)) {
-			ActionInventoryBuilder builder = loadBuilder(br);
-			if (builder!=null && addBuilder(builder)) {
-				count[0]++;
-			} else {
-				count[1]++;
-			}
-		} catch (IOException e) {
-			ActionInventoryMod.warn("Failed to read Action Inventory from: "+path);
-			count[1]++;
-		}
-	}
-
-	private static ActionInventoryBuilder loadBuilder(BufferedReader br) {
-		try {
-			return Serializer.builderFromJson(br);
-		} catch (ValidationException e) {
-			ActionInventoryMod.warn("Action Inventory Validation Exception: "+e.getMessage());
-			return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public static void clear() {
-		BUILDERS.clear();
+	public Set<Identifier> builderNames() {
+		return Set.copyOf(builders.keySet());
 	}
 }
