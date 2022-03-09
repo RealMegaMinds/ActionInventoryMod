@@ -19,13 +19,9 @@
     "client": [],
     "server": []
   },
-  "mixins": [
-    "actioninventory.mixins.json"
-  ],
   "depends": {
-    "fabricloader": ">=0.11.3",
     "fabric": "*",
-    "minecraft": "1.18.x",
+    "minecraft": ">=1.18.2",
     "java": ">=17"
   }
 }
