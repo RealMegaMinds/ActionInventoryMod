@@ -31,7 +31,7 @@ public final class GiveAction extends BasicAction {
 	private static final Identifier[] EMPTY = new Identifier[0];
 
 	private Identifier[] lootTables;
-	private TriState giveClicked;
+	private TriState giveClicked = TriState.DEFAULT;
 
 	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Identifier[] lootTables, TriState giveClicked) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);

@@ -27,9 +27,9 @@ import net.minecraft.util.Identifier;
 @PolyName("Command")
 public final class CommandAction extends BasicAction {
 	private String command;
-	private TriState fromServer;
+	private TriState fromServer = TriState.DEFAULT;
 	/**@since 3.1*/
-	private TriState silent;
+	private TriState silent = TriState.DEFAULT;
 	/**@since 3.1*/
 	private Integer higherLevel;
 

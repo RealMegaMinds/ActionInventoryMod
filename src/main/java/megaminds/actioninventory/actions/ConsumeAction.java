@@ -28,9 +28,9 @@ public final class ConsumeAction extends GroupAction {
 	/**Consumables to consume*/
 	private BasicConsumable[] consumables;
 	/**True->pay first time, false->pay every time*/
-	private TriState singlePay;
+	private TriState singlePay = TriState.DEFAULT;
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
-	private TriState requireFull;
+	private TriState requireFull = TriState.DEFAULT;
 
 	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);

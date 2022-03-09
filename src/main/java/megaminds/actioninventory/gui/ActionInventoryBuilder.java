@@ -33,8 +33,8 @@ public final class ActionInventoryBuilder implements Validated {
 	private Identifier name;
 	@Setter
 	private Text title;
-	private TriState includePlayer;
-	private TriState lockPlayerInventory;
+	private TriState includePlayer = TriState.DEFAULT;
+	private TriState lockPlayerInventory = TriState.DEFAULT;
 
 	@Setter private SlotElement[] elements;
 	/**@since 3.1*/
@@ -46,7 +46,7 @@ public final class ActionInventoryBuilder implements Validated {
 	/**@since 3.1*/
 	@Setter private BasicAction recipeAction;
 	/**@since 3.2*/
-	private TriState chained;
+	private TriState chained = TriState.DEFAULT;
 
 	@Exclude private int size;
 

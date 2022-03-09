@@ -26,7 +26,7 @@ public abstract sealed class BasicAction implements ActionInventoryCallback, Val
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
 	/**@since 3.1*/
-	private TriState requireShift;
+	private TriState requireShift = TriState.DEFAULT;
 	/**@since 3.1*/
 	private Identifier requiredRecipe;
 	private Identifier requiredGuiName;

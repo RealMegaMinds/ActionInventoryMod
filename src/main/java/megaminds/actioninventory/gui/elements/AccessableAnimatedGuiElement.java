@@ -29,7 +29,7 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 
 	private ItemStack[] items;
 	private int interval;
-	private TriState random;
+	private TriState random = TriState.DEFAULT;
 
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)

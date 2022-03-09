@@ -18,7 +18,7 @@ import net.minecraft.server.MinecraftServer;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
 public abstract sealed class BasicConsumable implements Validated permits XpConsumable, NumberConsumable {
-	private TriState requireFull;
+	private TriState requireFull = TriState.DEFAULT;
 
 	/**
 	 * Returns true if the player has paid or can pay the full amount.
