@@ -12,6 +12,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.loaders.ActionInventoryLoader;
 import megaminds.actioninventory.serialization.Serializer;
 import megaminds.actioninventory.util.ValidationException;
@@ -25,8 +26,6 @@ public class LoadCommand {
 				.then(argument("path", StringArgumentType.greedyString())
 						.executes(LoadCommand::load)));
 	}
-	
-	//TODO Fabric Permissions API integration
 	
 	private static int remove(CommandContext<ServerCommandSource> context) {
 		return 1;//TODO
@@ -42,8 +41,8 @@ public class LoadCommand {
 		
 		try (var br = Files.newBufferedReader(p)) {
 			var builder = Serializer.builderFromJson(br);
-			if (!ActionInventoryLoader.hasBuilder(builder.getName())) {
-				ActionInventoryLoader.addBuilder(builder);
+			if (!ActionInventoryMod.INVENTORY_LOADER.hasBuilder(builder.getName())) {
+				ActionInventoryMod.INVENTORY_LOADER.addBuilder(builder);
 				context.getSource().sendFeedback(new LiteralText("Loaded action inventory: "+builder.getName()), false);
 				return 1;
 			} else {

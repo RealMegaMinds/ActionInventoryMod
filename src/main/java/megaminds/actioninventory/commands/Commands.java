@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.misc.Saver;
 import net.minecraft.server.command.ServerCommandSource;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -17,16 +16,11 @@ public class Commands {
 		//		root.redirect(null);	//redirect to help
 
 		root.then(literal("reload").executes(Commands::reload));
-		root.then(literal("save").executes(Commands::save));
 		OpenCommand.register(root);
 
 		dispatcher.register(root);
 	}
 
-	private static int save(CommandContext<ServerCommandSource> context) {
-		Saver.saveAll();
-		return 1;
-	}
 	private static int reload(CommandContext<ServerCommandSource> context) {
 		ActionInventoryMod.reload(context.getSource().getServer());
 		return 1;
