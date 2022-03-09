@@ -83,14 +83,14 @@ public class ActionInventoryGui extends BetterGui {
 	/**
 	 * Returns the last clicked stack. Currently only used for GiveAction.
 	 */
-	public ItemStack getLastClickedStack() {
+	public ItemStack getLastClicked() {
 		return lastClicked.copy();
 	}
 
 	/**
 	 * Returns the name of the last action. Currently only used for ConsumableAction.
 	 */
-	public String lastAction() {
+	public String getLastAction() {
 		return lastAction;
 	}
 	

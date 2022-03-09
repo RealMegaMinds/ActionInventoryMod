@@ -44,7 +44,7 @@ public final class GiveAction extends BasicAction {
 		ServerPlayerEntity p = gui.getPlayer();
 
 		if (giveClicked) {
-			ItemStack current = gui.getLastClickedStack().copy();
+			ItemStack current = gui.getLastClicked().copy();
 			if (current!=null) p.getInventory().offerOrDrop(current);
 		}
 
