@@ -2,7 +2,6 @@ package megaminds.actioninventory;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.server.MinecraftServer;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -31,12 +30,6 @@ public class ActionInventoryMod implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(Commands::register);
 
 		info("Initialized");
-	}
-
-	public static void reload(MinecraftServer server) {
-		var manager = server.getResourceManager();
-		INVENTORY_LOADER.reload(manager);
-		OPENER_LOADER.reload(manager);
 	}
 
 	public static void info(String message) {
