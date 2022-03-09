@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Poly;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 
@@ -17,7 +18,7 @@ import net.minecraft.server.MinecraftServer;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
 public abstract sealed class BasicConsumable implements Validated permits XpConsumable, NumberConsumable {
-	private boolean requireFull;
+	private TriState requireFull;
 
 	/**
 	 * Returns true if the player has paid or can pay the full amount.
@@ -37,13 +38,13 @@ public abstract sealed class BasicConsumable implements Validated permits XpCons
 
 	public abstract BasicConsumable copy();
 
-	public final boolean isRequireFull() {
+	public final TriState isRequireFull() {
 		return requireFull;
 	}
-	public final void setRequireFull(boolean require) {
+	public final void setRequireFull(TriState require) {
 		requireFull = require;
 	}
 	public final void requireFull() {
-		setRequireFull(true);
+		setRequireFull(TriState.TRUE);
 	}
 }

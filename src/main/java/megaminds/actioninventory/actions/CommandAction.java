@@ -8,9 +8,8 @@ import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -28,13 +27,13 @@ import net.minecraft.util.Identifier;
 @PolyName("Command")
 public final class CommandAction extends BasicAction {
 	private String command;
-	private boolean fromServer;
+	private TriState fromServer;
 	/**@since 3.1*/
-	private boolean silent;
+	private TriState silent;
 	/**@since 3.1*/
 	private Integer higherLevel;
-	
-	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, boolean fromServer, boolean silent, Integer higherLevel) {
+
+	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, TriState fromServer, TriState silent, Integer higherLevel) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.command = command;
 		this.fromServer = fromServer;
@@ -44,15 +43,15 @@ public final class CommandAction extends BasicAction {
 
 	@Override
 	public void accept(ActionInventoryGui gui) {
-		ServerPlayerEntity player = gui.getPlayer();
-		
-		ServerCommandSource source = fromServer ? player.getServer().getCommandSource() : player.getCommandSource();
-		if (silent) source = source.withSilent();
+		var player = gui.getPlayer();
+
+		var source = fromServer.orElse(false) ? player.getServer().getCommandSource() : player.getCommandSource();
+		if (silent.orElse(false)) source = source.withSilent();
 		if (higherLevel!=null) source = source.withMaxLevel(higherLevel);
-		
+
 		MessageHelper.executeCommand(source, command);
 	}
-	
+
 	@Override
 	public void validate() {
 		if (command==null) command = "";

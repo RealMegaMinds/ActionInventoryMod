@@ -13,6 +13,7 @@ import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.gui.callback.ActionInventoryCallback;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Poly;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
@@ -25,12 +26,12 @@ public abstract sealed class BasicAction implements ActionInventoryCallback, Val
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
 	/**@since 3.1*/
-	private Boolean requireShift;
+	private TriState requireShift;
 	/**@since 3.1*/
 	private Identifier requiredRecipe;
 	private Identifier requiredGuiName;
 	
-	protected BasicAction(Integer requiredIndex, ClickType requiredClickType, SlotActionType requiredSlotActionType, Boolean requireShift, Identifier requiredRecipe, Identifier requiredGuiName) {
+	protected BasicAction(Integer requiredIndex, ClickType requiredClickType, SlotActionType requiredSlotActionType, TriState requireShift, Identifier requiredRecipe, Identifier requiredGuiName) {
 		this.requiredIndex = requiredIndex;
 		this.requiredClickType = requiredClickType;
 		this.requiredSlotActionType = requiredSlotActionType;

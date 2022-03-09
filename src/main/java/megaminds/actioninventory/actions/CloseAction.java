@@ -6,13 +6,14 @@ import eu.pb4.sgui.api.ClickType;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
 @PolyName("CloseGui")
 public final class CloseAction extends BasicAction {	
-	public CloseAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe, Identifier requiredGuiName) {
+	public CloseAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe, Identifier requiredGuiName) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 	}
 	

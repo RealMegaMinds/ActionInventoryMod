@@ -11,6 +11,7 @@ import lombok.Setter;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
@@ -24,7 +25,7 @@ public final class ItemConsumable extends NumberConsumable {
 	private Set<Identifier> tags;
 	private TagOption tagOption;
 
-	public ItemConsumable(boolean requireFull, long amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+	public ItemConsumable(TriState requireFull, long amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
 		super(requireFull, amount);
 		this.stack = stack!=null ? stack : ItemStackish.MATCH_ALL;
 		this.tags = tags;
@@ -50,6 +51,8 @@ public final class ItemConsumable extends NumberConsumable {
 
 	@Override
 	public long consume(MinecraftServer server, UUID player, long left) {
+		if (isRequireFull().orElse(false) && !canConsume(server, player, left)) return left;
+
 		var p = server.getPlayerManager().getPlayer(player);
 		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
 

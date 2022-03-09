@@ -12,12 +12,12 @@ import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor
@@ -28,12 +28,12 @@ public final class RequirementAction extends GroupAction {
 
 	@Exclude private EntitySelector selector;
 
-	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
 		this.entityPredicate = entityPredicate;
 	}
-	
+
 	public RequirementAction(BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(actions);
 		this.entitySelector = entitySelector;
@@ -42,12 +42,12 @@ public final class RequirementAction extends GroupAction {
 
 	@Override
 	public void accept(ActionInventoryGui gui) {
-		ServerPlayerEntity p = gui.getPlayer();
+		var p = gui.getPlayer();
 		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
 			super.accept(gui);
 		}
 	}
-	
+
 	private boolean matches(Entity e) {
 		try {
 			return e.equals(selector.getEntity(e.getCommandSource().withMaxLevel(2)));
@@ -58,9 +58,9 @@ public final class RequirementAction extends GroupAction {
 
 	private void validateSelector() {
 		if (entitySelector==null || entitySelector.isBlank()) return;
-		
-		String whole = "@s"+entitySelector.strip();
-		
+
+		var whole = "@s"+entitySelector.strip();
+
 		try {
 			this.selector = new EntitySelectorReader(new StringReader(whole)).read();
 		} catch (CommandSyntaxException e) {
@@ -74,10 +74,10 @@ public final class RequirementAction extends GroupAction {
 		validateSelector();
 		if (entityPredicate==null) entityPredicate = EntityPredicate.ANY;
 	}
-	
+
 	@Override
 	public BasicAction copy() {
-		RequirementAction copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
+		var copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
 		copy.selector = selector;
 		return copy;
 	}

@@ -13,6 +13,7 @@ import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.ConsumableDataHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
@@ -27,18 +28,18 @@ public final class ConsumeAction extends GroupAction {
 	/**Consumables to consume*/
 	private BasicConsumable[] consumables;
 	/**True->pay first time, false->pay every time*/
-	private boolean singlePay;
+	private TriState singlePay;
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
-	private boolean requireFull;
+	private TriState requireFull;
 
-	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
+	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.consumables = consumables;
 		this.singlePay = singlePay;
 		this.requireFull = requireFull;
 	}
 
-	public ConsumeAction(BasicAction[] actions, BasicConsumable[] consumables, boolean singlePay, boolean requireFull) {
+	public ConsumeAction(BasicAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
 		super(actions);
 		this.consumables = consumables;
 		this.singlePay = singlePay;
@@ -60,13 +61,13 @@ public final class ConsumeAction extends GroupAction {
 
 		var actionData = ConsumableDataHelper.getAction(server, player, guiName, lastAction);
 
-		boolean hasPaidFull = singlePay && actionData.isPresent() && actionData.orElseThrow().getBoolean(COMPLETE);
+		boolean hasPaidFull = singlePay.orElse(false) && actionData.isPresent() && actionData.orElseThrow().getBoolean(COMPLETE);
 		if (!hasPaidFull) {
 			boolean canPay = true;
-			if (requireFull) canPay = canPay(server, player, guiName, lastAction);
+			if (requireFull.orElse(false)) canPay = canPay(server, player, guiName, lastAction);
 			if (canPay) {
 				pay(server, player, guiName, lastAction);
-				hasPaidFull = requireFull;
+				hasPaidFull = requireFull.orElse(false);
 			}
 		}
 
@@ -79,7 +80,7 @@ public final class ConsumeAction extends GroupAction {
 		for (var c : consumables) {
 			c.consume(server, player, ConsumableDataHelper.getOrCreateConsumable(server, player, guiName, lastAction, c.getStorageName()));
 		}
-		if (singlePay) ConsumableDataHelper.getOrCreateAction(server, player, guiName, lastAction).putBoolean(COMPLETE, true);
+		if (singlePay.orElse(false)) ConsumableDataHelper.getOrCreateAction(server, player, guiName, lastAction).putBoolean(COMPLETE, true);
 	}
 
 	private boolean canPay(MinecraftServer server, UUID player, String guiName, String lastAction) {

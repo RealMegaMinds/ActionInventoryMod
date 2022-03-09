@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
@@ -22,7 +23,7 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 
 	private BasicAction[] actions;
 
-	public GroupAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions) {
+	public GroupAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.actions = actions;
 	}
@@ -34,7 +35,7 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 
 	@Override
 	public void accept(ActionInventoryGui gui) {
-		for (BasicAction a : actions) {
+		for (var a : actions) {
 			a.accept(gui);
 		}
 	}

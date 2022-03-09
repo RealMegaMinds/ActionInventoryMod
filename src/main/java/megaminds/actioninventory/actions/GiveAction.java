@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -31,9 +31,9 @@ public final class GiveAction extends BasicAction {
 	private static final Identifier[] EMPTY = new Identifier[0];
 
 	private Identifier[] lootTables;
-	private boolean giveClicked;
+	private TriState giveClicked;
 
-	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Identifier[] lootTables, boolean giveClicked) {
+	public GiveAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Identifier[] lootTables, TriState giveClicked) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.lootTables = lootTables;
 		this.giveClicked = giveClicked;
@@ -41,26 +41,26 @@ public final class GiveAction extends BasicAction {
 
 	@Override
 	public void accept(ActionInventoryGui gui) {
-		ServerPlayerEntity p = gui.getPlayer();
+		var p = gui.getPlayer();
 
-		if (giveClicked) {
-			ItemStack current = gui.getLastClicked().copy();
+		if (giveClicked.orElse(false)) {
+			var current = gui.getLastClicked().copy();
 			if (current!=null) p.getInventory().offerOrDrop(current);
 		}
 
-		LootContext lootContext = new LootContext.Builder(p.getWorld())
+		var lootContext = new LootContext.Builder(p.getWorld())
 				.parameter(LootContextParameters.THIS_ENTITY, p)
 				.parameter(LootContextParameters.ORIGIN, p.getPos())
 				.random(p.getRandom())
 				.luck(p.getLuck())
 				.build(LootContextTypes.ADVANCEMENT_REWARD);
-		
+
 		Arrays.stream(lootTables)
 		.map(id->p.server.getLootManager().getTable(id).generateLoot(lootContext))
 		.<ItemStack>mapMulti(List::forEach)
 		.filter(Objects::nonNull)
 		.forEach(p.getInventory()::offerOrDrop);
-		
+
 		p.currentScreenHandler.sendContentUpdates();
 	}
 

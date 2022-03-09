@@ -23,6 +23,7 @@ import megaminds.actioninventory.serialization.wrappers.InstancedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.ValidatedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.WrapperAdapterFactory;
 import megaminds.actioninventory.util.ValidationException;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantment;
@@ -74,6 +75,7 @@ public class Serializer {
 				.registerTypeAdapter(ClickCallback.class, delegate(BasicAction.class, ClickCallback.class::cast, BasicAction.class::cast))
 				.registerTypeAdapter(ItemStack.class, delegate(ItemStackish.class, ItemStackish::toStack, ItemStackish::new))
 				.registerTypeAdapter(Identifier.class, delegate(String.class, Identifier::new, Identifier::toString))
+				.registerTypeAdapter(TriState.class, new TriStateAdapter())
 
 				.registerTypeAdapter(Item.class, registryDelegate(Registry.ITEM))
 				.registerTypeAdapter(Enchantment.class, registryDelegate(Registry.ENCHANTMENT))

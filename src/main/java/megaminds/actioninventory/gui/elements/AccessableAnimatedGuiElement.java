@@ -14,6 +14,7 @@ import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -25,11 +26,11 @@ import net.minecraft.item.ItemStack;
 @PolyName("Animated")
 public final class AccessableAnimatedGuiElement extends AccessableElement {
 	private static final ItemStack[] EMPTY = {ItemStack.EMPTY};
-	
+
 	private ItemStack[] items;
 	private int interval;
-	private boolean random;
-	
+	private TriState random;
+
 	@Getter(AccessLevel.NONE)
 	@Setter(AccessLevel.NONE)
 	@Exclude private int frame;
@@ -37,7 +38,7 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 	@Setter(AccessLevel.NONE)
 	@Exclude private int tick;
 
-	public AccessableAnimatedGuiElement(int index, BasicAction action, ItemStack[] items, int interval, boolean random) {
+	public AccessableAnimatedGuiElement(int index, BasicAction action, ItemStack[] items, int interval, TriState random) {
 		super(index, action);
 		this.items = items;
 		this.interval = interval;
@@ -50,7 +51,7 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 		Validated.validate(interval>=0, "Animated gui element requires interval to be 0 or greater.");
 		if (items==null) items = EMPTY;
 	}
-	
+
 	@NotNull
 	@Override
 	public ItemStack getItemStack() {
@@ -60,13 +61,13 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 	@Override
 	public ItemStack getItemStackForDisplay(GuiInterface gui) {
 		if (items.length==1) return items[0];
-		
-		int cFrame = frame;
+
+		var cFrame = frame;
 
 		tick += 1;
 		if (tick >= interval) {
 			tick = 0;
-			if (this.random) {
+			if (random.orElse(false)) {
 				this.frame = ActionInventoryMod.RANDOM.nextInt(items.length);
 			} else {
 				frame += 1;
@@ -79,7 +80,7 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 
 	@Override
 	public SlotElement copy() {
-		AccessableAnimatedGuiElement copy = new AccessableAnimatedGuiElement();
+		var copy = new AccessableAnimatedGuiElement();
 		copy.setAction(getGuiCallback().copy());
 		copy.items = Arrays.stream(items).map(ItemStack::copy).toArray(ItemStack[]::new);
 		copy.interval = interval;

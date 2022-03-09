@@ -13,6 +13,7 @@ import megaminds.actioninventory.gui.elements.SlotElement;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.ValidationException;
 import megaminds.actioninventory.util.annotations.Exclude;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -27,14 +28,14 @@ import net.minecraft.util.registry.Registry;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ActionInventoryBuilder implements Validated {
 	private static final SlotElement[] EMPTY = new SlotElement[0];
-	
+
 	private ScreenHandlerType<?> type;
 	private Identifier name;
 	@Setter
 	private Text title;
-	private boolean includePlayer;
-	private boolean lockPlayerInventory;
-	
+	private TriState includePlayer;
+	private TriState lockPlayerInventory;
+
 	@Setter private SlotElement[] elements;
 	/**@since 3.1*/
 	@Setter private BasicAction openAction;
@@ -45,10 +46,10 @@ public final class ActionInventoryBuilder implements Validated {
 	/**@since 3.1*/
 	@Setter private BasicAction recipeAction;
 	/**@since 3.2*/
-	private boolean chained;
-	
+	private TriState chained;
+
 	@Exclude private int size;
-		
+
 	@Override
 	public void validate() {
 		Validated.validate(type!=null, "ActionInventories requires type to be non-null.");
@@ -58,19 +59,19 @@ public final class ActionInventoryBuilder implements Validated {
 		if (closeAction==null) closeAction = EmptyAction.INSTANCE;
 		if (anyClickAction==null) anyClickAction = EmptyAction.INSTANCE;
 		if (recipeAction==null) recipeAction = EmptyAction.INSTANCE;
-		
-		size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
-		
+
+		size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer.orElse(false) ? 36 : 0);
+
 		if (elements==null) {
 			elements = EMPTY; 
 			return;
 		}
-		int len = elements.length;
+		var len = elements.length;
 		Validated.validate(len<=size, ()->"Too many elements. Screen handler type "+Registry.SCREEN_HANDLER.getId(type)+" requires there to be a maximum of "+size+" SlotElements");
-		boolean[] test = new boolean[size];
-		for (SlotElement e : elements) {
+		var test = new boolean[size];
+		for (var e : elements) {
 			if (e!=null) {
-				int i = e.getIndex();
+				var i = e.getIndex();
 				Validated.validate(i<size, ()->"Screen handler type "+Registry.SCREEN_HANDLER.getId(type)+" requires SlotElements to have an index below "+size);
 				if (i>=0) {
 					Validated.validate(!test[i], "A slot has declared an already used index: "+i);
@@ -80,25 +81,25 @@ public final class ActionInventoryBuilder implements Validated {
 		}
 	}
 
-	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, boolean includePlayerInventorySlots) {
+	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, TriState includePlayerInventorySlots) {
 		this.type = type;
 		this.name = name;
 		this.includePlayer = includePlayerInventorySlots;
 		this.lockPlayerInventory = includePlayerInventorySlots;
-		
+
 		this.title = LiteralText.EMPTY;
 		this.closeAction = EmptyAction.INSTANCE;
 		this.openAction = EmptyAction.INSTANCE;
 		this.anyClickAction = EmptyAction.INSTANCE;
 
-		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
+		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer.orElse(false) ? 36 : 0);
 		this.elements = new SlotElement[this.size];
 	}
 
 	/**
 	 * {@link #validate()} is called when using this constructor
 	 */
-	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
+	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, Text title, TriState includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
 		this.type = type;
 		this.name = name;
 		this.title = title;
@@ -108,19 +109,19 @@ public final class ActionInventoryBuilder implements Validated {
 		this.closeAction = closeAction;
 		this.openAction = openAction;
 		this.anyClickAction = anyClickAction;
-		
-		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer ? 36 : 0);
-		
+
+		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer.orElse(false) ? 36 : 0);
+
 		validate();
 	}
 
 	public ActionInventoryGui build(ServerPlayerEntity player) {
-		ActionInventoryGui gui = new ActionInventoryGui(type, player, includePlayer, name, openAction, closeAction, anyClickAction, recipeAction);
+		var gui = new ActionInventoryGui(type, player, includePlayer.orElse(false), name, openAction, closeAction, anyClickAction, recipeAction);
 		gui.setTitle(title);
-		gui.setLockPlayerInventory(lockPlayerInventory);
-		gui.setChained(chained);
+		gui.setLockPlayerInventory(lockPlayerInventory.orElse(false));
+		gui.setChained(chained.orElse(false));
 
-		for (SlotElement element : elements) {
+		for (var element : elements) {
 			if (element != null) {
 				element.apply(gui, player);
 			}
@@ -128,13 +129,13 @@ public final class ActionInventoryBuilder implements Validated {
 
 		return gui;
 	}
-	
-	public void setLockPlayerInventory(boolean lockPlayerInventory) {
-		if (!includePlayer) this.lockPlayerInventory = lockPlayerInventory;
+
+	public void setLockPlayerInventory(TriState lockPlayerInventory) {
+		if (!includePlayer.orElse(false)) this.lockPlayerInventory = lockPlayerInventory;
 	}
 
 	public ActionInventoryBuilder copy() {
-		ActionInventoryBuilder builder = new ActionInventoryBuilder();
+		var builder = new ActionInventoryBuilder();
 		builder.type = type;
 		builder.name = name;
 		builder.title = title.shallowCopy();
@@ -145,7 +146,7 @@ public final class ActionInventoryBuilder implements Validated {
 		builder.closeAction = closeAction;
 		builder.openAction = openAction;
 		builder.recipeAction = recipeAction;
-		
+
 		builder.size = size;
 		return builder;
 	}

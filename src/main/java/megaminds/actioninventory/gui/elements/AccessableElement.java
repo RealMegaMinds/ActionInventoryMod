@@ -18,17 +18,17 @@ public abstract sealed class AccessableElement extends SlotElement implements Gu
 		super(index);
 		this.action = action;
 	}
-	
+
 	@Override
 	public void validate() {
 		if (action==null) action = EmptyAction.INSTANCE;
 	}
-	
+
 	@Override
 	public BasicAction getGuiCallback() {
 		return action;
 	}
-	
+
 	@Override
 	public void apply(ActionInventoryGui gui, ServerPlayerEntity p) {
 		gui.setSlot(getCheckedIndex(gui), this);

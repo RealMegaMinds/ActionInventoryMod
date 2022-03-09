@@ -13,10 +13,9 @@ import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.network.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -37,14 +36,14 @@ public final class MessageAction extends BasicAction {
 	 */
 	private UUID sender;
 	/**
-	* Receivers of the message
-	* If null or empty -> broadcast
-	* Contains: nil uuid -> server, null -> player
-	*/
+	 * Receivers of the message
+	 * If null or empty -> broadcast
+	 * Contains: nil uuid -> server, null -> player
+	 */
 	private List<UUID> receivers;
 	private MessageType messageType;
-	
-	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
+
+	public MessageAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, Text message, UUID sender, List<UUID> receivers, MessageType messageType) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.message = message;
 		this.sender = sender;
@@ -54,16 +53,16 @@ public final class MessageAction extends BasicAction {
 
 	@Override
 	public void accept(ActionInventoryGui gui) {
-		ServerPlayerEntity player = gui.getPlayer();
-		MinecraftServer server = player.getServer();
+		var player = gui.getPlayer();
+		var server = player.getServer();
 		if (sender==null) sender = player.getUuid();
-		
+
 		if (receivers==null || receivers.isEmpty()) {
 			MessageHelper.broadcast(sender, message, messageType, server);
 			return;
 		}
-		
-		List<UUID> temp = new ArrayList<>(receivers);
+
+		var temp = new ArrayList<>(receivers);
 		if (temp.removeIf(Util.NIL_UUID::equals)) {
 			MessageHelper.log(sender, message, server);
 		}

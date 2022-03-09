@@ -15,6 +15,7 @@ import lombok.Setter;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 
@@ -30,7 +31,7 @@ public final class XpConsumable extends BasicConsumable {
 	private int level;
 	private int amount;
 
-	public XpConsumable(boolean requireFull, int level, int amount) {
+	public XpConsumable(TriState requireFull, int level, int amount) {
 		super(requireFull);
 		this.level = level;
 		this.amount = amount;
@@ -67,7 +68,7 @@ public final class XpConsumable extends BasicConsumable {
 		var amountLeft = this.amount - storage.getInt(AMOUNT_KEY);
 
 		var extra = p.experienceLevel - levelLeft;
-		if (isRequireFull()) {
+		if (isRequireFull().orElse(false)) {
 			if (extra<0) return;
 			if (Helper.getTotalExperienceForLevel(extra) >= amountLeft) {
 				p.addExperienceLevels(-levelLeft);

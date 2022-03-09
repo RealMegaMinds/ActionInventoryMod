@@ -11,6 +11,7 @@ import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.MessageHelper;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -23,7 +24,7 @@ public final class OpenGui extends BasicAction {
 	private Identifier guiName;
 	private UUID playerUUID;
 
-	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, GuiType guiType, Identifier guiName, UUID playerUUID) {
+	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, GuiType guiType, Identifier guiName, UUID playerUUID) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.guiName = guiName;
 		this.guiType = guiType;

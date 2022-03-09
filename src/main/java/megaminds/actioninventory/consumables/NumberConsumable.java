@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 
@@ -21,7 +22,7 @@ public abstract sealed class NumberConsumable extends BasicConsumable permits It
 	/**This is the paid amount*/
 	private long amount;
 
-	protected NumberConsumable(boolean requireFull, long amount) {
+	protected NumberConsumable(TriState requireFull, long amount) {
 		super(requireFull);
 		this.amount = amount;
 	}
