@@ -3,6 +3,7 @@ package megaminds.actioninventory.loaders;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,8 @@ public class BasicOpenerLoader implements SimpleSynchronousResourceReloadListene
 	}
 
 	public List<BasicOpener> getOpeners(Identifier type) {
-		return openers.get(type);
+		var list = openers.get(type);
+		return list!=null ? list : Collections.emptyList();
 	}
 
 	@Override

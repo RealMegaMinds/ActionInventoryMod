@@ -67,7 +67,7 @@ public class LoadCommand {
 			}
 		} catch (IOException e) {
 			var msg = e.getMessage();
-			context.getSource().sendError(new LiteralText("Unable to read file: "+p+". "+(msg!=null?msg:"")));
+			context.getSource().sendError(new LiteralText("Unable to read file: "+p+". "+(msg!=null&&!msg.equals(p.toString())?msg:"")));
 		} catch (ValidationException e) {
 			var msg = e.getMessage();
 			context.getSource().sendError(new LiteralText("Failed to create action inventory. "+(msg!=null?msg:"")));

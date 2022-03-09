@@ -2,6 +2,9 @@ package megaminds.actioninventory;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resource.ResourceType;
+
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -24,6 +27,8 @@ public class ActionInventoryMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(INVENTORY_LOADER);
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(OPENER_LOADER);
 		ItemOpener.registerCallbacks();
 		BlockOpener.registerCallbacks();
 		EntityOpener.registerCallbacks();

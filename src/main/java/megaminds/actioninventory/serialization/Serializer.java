@@ -95,7 +95,7 @@ public class Serializer {
 
 				.create();
 	}
-	
+
 	private static <T> Both<T> basic(Function<JsonElement, T> from, Function<T, JsonElement> to) {
 		return new Both<T>() {
 			@Override public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {return from.apply(json);}

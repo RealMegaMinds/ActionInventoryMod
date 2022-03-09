@@ -27,14 +27,17 @@ public class DelegatedElement implements GuiElementInterface {
 		this.guiCallback = ElementHelper.combine(this.guiCallback, callback);
 	}
 
+	@Override
 	public ItemStack getItemStackForDisplay(GuiInterface gui) {
 		return delegate.getItemStackForDisplay(gui);
 	}
 
+	@Override
 	public void onAdded(SlotGuiInterface gui) {
 		delegate.onAdded(gui);
 	}
 
+	@Override
 	public void onRemoved(SlotGuiInterface gui) {
 		delegate.onRemoved(gui);
 	}
