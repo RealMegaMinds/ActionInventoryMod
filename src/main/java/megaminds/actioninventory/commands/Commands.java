@@ -21,20 +21,12 @@ public class Commands {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean isDedicated) {	//NOSONAR See net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 		LiteralArgumentBuilder<ServerCommandSource> root = literal(ActionInventoryMod.MOD_ID);
 
-		root.then(literal("reload").executes(Commands::reload));
 		root.then(literal("list").executes(Commands::list));
 		OpenCommand.register(root);
 		LoadCommand.register(root);
 		RemoveCommand.register(root);
 
 		dispatcher.register(root);
-	}
-
-	private static int reload(CommandContext<ServerCommandSource> context) {
-		var manager = context.getSource().getServer().getResourceManager();
-		ActionInventoryMod.INVENTORY_LOADER.reload(manager);
-		ActionInventoryMod.OPENER_LOADER.reload(manager);
-		return 1;
 	}
 
 	private static int list(CommandContext<ServerCommandSource> context) {
