@@ -2,7 +2,6 @@ package megaminds.actioninventory.consumables;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,38 +30,33 @@ public final class XpConsumable extends BasicConsumable {
 	private int level;
 	private int amount;
 
-	public XpConsumable(TriState requireFull, int level, int amount) {
-		super(requireFull);
+	public XpConsumable(TriState requireFull, TriState singlePay, int level, int amount) {
+		super(requireFull, singlePay);
 		this.level = level;
 		this.amount = amount;
 	}
 
 	@Override
+	public boolean hasConsumedFull(@Nullable NbtCompound storage) {
+		var left = getLeft(storage);
+		return left[0]<=0 && left[1]<=0;
+	}
+	
+	@Override
 	public boolean canConsumeFull(MinecraftServer server, UUID player, @Nullable NbtCompound storage) {
-		var levelLeft = this.level;
-		var amountLeft = this.amount;
+		var left = getLeft(storage);
+		var p = Helper.getPlayer(server, player);
 
-		if (storage!=null) {
-			if (storage.getBoolean(COMPLETE)) return true;
-
-			levelLeft -= storage.getInt(LEVEL_KEY);
-			amountLeft -= storage.getInt(AMOUNT_KEY);
-		}
-
-		var p = server.getPlayerManager().getPlayer(player);
-		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
-
-		var extra = p.experienceLevel-levelLeft;
+		var extra = p.experienceLevel-left[0];
 		if (extra<0) return false;
-		return Helper.getTotalExperienceForLevel(extra) >= amountLeft;
+		return Helper.getTotalExperienceForLevel(extra)+p.experienceProgress*p.getNextLevelExperience() >= left[1];
 	}
 
 	@Override
 	public void consume(MinecraftServer server, UUID player, @NotNull NbtCompound storage) {
-		if (storage.getBoolean(COMPLETE)) return;
+		if (isSinglePay().orElse(false) && storage.getBoolean(COMPLETE)) return;
 
-		var p = server.getPlayerManager().getPlayer(player);
-		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
+		var p = Helper.getPlayer(server, player);
 
 		var levelLeft = this.level - storage.getInt(LEVEL_KEY);
 		var amountLeft = this.amount - storage.getInt(AMOUNT_KEY);
@@ -93,8 +87,34 @@ public final class XpConsumable extends BasicConsumable {
 			}
 		}
 
-		storage.putInt(LEVEL_KEY, level-levelLeft);
-		storage.putInt(AMOUNT_KEY, amount-amountLeft);
+		var paidFull = levelLeft<=0 && amountLeft<=0;
+
+		if (paidFull) {
+			storage.remove(LEVEL_KEY);
+			storage.remove(AMOUNT_KEY);
+			if (isSinglePay().orElse(false)) {
+				storage.putBoolean(COMPLETE, true);
+			}
+		} else {
+			storage.putInt(LEVEL_KEY, level-levelLeft);
+			storage.putInt(AMOUNT_KEY, amount-amountLeft);
+		}
+	}
+	
+	/**
+	 * Returns an array of form [levelLeft, amountLeft]
+	 */
+	private int[] getLeft(@Nullable NbtCompound storage) {
+		var left = new int[]{level, amount};
+
+		if (storage!=null) {
+			if (isSinglePay().orElse(false) && storage.getBoolean(COMPLETE)) return new int[2];
+
+			left[0] -= storage.getInt(LEVEL_KEY);
+			left[1] -= storage.getInt(AMOUNT_KEY);
+		}
+
+		return left;
 	}
 
 	@Override
@@ -110,6 +130,6 @@ public final class XpConsumable extends BasicConsumable {
 
 	@Override
 	public BasicConsumable copy() {
-		return new XpConsumable(isRequireFull(), level, amount);
+		return new XpConsumable(isRequireFull(), isSinglePay(), level, amount);
 	}
 }

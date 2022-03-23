@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -19,6 +20,8 @@ import java.util.function.Supplier;
 import megaminds.actioninventory.ActionInventoryMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * Just some random helper methods.
@@ -28,6 +31,15 @@ public class Helper {
 	private static final String WORLD = "WORLD";
 
 	private Helper() {}
+
+	/**
+	 * Throws error if there is no player for the UUID.
+	 */
+	public static ServerPlayerEntity getPlayer(MinecraftServer server, UUID playerUuid) {
+		var player = server.getPlayerManager().getPlayer(playerUuid);
+		Objects.requireNonNull(player, ()->"No Player Exists for UUID: "+playerUuid);
+		return player;
+	}
 
 	public static int getTotalExperienceForLevel(int level) {
 		if (level<17) {

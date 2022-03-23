@@ -19,11 +19,17 @@ import net.minecraft.server.MinecraftServer;
 @Poly
 public abstract sealed class BasicConsumable implements Validated permits XpConsumable, NumberConsumable {
 	private TriState requireFull = TriState.DEFAULT;
+	/**Added 3.2*/
+	private TriState singlePay = TriState.DEFAULT;
 
 	/**
 	 * Returns true if the player has paid or can pay the full amount.
 	 */
 	public abstract boolean canConsumeFull(MinecraftServer server, UUID player, @Nullable NbtCompound storage);
+	/**
+	 * Returns true if the player has already paid the full amount.
+	 */
+	public abstract boolean hasConsumedFull(@Nullable NbtCompound storage);
 	/**
 	 * Consumes from the player, and corrects storage if saveAmount is true.
 	 * @param storage
@@ -37,6 +43,13 @@ public abstract sealed class BasicConsumable implements Validated permits XpCons
 	public abstract String getStorageName();
 
 	public abstract BasicConsumable copy();
+
+	public final TriState isSinglePay() {
+		return singlePay;
+	}
+	public final void setSinglePay(TriState singlePay) {
+		this.singlePay = singlePay;
+	}
 
 	public final TriState isRequireFull() {
 		return requireFull;

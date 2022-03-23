@@ -64,16 +64,14 @@ public final class ConsumeAction extends GroupAction {
 		boolean hasPaidFull = singlePay.orElse(false) && actionData.isPresent() && actionData.orElseThrow().getBoolean(COMPLETE);
 		if (!hasPaidFull) {
 			boolean canPay = true;
-			if (requireFull.orElse(false)) canPay = canPay(server, player, guiName, lastAction);
+			if (requireFull.orElse(false)) canPay = canPayFull(server, player, guiName, lastAction);
 			if (canPay) {
 				pay(server, player, guiName, lastAction);
 				hasPaidFull = requireFull.orElse(false);
 			}
 		}
 
-		if (hasPaidFull) {
-			super.accept(gui);
-		}
+		if (hasPaidFull) super.accept(gui);
 	}
 
 	private void pay(MinecraftServer server, UUID player, String guiName, String lastAction) {
@@ -83,7 +81,7 @@ public final class ConsumeAction extends GroupAction {
 		if (singlePay.orElse(false)) ConsumableDataHelper.getOrCreateAction(server, player, guiName, lastAction).putBoolean(COMPLETE, true);
 	}
 
-	private boolean canPay(MinecraftServer server, UUID player, String guiName, String lastAction) {
+	private boolean canPayFull(MinecraftServer server, UUID player, String guiName, String lastAction) {
 		for (var c : consumables) {
 			if (!c.canConsumeFull(server, player, ConsumableDataHelper.getConsumable(server, player, guiName, lastAction, c.getStorageName()).orElse(null))) {
 				return false;
