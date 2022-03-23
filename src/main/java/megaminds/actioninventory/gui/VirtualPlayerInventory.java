@@ -38,7 +38,7 @@ public class VirtualPlayerInventory extends SimpleGui {
 		i++;
 		this.setSlotRedirect(i, new Slot(inv, PlayerInventory.OFF_HAND_SLOT, 0, 0));
 		i++;
-		builder.setName(new LiteralText("Unavailable"));
+		builder.setName(LiteralText.EMPTY);
 		for(; i < this.getSize(); i++) {
 			this.setSlot(i, builder.build());
 		}
