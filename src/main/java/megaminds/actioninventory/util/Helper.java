@@ -17,6 +17,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import megaminds.actioninventory.ActionInventoryMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -33,8 +36,30 @@ public class Helper {
 	private Helper() {}
 
 	/**
+	 * False if compound==null
+	 */
+	public static boolean getBoolean(@Nullable NbtCompound compound, String key) {
+		return compound!=null && compound.getBoolean(key);
+	}
+
+	/**
+	 * 0 if compound==null
+	 */
+	public static int getInt(@Nullable NbtCompound compound, String key) {
+		return compound==null ? 0 : compound.getInt(key);
+	}
+
+	/**
+	 * 0 if compound==null
+	 */
+	public static long getLong(@Nullable NbtCompound compound, String key) {
+		return compound==null ? 0 : compound.getInt(key);
+	}
+
+	/**
 	 * Throws error if there is no player for the UUID.
 	 */
+	@NotNull
 	public static ServerPlayerEntity getPlayer(MinecraftServer server, UUID playerUuid) {
 		var player = server.getPlayerManager().getPlayer(playerUuid);
 		Objects.requireNonNull(player, ()->"No Player Exists for UUID: "+playerUuid);

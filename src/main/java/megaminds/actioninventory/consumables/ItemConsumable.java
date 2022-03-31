@@ -1,6 +1,5 @@
 package megaminds.actioninventory.consumables;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,8 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
+import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
-import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
@@ -25,8 +24,8 @@ public final class ItemConsumable extends NumberConsumable {
 	private Set<Identifier> tags;
 	private TagOption tagOption;
 
-	public ItemConsumable(TriState requireFull, long amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
-		super(requireFull, amount);
+	public ItemConsumable(long amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+		super(amount);
 		this.stack = stack!=null ? stack : ItemStackish.MATCH_ALL;
 		this.tags = tags;
 		this.tagOption = tagOption!=null ? tagOption : TagOption.ANY;
@@ -34,16 +33,14 @@ public final class ItemConsumable extends NumberConsumable {
 
 	@Override
 	public boolean canConsume(MinecraftServer server, UUID player, long left) {
-		var p = server.getPlayerManager().getPlayer(player);
-		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
-
+		var p = Helper.getPlayer(server, player);
 		var inv = p.getInventory();
-		var available = 0;
+
 		for (int i = 0, size = inv.size(); i < size; i++) {
 			var s = inv.getStack(i);
 			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
-				available += s.getCount();
-				if (available >= left) return true;
+				left -= s.getCount();
+				if (left<=0) return true;
 			}
 		}
 		return false;
@@ -51,18 +48,15 @@ public final class ItemConsumable extends NumberConsumable {
 
 	@Override
 	public long consume(MinecraftServer server, UUID player, long left) {
-		if (isRequireFull().orElse(false) && !canConsume(server, player, left)) return left;
-
-		var p = server.getPlayerManager().getPlayer(player);
-		Objects.requireNonNull(p, ()->"No Player Exists for UUID: "+player);
-
+		var p = Helper.getPlayer(server, player);
 		var inv = p.getInventory();
+
 		for (int i = 0, size = inv.size(); i < size; i++) {
 			var s = inv.getStack(i);
 			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
-				var count = Math.min(s.getCount(), left);
+				var count = (int)Math.min(s.getCount(), left);
 				left -= count;
-				s.setCount(s.getCount()-(int)count);
+				s.setCount(s.getCount()-count);
 				if (left<=0) break;
 			}
 		}
