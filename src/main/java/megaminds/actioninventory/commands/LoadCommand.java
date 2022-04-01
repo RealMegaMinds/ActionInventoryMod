@@ -24,10 +24,10 @@ public class LoadCommand {
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("load")
 				.then(literal("opener")
-						.then(argument("path", StringArgumentType.greedyString())
+						.then(argument("path", StringArgumentType.string())
 								.executes(LoadCommand::loadOpener)))
 				.then(literal("inventory")
-						.then(argument("path", StringArgumentType.greedyString())
+						.then(argument("path", StringArgumentType.string())
 								.executes(c->LoadCommand.loadInventory(c, false))
 								.then(argument("override", BoolArgumentType.bool())
 										.executes(c->LoadCommand.loadInventory(c, BoolArgumentType.getBool(c, "override")))))));

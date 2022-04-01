@@ -9,10 +9,10 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.Texts;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Commands {
@@ -32,8 +32,12 @@ public class Commands {
 	private static int list(CommandContext<ServerCommandSource> context) {
 		var names = ActionInventoryMod.INVENTORY_LOADER.builderNames();
 		var size = names.size();
-		var text = Texts.join(names, new LiteralText("\n"), i->new LiteralText(i.toString()));
-		context.getSource().sendFeedback(new LiteralText(size+" Action Inventories are loaded.\n").append(text), false);
+		var combined = new StringBuilder(size*10);
+		names.forEach(i->combined.append("\n"+i.toString()));
+
+		var message = new LiteralText("").append(MessageHelper.toSuccess(size+" Action Inventories are loaded."));
+		if (size>0) message.append(combined.toString());
+		context.getSource().sendFeedback(message, false);
 		return size;
 	}
 }
