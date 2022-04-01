@@ -9,6 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.util.CommandPermissions;
 import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
@@ -21,7 +22,7 @@ public class Commands {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean isDedicated) {	//NOSONAR See net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 		LiteralArgumentBuilder<ServerCommandSource> root = literal(ActionInventoryMod.MOD_ID);
 
-		root.then(literal("list").executes(Commands::list));
+		root.then(literal("list").requires(CommandPermissions.requires(root.getLiteral()+".list", 2)).executes(Commands::list));
 		OpenCommand.register(root);
 		LoadCommand.register(root);
 		RemoveCommand.register(root);

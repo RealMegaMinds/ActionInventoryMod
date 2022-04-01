@@ -10,6 +10,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.util.CommandPermissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -19,6 +20,7 @@ import net.minecraft.text.LiteralText;
 public class OpenCommand {
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
+				.requires(CommandPermissions.requires(root.getLiteral()+".open", 3))
 				.then(argument("targets", EntityArgumentType.players())
 						.then(argument("guiName", IdentifierArgumentType.identifier())
 								.suggests(Commands.NAME_SUGGESTIONS)

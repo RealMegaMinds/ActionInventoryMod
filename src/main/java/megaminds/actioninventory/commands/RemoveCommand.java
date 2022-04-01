@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.util.CommandPermissions;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
@@ -17,6 +18,7 @@ import net.minecraft.text.LiteralText;
 public class RemoveCommand {
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("remove")
+				.requires(CommandPermissions.requires(root.getLiteral()+".remove", 4))
 				.then(argument("guiName", IdentifierArgumentType.identifier())
 						.suggests(Commands.NAME_SUGGESTIONS)
 						.executes(RemoveCommand::remove)));

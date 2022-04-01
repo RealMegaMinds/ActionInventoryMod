@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.serialization.Serializer;
+import megaminds.actioninventory.util.CommandPermissions;
 import megaminds.actioninventory.util.ValidationException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
@@ -23,6 +24,7 @@ import net.minecraft.text.LiteralText;
 public class LoadCommand {
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("load")
+				.requires(CommandPermissions.requires(root.getLiteral()+".load", 4))
 				.then(literal("opener")
 						.then(argument("path", StringArgumentType.string())
 								.executes(LoadCommand::loadOpener)))
