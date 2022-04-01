@@ -43,39 +43,46 @@ public final class XpConsumable extends BasicConsumable {
 	}
 
 	@Override
-	public boolean consume(MinecraftServer server, UUID player, @NotNull NbtCompound storage) {
-		if (storage.getBoolean(Enums.COMPLETE)) return true;
-
-		var p = Helper.getPlayer(server, player);
+	public boolean consume(MinecraftServer server, UUID player, @NotNull NbtCompound storage){
+		var requireFullB = getRequireFull().orElse(false);
+		var hasPaid = Helper.getBoolean(storage, COMPLETE);
 
 		var left = getLeft(storage);
-		var extra = p.experienceLevel - left[0];
-		if (extra<0) {
-			left[0] -= p.experienceLevel;
-			p.addExperienceLevels(-p.experienceLevel);
-		} else {
-			p.addExperienceLevels(-left[0]);
-			left[0] = 0;
 
-			if (Helper.getTotalExperienceForLevel(p.experienceLevel) >= left[1]) {
-				p.addExperience(-left[1]);
-				left[1] = 0;
+		//the full amount has not been paid and [the full amount is not required or (the full amount is required and can be paid)].
+		if (!hasPaid && (!requireFullB || canConsumeFull(server, player, storage))) {
+			var p = Helper.getPlayer(server, player);
+			var extra = p.experienceLevel - left[0];
+			if (extra<0) {
+				left[0] -= p.experienceLevel;
+				p.addExperienceLevels(-p.experienceLevel);
 			} else {
-				left[1] -= Helper.getTotalExperienceForLevel(p.experienceLevel);
-				p.addExperience(-Helper.getTotalExperienceForLevel(p.experienceLevel));
+				p.addExperienceLevels(-left[0]);
+				left[0] = 0;
+
+				if (Helper.getTotalExperienceForLevel(p.experienceLevel) >= left[1]) {
+					p.addExperience(-left[1]);
+					left[1] = 0;
+				} else {
+					left[1] -= Helper.getTotalExperienceForLevel(p.experienceLevel);
+					p.addExperience(-Helper.getTotalExperienceForLevel(p.experienceLevel));
+				}
 			}
+
+			hasPaid = left[0]<=0 && left[1]<=0;
 		}
 
-		if (left[0]<=0 && left[1]<=0) {
+		//the full amount was paid or has now been paid
+		if (hasPaid) {
 			storage.remove(LEVEL_KEY);
 			storage.remove(AMOUNT_KEY);
 			storage.putBoolean(COMPLETE, true);
-			return true;
 		} else {
 			storage.putInt(LEVEL_KEY, level-left[0]);
 			storage.putInt(AMOUNT_KEY, amount-left[1]);
-			return false;
 		}
+
+		return hasPaid;
 	}
 
 	/**

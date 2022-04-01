@@ -6,15 +6,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Poly;
+import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
-public abstract sealed class BasicConsumable implements Validated permits XpConsumable, NumberConsumable {
+@Getter
+public abstract sealed class BasicConsumable implements Validated permits XpConsumable, IntConsumable {
+	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
+	private TriState requireFull = TriState.DEFAULT;
+
 	/**
 	 * Returns true if the player has paid or can pay the full amount.
 	 */

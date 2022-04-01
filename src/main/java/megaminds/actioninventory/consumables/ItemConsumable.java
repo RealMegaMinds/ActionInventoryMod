@@ -19,12 +19,12 @@ import net.minecraft.util.Identifier;
 @Getter
 @Setter
 @PolyName("Item")
-public final class ItemConsumable extends NumberConsumable {
+public final class ItemConsumable extends IntConsumable {
 	private ItemStackish stack;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
 
-	public ItemConsumable(long amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+	public ItemConsumable(int amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
 		super(amount);
 		this.stack = stack!=null ? stack : ItemStackish.MATCH_ALL;
 		this.tags = tags;
@@ -32,7 +32,7 @@ public final class ItemConsumable extends NumberConsumable {
 	}
 
 	@Override
-	public boolean canConsume(MinecraftServer server, UUID player, long left) {
+	public boolean canConsumeFull(MinecraftServer server, UUID player, int left) {
 		var p = Helper.getPlayer(server, player);
 		var inv = p.getInventory();
 
@@ -47,14 +47,14 @@ public final class ItemConsumable extends NumberConsumable {
 	}
 
 	@Override
-	public long consume(MinecraftServer server, UUID player, long left) {
+	public int consume(MinecraftServer server, UUID player, int left) {
 		var p = Helper.getPlayer(server, player);
 		var inv = p.getInventory();
 
 		for (int i = 0, size = inv.size(); i < size; i++) {
 			var s = inv.getStack(i);
 			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
-				var count = (int)Math.min(s.getCount(), left);
+				var count = Math.min(s.getCount(), left);
 				left -= count;
 				s.setCount(s.getCount()-count);
 				if (left<=0) break;
