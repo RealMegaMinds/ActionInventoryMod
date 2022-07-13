@@ -1,23 +1,21 @@
 package megaminds.actioninventory.gui.elements;
 
+import java.util.function.Consumer;
+
 import org.jetbrains.annotations.NotNull;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.actions.ClickAwareAction;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.item.ItemStack;
 
-/**
- * Adapted from {@link eu.pb4.sgui.api.elements.GuiElement}
- */
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @PolyName("Normal")
 public final class AccessableGuiElement extends AccessableElement {
 	private ItemStack item;
 
-	public AccessableGuiElement(int index, BasicAction action, ItemStack item) {
+	public AccessableGuiElement(int index, ClickAwareAction action, ItemStack item) {
 		super(index, action);
 		this.item = item;
 	}
@@ -29,16 +27,13 @@ public final class AccessableGuiElement extends AccessableElement {
 	}
 
 	@Override
-	public void validate() {
-		super.validate();
+	public void validate(@NotNull Consumer<String> errorReporter) {
+		super.validate(errorReporter);
 		if (item==null) item = ItemStack.EMPTY;
 	}
 
 	@Override
 	public SlotElement copy() {
-		AccessableGuiElement copy = new AccessableGuiElement();
-		copy.item = item.copy();
-		copy.setAction(getGuiCallback().copy());
-		return copy;
+		return new AccessableGuiElement(getIndex(), getGuiCallback(), item);
 	}
 }

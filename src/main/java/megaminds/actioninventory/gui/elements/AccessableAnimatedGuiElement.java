@@ -1,6 +1,8 @@
 package megaminds.actioninventory.gui.elements;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -8,10 +10,8 @@ import eu.pb4.sgui.api.gui.GuiInterface;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.actions.ClickAwareAction;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
@@ -21,24 +21,19 @@ import net.minecraft.item.ItemStack;
  * Adapted from {@link eu.pb4.sgui.api.elements.AnimatedGuiElement}
  */
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @PolyName("Animated")
 public final class AccessableAnimatedGuiElement extends AccessableElement {
-	private static final ItemStack[] EMPTY = {ItemStack.EMPTY};
-
-	private ItemStack[] items;
+	private List<ItemStack> items;
 	private int interval;
 	private TriState random = TriState.DEFAULT;
 
 	@Getter(AccessLevel.NONE)
-	@Setter(AccessLevel.NONE)
 	@Exclude private int frame;
 	@Getter(AccessLevel.NONE)
-	@Setter(AccessLevel.NONE)
 	@Exclude private int tick;
 
-	public AccessableAnimatedGuiElement(int index, BasicAction action, ItemStack[] items, int interval, TriState random) {
+	public AccessableAnimatedGuiElement(int index, ClickAwareAction action, List<ItemStack> items, int interval, TriState random) {
 		super(index, action);
 		this.items = items;
 		this.interval = interval;
@@ -46,21 +41,22 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 	}
 
 	@Override
-	public void validate() {
-		super.validate();
-		Validated.validate(interval>=0, "Animated gui element requires interval to be 0 or greater.");
-		if (items==null) items = EMPTY;
+	public void validate(@NotNull Consumer<String> errorReporter) {
+		super.validate(errorReporter);
+		if (interval<0) errorReporter.accept("Interval is: "+interval+", but must be >= 0.");
+		if (items==null) items = Collections.singletonList(ItemStack.EMPTY);
 	}
 
 	@NotNull
 	@Override
 	public ItemStack getItemStack() {
-		return this.items[frame].copy();
+		return this.items.get(frame).copy();
 	}
 
 	@Override
 	public ItemStack getItemStackForDisplay(GuiInterface gui) {
-		if (items.length==1) return items[0];
+		var size = items.size();
+		if (size==1) return items.get(0);
 
 		var cFrame = frame;
 
@@ -68,23 +64,18 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 		if (tick >= interval) {
 			tick = 0;
 			if (random.orElse(false)) {
-				this.frame = ActionInventoryMod.RANDOM.nextInt(items.length);
+				this.frame = ActionInventoryMod.RANDOM.nextInt(size);
 			} else {
 				frame += 1;
-				if (frame >= items.length) frame = 0;
+				if (frame >= size) frame = 0;
 			}
 		}
 
-		return this.items[cFrame].copy();
+		return this.items.get(cFrame).copy();
 	}
 
 	@Override
 	public SlotElement copy() {
-		var copy = new AccessableAnimatedGuiElement();
-		copy.setAction(getGuiCallback().copy());
-		copy.items = Arrays.stream(items).map(ItemStack::copy).toArray(ItemStack[]::new);
-		copy.interval = interval;
-		copy.random = random;
-		return copy;
+		return new AccessableAnimatedGuiElement(frame, getGuiCallback(), items, interval, random);
 	}
 }

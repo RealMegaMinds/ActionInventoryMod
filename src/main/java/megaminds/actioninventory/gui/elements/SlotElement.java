@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.gui.ActionInventoryGui;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -12,16 +13,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Poly
-public abstract sealed class SlotElement permits SlotFunction, AccessableElement {
+public abstract sealed class SlotElement implements Validated permits SlotFunction, AccessableElement {
 	private int index;
-	
+
 	/**
 	 * Use {@link ActionInventoryGui#setSlot}
 	 */
 	public abstract void apply(ActionInventoryGui gui, ServerPlayerEntity player);
-	
+
 	public abstract SlotElement copy();
-		
+
 	/**
 	 * @throws IllegalArgumentException If {@code test} is negative and {@code gui} has no empty slots.
 	 */

@@ -28,13 +28,13 @@ public final class RequirementAction extends GroupAction {
 
 	@Exclude private EntitySelector selector;
 
-	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, ClickAwareAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
 		this.entityPredicate = entityPredicate;
 	}
 
-	public RequirementAction(BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
+	public RequirementAction(ClickAwareAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(actions);
 		this.entitySelector = entitySelector;
 		this.entityPredicate = entityPredicate;
@@ -76,8 +76,8 @@ public final class RequirementAction extends GroupAction {
 	}
 
 	@Override
-	public BasicAction copy() {
-		var copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
+	public ClickAwareAction copy() {
+		var copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(ClickAwareAction::copy).toArray(ClickAwareAction[]::new), entitySelector, entityPredicate);
 		copy.selector = selector;
 		return copy;
 	}

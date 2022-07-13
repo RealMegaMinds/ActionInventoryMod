@@ -27,7 +27,7 @@ import net.minecraft.util.Identifier;
 @Getter
 @Setter
 @PolyName("Give")
-public final class GiveAction extends BasicAction {
+public final class GiveAction extends ClickAwareAction {
 	private static final Identifier[] EMPTY = new Identifier[0];
 
 	private Identifier[] lootTables;
@@ -70,7 +70,7 @@ public final class GiveAction extends BasicAction {
 	}
 
 	@Override
-	public BasicAction copy() {
+	public ClickAwareAction copy() {
 		return new GiveAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.copyOf(lootTables, lootTables.length), giveClicked);
 	}
 }

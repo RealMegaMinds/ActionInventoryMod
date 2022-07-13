@@ -1,49 +1,43 @@
 package megaminds.actioninventory.gui;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import megaminds.actioninventory.actions.BasicAction;
-import megaminds.actioninventory.actions.EmptyAction;
+import megaminds.actioninventory.actions.ClickAwareAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Getter
-@Setter
 public class ActionInventoryGui extends BetterGui {
 	/**@since 3.1*/
-	private final BasicAction openAction;
+	private final ClickAwareAction openAction;
 	/**@since 3.1*/
-	private final BasicAction closeAction;
+	private final ClickAwareAction closeAction;
 	/**@since 3.1*/
-	private final BasicAction anyClickAction;
+	private final ClickAwareAction anyClickAction;
 	/**@since 3.1*/
-	private final BasicAction recipeAction;
+	private final ClickAwareAction recipeAction;
 	/**@since 3.1*/
-	@Setter(AccessLevel.NONE)
 	private ItemStack lastClicked;
 	/**@since 3.1*/
-	@Setter(AccessLevel.NONE)
 	private String lastAction;
-	
-	public ActionInventoryGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name) {
-		this(type, player, includePlayerInventorySlots, name, EmptyAction.INSTANCE, EmptyAction.INSTANCE, EmptyAction.INSTANCE, EmptyAction.INSTANCE);
-	}
-	
-	public ActionInventoryGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction, BasicAction recipeAction) {
-		super(type, player, includePlayerInventorySlots);
-		this.setId(name);
+
+	public ActionInventoryGui(ServerPlayerEntity player, ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, boolean lockPlayerInventory, boolean chained, ClickAwareAction openAction, ClickAwareAction closeAction, ClickAwareAction anyClickAction, ClickAwareAction recipeAction) {	//NOSONAR
+		super(player, type, name, title, includePlayerInventorySlots, lockPlayerInventory, chained);
 		this.openAction = openAction;
 		this.closeAction = closeAction;
 		this.anyClickAction = anyClickAction;
 		this.recipeAction = recipeAction;
+		this.lastClicked = ItemStack.EMPTY;
+		this.lastAction = "";
 	}
 
 	/**@since 3.1*/
@@ -53,7 +47,7 @@ public class ActionInventoryGui extends BetterGui {
 		lastAction = "onClose";
 		closeAction.accept(this);
 	}
-	
+
 	/**@since 3.1*/
 	@Override
 	public void onOpen() {
@@ -61,7 +55,7 @@ public class ActionInventoryGui extends BetterGui {
 		lastAction = "onOpen";
 		openAction.accept(this);
 	}
-	
+
 	/**@since 3.1*/
 	@Override
 	public boolean onAnyClick(int index, ClickType type, SlotActionType action) {
@@ -71,7 +65,7 @@ public class ActionInventoryGui extends BetterGui {
 		lastAction = "click"+index;
 		return super.onAnyClick(index, type, action);
 	}
-	
+
 	/**@since 3.1*/
 	@Override
 	public void onCraftRequest(Identifier recipe, boolean shift) {
@@ -83,6 +77,7 @@ public class ActionInventoryGui extends BetterGui {
 	/**
 	 * Returns the last clicked stack. Currently only used for GiveAction.
 	 */
+	@NotNull
 	public ItemStack getLastClicked() {
 		return lastClicked.copy();
 	}
@@ -90,10 +85,11 @@ public class ActionInventoryGui extends BetterGui {
 	/**
 	 * Returns the name of the last action. Currently only used for ConsumableAction.
 	 */
+	@NotNull
 	public String getLastAction() {
 		return lastAction;
 	}
-	
+
 	/**
 	 * Returns the stack at the current slot.
 	 */

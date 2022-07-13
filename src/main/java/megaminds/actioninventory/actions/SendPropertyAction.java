@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier;
 @Getter
 @Setter
 @PolyName("SendProperty")
-public final class SendPropertyAction extends BasicAction {
+public final class SendPropertyAction extends ClickAwareAction {
 	private ScreenProperty property;
 	private int value;
 
@@ -38,7 +38,7 @@ public final class SendPropertyAction extends BasicAction {
 	}
 
 	@Override
-	public BasicAction copy() {
+	public ClickAwareAction copy() {
 		return new SendPropertyAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), property, value);
 	}
 }

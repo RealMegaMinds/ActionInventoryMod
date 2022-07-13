@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Getter
@@ -20,10 +21,18 @@ public class BetterGui extends SimpleGui implements BetterGuiI {
 	private BetterGuiI previousGui;
 	private boolean chained;
 
+	public BetterGui(ServerPlayerEntity player, ScreenHandlerType<?> type, Identifier name, Text title, boolean includePlayerInventorySlots, boolean lockPlayerInventory, boolean chained) {
+		super(type, player, includePlayerInventorySlots);
+		this.setId(name);
+		this.setTitle(title);
+		this.setLockPlayerInventory(lockPlayerInventory);
+		this.setChained(chained);
+	}
+
 	public BetterGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots) {
 		super(type, player, includePlayerInventorySlots);
 	}
-	
+
 	@Override
 	public boolean open(BetterGuiI previous) {
 		this.previousGui = previous;

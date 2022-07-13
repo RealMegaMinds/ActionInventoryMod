@@ -1,10 +1,16 @@
 package megaminds.actioninventory.actions;
 
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
@@ -20,20 +26,16 @@ import net.minecraft.util.Identifier;
  * @see GiveAction
  * @see OpenActionInventoryAction
  */
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Setter
-@PolyName("Command")
-public final class CommandAction extends BasicAction {
-	private String command;
-	private TriState fromServer = TriState.DEFAULT;
+public class CommandAction extends ClickAwareAction {
+	private final String command;
+	private final TriState fromServer;
 	/**@since 3.1*/
-	private TriState silent = TriState.DEFAULT;
+	private final TriState silent;
 	/**@since 3.1*/
-	private Integer higherLevel;
+	private final Integer higherLevel;
 
-	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, TriState fromServer, TriState silent, Integer higherLevel) {
+	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, Boolean requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, TriState fromServer, TriState silent, Integer higherLevel) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.command = command;
 		this.fromServer = fromServer;
@@ -49,16 +51,14 @@ public final class CommandAction extends BasicAction {
 		if (silent.orElse(false)) source = source.withSilent();
 		if (higherLevel!=null) source = source.withMaxLevel(higherLevel);
 
-		MessageHelper.executeCommand(source, command);
+		MessageHelper.executeCommand(source, Objects.requireNonNullElse(command, ""));
 	}
 
 	@Override
-	public void validate() {
-		if (command==null) command = "";
+	public Identifier getType() {
+		return new Identifier(ActionInventoryMod.MOD_ID, "Command");
 	}
 
 	@Override
-	public BasicAction copy() {
-		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), command, fromServer, silent, higherLevel);
-	}
+	public void validate(@NotNull Consumer<String> errorReporter) { /* Nothing to validate */ }
 }

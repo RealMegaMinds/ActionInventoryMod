@@ -27,7 +27,7 @@ import net.minecraft.util.math.Vec3d;
 @Getter
 @Setter
 @PolyName("Sound")
-public final class SoundAction extends BasicAction {
+public final class SoundAction extends ClickAwareAction {
 	private SoundEvent sound;
 	private SoundCategory category;
 	private Vec3d position;
@@ -61,7 +61,7 @@ public final class SoundAction extends BasicAction {
 	}
 
 	@Override
-	public BasicAction copy() {
+	public ClickAwareAction copy() {
 		return new SoundAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), sound, category, position, volume, pitch);
 	}
 }

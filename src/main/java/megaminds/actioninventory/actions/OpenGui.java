@@ -19,7 +19,7 @@ import net.minecraft.util.Util;
 @NoArgsConstructor
 @Getter
 @Setter
-public final class OpenGui extends BasicAction {
+public final class OpenGui extends ClickAwareAction {
 	private GuiType guiType;
 	private Identifier guiName;
 	private UUID playerUUID;
@@ -85,7 +85,7 @@ public final class OpenGui extends BasicAction {
 	}
 
 	@Override
-	public BasicAction copy() {
+	public ClickAwareAction copy() {
 		var copy = new OpenGui(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), guiType, guiName, playerUUID);
 		copy.playerUUID = playerUUID;
 		return copy;

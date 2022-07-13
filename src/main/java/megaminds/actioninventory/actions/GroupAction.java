@@ -18,12 +18,12 @@ import net.minecraft.util.Identifier;
 @Getter
 @Setter
 @PolyName("Group")
-public sealed class GroupAction extends BasicAction permits RequirementAction, ConsumeAction {
-	private static final BasicAction[] EMPTY_A = new BasicAction[0];
+public sealed class GroupAction extends ClickAwareAction permits RequirementAction, ConsumeAction {
+	private static final ClickAwareAction[] EMPTY_A = new ClickAwareAction[0];
 
-	private BasicAction[] actions;
+	private ClickAwareAction[] actions;
 
-	public GroupAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions) {
+	public GroupAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, ClickAwareAction[] actions) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.actions = actions;
 	}
@@ -41,7 +41,7 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 	}
 
 	@Override
-	public BasicAction copy() {
-		return new GroupAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(actions).map(BasicAction::copy).toArray(BasicAction[]::new));
+	public ClickAwareAction copy() {
+		return new GroupAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(actions).map(ClickAwareAction::copy).toArray(ClickAwareAction[]::new));
 	}
 }

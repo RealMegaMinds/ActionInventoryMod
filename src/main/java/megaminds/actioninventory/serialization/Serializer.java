@@ -15,12 +15,11 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
-import megaminds.actioninventory.actions.BasicAction;
+import megaminds.actioninventory.actions.ClickAwareAction;
 import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.openers.BasicOpener;
 import megaminds.actioninventory.serialization.wrappers.InstancedAdapterWrapper;
-import megaminds.actioninventory.serialization.wrappers.ValidatedAdapterWrapper;
 import megaminds.actioninventory.serialization.wrappers.WrapperAdapterFactory;
 import megaminds.actioninventory.util.ValidationException;
 import net.fabricmc.fabric.api.util.TriState;
@@ -67,12 +66,13 @@ public class Serializer {
 				.disableHtmlEscaping()
 				.setPrettyPrinting()
 				.enableComplexMapKeySerialization()
-				.setExclusionStrategies(new ExcludeStrategy())
+				.addDeserializationExclusionStrategy(new ExcludeStrategy(false))
+				.addSerializationExclusionStrategy(new ExcludeStrategy(true))
 
 				.registerTypeHierarchyAdapter(NbtElement.class, new NbtElementAdapter().nullSafe())
 				.registerTypeHierarchyAdapter(Text.class, basic(Text.Serializer::fromJson, Text.Serializer::toJsonTree))
 
-				.registerTypeAdapter(ClickCallback.class, delegate(BasicAction.class, ClickCallback.class::cast, BasicAction.class::cast))
+				.registerTypeAdapter(ClickCallback.class, delegate(ClickAwareAction.class, ClickCallback.class::cast, ClickAwareAction.class::cast))
 				.registerTypeAdapter(ItemStack.class, delegate(ItemStackish.class, ItemStackish::toStack, ItemStackish::new))
 				.registerTypeAdapter(Identifier.class, delegate(String.class, Identifier::new, Identifier::toString))
 				.registerTypeAdapter(TriState.class, new TriStateAdapter())
@@ -89,7 +89,7 @@ public class Serializer {
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registry.PARTICLE_TYPE))
 				.registerTypeAdapter(EntityPredicate.class, basic(EntityPredicate::fromJson, EntityPredicate::toJson))
 
-				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
+				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper()))
 				.registerTypeAdapterFactory(new PolyAdapterFactory())
 				.registerTypeAdapterFactory(new OptionalAdapterFactory())
 

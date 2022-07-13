@@ -34,14 +34,14 @@ public final class ConsumeAction extends GroupAction {
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
 	private TriState requireFull = TriState.DEFAULT;
 
-	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
+	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, ClickAwareAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.consumables = consumables;
 		this.singlePay = singlePay;
 		this.requireFull = requireFull;
 	}
 
-	public ConsumeAction(BasicAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
+	public ConsumeAction(ClickAwareAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
 		super(actions);
 		this.consumables = consumables;
 		this.singlePay = singlePay;
@@ -117,7 +117,18 @@ public final class ConsumeAction extends GroupAction {
 	}
 
 	@Override
+<<<<<<< Updated upstream
 	public BasicAction copy() {
 		return new ConsumeAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), Arrays.stream(consumables).map(BasicConsumable::copy).toArray(BasicConsumable[]::new), singlePay, requireFull);
+=======
+	public void validate() {
+		super.validate();
+		if (consumables==null) consumables = EMPTY_C;
+	}
+
+	@Override
+	public ClickAwareAction copy() {
+		return new ConsumeAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(ClickAwareAction::copy).toArray(ClickAwareAction[]::new), Arrays.stream(consumables).map(BasicConsumable::copy).toArray(BasicConsumable[]::new), singlePay, requireFull);
+>>>>>>> Stashed changes
 	}
 }

@@ -29,7 +29,7 @@ import net.minecraft.util.Util;
 @Getter
 @Setter
 @PolyName("Message")
-public final class MessageAction extends BasicAction {	
+public final class MessageAction extends ClickAwareAction {	
 	private Text message;
 	/**
 	 * null -> player.uuid
@@ -79,7 +79,7 @@ public final class MessageAction extends BasicAction {
 	}
 
 	@Override
-	public BasicAction copy() {
+	public ClickAwareAction copy() {
 		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), message.shallowCopy(), sender, new ArrayList<>(receivers), messageType);
 	}
 }

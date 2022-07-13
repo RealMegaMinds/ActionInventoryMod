@@ -1,40 +1,17 @@
 package megaminds.actioninventory.actions;
 
-import java.util.function.Consumer;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import eu.pb4.sgui.api.ClickType;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.gui.ActionInventoryGui;
-import megaminds.actioninventory.util.annotations.Instanced;
-import megaminds.actioninventory.util.annotations.PolyName;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Identifier;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@PolyName("Empty")
-@Instanced
-public non-sealed class EmptyAction extends BasicAction {
-	public static final EmptyAction INSTANCE = new EmptyAction();
-	
-	@Override
-	public void validate() {
-		//Unused
-	}
-	
-	@Override
-	public void accept(ActionInventoryGui gui) {
-		//Unused
-	}
+public class EmptyAction implements Action {
+	@Override public boolean cancellingClick(int index, ClickType type, SlotActionType action, ActionInventoryGui gui) {return false;}
+	@Override public void accept(ActionInventoryGui gui) { /* Does nothing */ }
 
 	@Override
-	public BasicAction copy() {
-		return INSTANCE;
-	}
-	
-	public static EmptyAction getNew(Consumer<ActionInventoryGui> consumer) {
-		return new EmptyAction() {
-			@Override
-			public void accept(ActionInventoryGui gui) {
-				consumer.accept(gui);
-			}
-		};
+	public Identifier getType() {
+		return new Identifier(ActionInventoryMod.MOD_ID, "Empty");
 	}
 }
