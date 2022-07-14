@@ -6,13 +6,12 @@ import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.authlib.GameProfile;
-
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -25,11 +24,11 @@ public class MessageHelper {
 	private MessageHelper() {}
 	
 	public static MutableText toSuccess(String msg) {
-		return new LiteralText(msg).formatted(SUCCESS);
+		return new LiteralTextContent(msg).formatted(SUCCESS);
 	}
 	
 	public static MutableText toError(String error) {
-		return new LiteralText(error).formatted(ERROR);
+		return new LiteralTextContent(error).formatted(ERROR);
 	}
 	
 	/**

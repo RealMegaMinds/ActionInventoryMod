@@ -1,5 +1,6 @@
 package megaminds.actioninventory.consumables;
 
+import I;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,7 +12,10 @@ import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor

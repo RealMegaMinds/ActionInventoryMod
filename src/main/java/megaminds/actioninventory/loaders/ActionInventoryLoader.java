@@ -1,6 +1,8 @@
 package megaminds.actioninventory.loaders;
 
+import ;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,8 +18,8 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 
 public class ActionInventoryLoader implements SimpleSynchronousResourceReloadListener {
@@ -54,7 +56,7 @@ public class ActionInventoryLoader implements SimpleSynchronousResourceReloadLis
 
 	public void openEnderChest(ServerPlayerEntity openFor, UUID toOpen) {
 		var p = openFor.getServer().getPlayerManager().getPlayer(toOpen);
-		openFor.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, p.getEnderChestInventory()), p.getName().shallowCopy().append(new LiteralText("'s ").append(new TranslatableText("container.enderchest")))));
+		openFor.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, p.getEnderChestInventory()), p.getName().copy().append(new LiteralTextContent("'s ").append(new TranslatableTextContent("container.enderchest")))));
 	}
 
 	public void openInventory(ServerPlayerEntity openFor, UUID toOpen) {

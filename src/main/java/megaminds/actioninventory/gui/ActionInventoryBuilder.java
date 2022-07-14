@@ -1,7 +1,8 @@
 package megaminds.actioninventory.gui;
 
 import java.util.Arrays;
-
+import ;
+import I;
 import eu.pb4.sgui.api.GuiHelpers;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import megaminds.actioninventory.util.annotations.Exclude;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -54,7 +55,7 @@ public final class ActionInventoryBuilder implements Validated {
 	public void validate() {
 		Validated.validate(type!=null, "ActionInventories requires type to be non-null.");
 		Validated.validate(name!=null, "ActionInventories requires name to be non-null.");
-		if (title==null) title = LiteralText.EMPTY;
+		if (title==null) title = LiteralTextContent.EMPTY;
 		if (openAction==null) openAction = EmptyAction.INSTANCE;
 		if (closeAction==null) closeAction = EmptyAction.INSTANCE;
 		if (anyClickAction==null) anyClickAction = EmptyAction.INSTANCE;
@@ -87,7 +88,7 @@ public final class ActionInventoryBuilder implements Validated {
 		this.includePlayer = includePlayerInventorySlots;
 		this.lockPlayerInventory = includePlayerInventorySlots;
 
-		this.title = LiteralText.EMPTY;
+		this.title = LiteralTextContent.EMPTY;
 		this.closeAction = EmptyAction.INSTANCE;
 		this.openAction = EmptyAction.INSTANCE;
 		this.anyClickAction = EmptyAction.INSTANCE;
@@ -138,7 +139,7 @@ public final class ActionInventoryBuilder implements Validated {
 		var builder = new ActionInventoryBuilder();
 		builder.type = type;
 		builder.name = name;
-		builder.title = title.shallowCopy();
+		builder.title = title.copy();
 		builder.includePlayer = includePlayer;
 		builder.lockPlayerInventory = lockPlayerInventory;
 		builder.elements = Arrays.stream(elements).map(SlotElement::copy).toArray(SlotElement[]::new);

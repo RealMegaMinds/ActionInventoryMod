@@ -7,12 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.MessageHelper;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 

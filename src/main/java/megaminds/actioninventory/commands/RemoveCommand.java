@@ -12,7 +12,8 @@ import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.CommandPermissions;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.util.Identifier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RemoveCommand {
@@ -28,12 +29,12 @@ public class RemoveCommand {
 		var name = IdentifierArgumentType.getIdentifier(context, "guiName");
 
 		if (!ActionInventoryMod.INVENTORY_LOADER.hasBuilder(name)) {
-			context.getSource().sendError(new LiteralText("No Action Inventory with name: "+name));
+			context.getSource().sendError(new LiteralTextContent("No Action Inventory with name: "+name));
 			return 0;
 		}
 
 		ActionInventoryMod.INVENTORY_LOADER.removeBuilder(name);
-		context.getSource().sendFeedback(new LiteralText("Removed Action Inventory with name: "+name), false);
+		context.getSource().sendFeedback(new LiteralTextContent("Removed Action Inventory with name: "+name), false);
 		return 1;
 	}
 }

@@ -2,6 +2,9 @@ package megaminds.actioninventory.consumables;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
+import ;
+import I;
+import Z;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +20,7 @@ import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 @NoArgsConstructor
 @AllArgsConstructor

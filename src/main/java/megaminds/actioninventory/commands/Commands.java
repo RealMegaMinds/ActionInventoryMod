@@ -1,11 +1,13 @@
 package megaminds.actioninventory.commands;
 
 import static net.minecraft.server.command.CommandManager.literal;
+
+import I;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
@@ -13,7 +15,8 @@ import megaminds.actioninventory.util.CommandPermissions;
 import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Commands {
@@ -36,7 +39,7 @@ public class Commands {
 		var combined = new StringBuilder(size*10);
 		names.forEach(i->combined.append("\n"+i.toString()));
 
-		var message = new LiteralText("").append(MessageHelper.toSuccess(size+" Action Inventories are loaded."));
+		var message = new LiteralTextContent("").append(MessageHelper.toSuccess(size+" Action Inventories are loaded."));
 		if (size>0) message.append(combined.toString());
 		context.getSource().sendFeedback(message, false);
 		return size;

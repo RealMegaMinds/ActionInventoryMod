@@ -2,6 +2,8 @@ package megaminds.actioninventory.consumables;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
+import I;
+import Z;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;

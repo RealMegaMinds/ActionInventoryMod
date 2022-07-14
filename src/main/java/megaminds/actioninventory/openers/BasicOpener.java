@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.Poly;

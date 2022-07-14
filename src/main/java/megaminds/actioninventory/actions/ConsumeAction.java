@@ -2,7 +2,9 @@ package megaminds.actioninventory.actions;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
+import Z;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +22,7 @@ import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @NoArgsConstructor

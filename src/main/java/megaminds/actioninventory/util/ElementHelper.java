@@ -13,7 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipSection;
 import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ElementHelper {
@@ -53,7 +53,7 @@ public class ElementHelper {
 
 	public static GuiElementInterface of(Item item, String name, int count, boolean glint, ClickCallback callback) {
 		ItemStack stack = new ItemStack(item, count);
-		stack.setCustomName(new LiteralText(name));
+		stack.setCustomName(new LiteralTextContent(name));
 		if (glint) addGlint(stack);
 		return new GuiElement(hideAllFlags(stack), callback);
 	}

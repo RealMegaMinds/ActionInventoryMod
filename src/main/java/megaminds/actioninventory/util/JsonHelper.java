@@ -19,8 +19,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
-
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -169,11 +168,11 @@ public class JsonHelper {
 	}
 
 	/**
-	 * Returns {@link LiteralText#EMPTY} if e is null.
+	 * Returns {@link LiteralTextContent#EMPTY} if e is null.
 	 */
 	@NotNull
 	public static Text text(JsonElement e) {
-		return text(e, LiteralText.EMPTY);
+		return text(e, LiteralTextContent.EMPTY);
 	}
 
 	public static Text text(JsonElement e, Text def) {

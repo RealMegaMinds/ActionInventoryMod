@@ -3,7 +3,7 @@ package megaminds.actioninventory.gui.elements;
 import java.util.Arrays;
 
 import org.jetbrains.annotations.NotNull;
-
+import I;
 import eu.pb4.sgui.api.gui.GuiInterface;
 import lombok.AccessLevel;
 import lombok.Getter;

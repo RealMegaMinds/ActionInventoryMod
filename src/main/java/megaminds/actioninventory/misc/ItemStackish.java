@@ -30,7 +30,7 @@ import net.minecraft.nbt.NbtEnd;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -154,7 +154,7 @@ public class ItemStackish {
 
 	private void addLore(ItemStack s) {
 		NbtList list = Arrays.stream(lore)
-				.map(l->l!=null?l:LiteralText.EMPTY)
+				.map(l->l!=null?l:LiteralTextContent.EMPTY)
 				.map(Text.Serializer::toJson)
 				.map(NbtString::of)
 				.collect(NbtList::new, NbtList::add, NbtList::addAll);

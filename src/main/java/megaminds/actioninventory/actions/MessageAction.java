@@ -14,9 +14,11 @@ import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.LiteralText;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -75,11 +77,11 @@ public final class MessageAction extends BasicAction {
 	@Override
 	public void validate() {
 		if (messageType==null) messageType = MessageType.CHAT;
-		if (message==null) message = LiteralText.EMPTY;		
+		if (message==null) message = LiteralTextContent.EMPTY;		
 	}
 
 	@Override
 	public BasicAction copy() {
-		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), message.shallowCopy(), sender, new ArrayList<>(receivers), messageType);
+		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), message.copy(), sender, new ArrayList<>(receivers), messageType);
 	}
 }
