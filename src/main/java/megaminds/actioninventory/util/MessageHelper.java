@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.command.SayCommand;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralTextContent;
@@ -16,6 +17,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
+import net.minecraft.util.registry.RegistryKey;
 
 public class MessageHelper {
 	private static final Formatting ERROR = Formatting.RED;
@@ -24,11 +26,11 @@ public class MessageHelper {
 	private MessageHelper() {}
 	
 	public static MutableText toSuccess(String msg) {
-		return new LiteralTextContent(msg).formatted(SUCCESS);
+		return Text.literal(msg).formatted(SUCCESS);
 	}
 	
 	public static MutableText toError(String error) {
-		return new LiteralTextContent(error).formatted(ERROR);
+		return Text.literal(error).formatted(ERROR);
 	}
 	
 	/**
@@ -39,29 +41,29 @@ public class MessageHelper {
 		type = type!=null ? type : getType(from);
 		
 		for (UUID uuid : to) {
+			server.getPlayerManager().getPlayer(uuid).message;
 			server.getPlayerManager().getPlayer(uuid).sendMessage(message, type, from);
 		}
-	}
-	
-	private static MessageType getType(UUID uuid) {
-		return uuid==Util.NIL_UUID ? MessageType.SYSTEM : MessageType.CHAT;
 	}
 	
 	/**
 	 * Broadcasts a message to all players.
 	 */
-	public static void broadcast(@Nullable UUID from, Text message, @Nullable MessageType type, MinecraftServer server) {
-		from = from!=null ? from : Util.NIL_UUID;
-		type = type!=null ? type : getType(from);
-
-		server.getPlayerManager().broadcast(message, type, from);
+	public static void broadcast(@Nullable UUID from, Text message, @Nullable RegistryKey<MessageType> type, MinecraftServer server) {
+		if (from==null) {
+			server.getPlayerManager().broadcast(message, type!=null ? type : MessageType.SYSTEM);
+		} else {
+			//TODO change so player is sending it
+			server.getPlayerManager().broadcast(message, type!=null ? type : MessageType.CHAT);
+		}
+		SayCommand
 	}
 	
 	/**
 	 * Logs a message to the server.
 	 */
-	public static void log(@Nullable UUID from, Text message, MinecraftServer server) {
-		server.sendSystemMessage(message, from);
+	public static void log(Text message, MinecraftServer server) {
+		server.sendMessage(message);
 	}
 	
 	/**

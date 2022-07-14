@@ -3,26 +3,20 @@ package megaminds.actioninventory.commands;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-import I;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.Collection;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.util.CommandPermissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.util.Identifier;
+import net.minecraft.text.Text;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OpenCommand {
+	private OpenCommand() {}
+	
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
 				.requires(CommandPermissions.requires(root.getLiteral()+".open", 3))
@@ -40,7 +34,7 @@ public class OpenCommand {
 		var builder = ActionInventoryMod.INVENTORY_LOADER.getBuilder(name);
 
 		if (builder==null) {
-			context.getSource().sendError(new LiteralTextContent("No Action Inventory with name: "+name));
+			context.getSource().sendError(Text.of("No Action Inventory with name: "+name));
 			return 0;
 		}
 
@@ -48,9 +42,9 @@ public class OpenCommand {
 		for (var target : targets) {
 			if (builder.build(target).open()) {
 				success++;
-				if (!silent) context.getSource().sendFeedback(new LiteralTextContent("Opened "+name+" for ").append(target.getName()), false);
+				if (!silent) context.getSource().sendFeedback(Text.literal("Opened "+name+" for ").append(target.getName()), false);
 			} else if (!silent) {
-				context.getSource().sendError(new LiteralTextContent("Failed to open "+name+" for ").append(target.getName()));
+				context.getSource().sendError(Text.literal("Failed to open "+name+" for ").append(target.getName()));
 			}
 		}
 		return success;

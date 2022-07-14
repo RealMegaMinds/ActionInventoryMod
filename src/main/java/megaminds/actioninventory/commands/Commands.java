@@ -2,27 +2,25 @@ package megaminds.actioninventory.commands;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
-import I;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import java.util.Set;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.CommandPermissions;
 import megaminds.actioninventory.util.MessageHelper;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Commands {
 	static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b)->CommandSource.suggestIdentifiers(ActionInventoryMod.INVENTORY_LOADER.builderNames(), b);
 
-	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean isDedicated) {	//NOSONAR See net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
+	private Commands() {}
+	
+	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, RegistrationEnvironment environment) { //NOSONAR
 		LiteralArgumentBuilder<ServerCommandSource> root = literal(ActionInventoryMod.MOD_ID);
 
 		root.then(literal("list").requires(CommandPermissions.requires(root.getLiteral()+".list", 2)).executes(Commands::list));
@@ -38,8 +36,12 @@ public class Commands {
 		var size = names.size();
 		var combined = new StringBuilder(size*10);
 		names.forEach(i->combined.append("\n"+i.toString()));
-
-		var message = new LiteralTextContent("").append(MessageHelper.toSuccess(size+" Action Inventories are loaded."));
+		
+		//TODO Figure out if there is a reason for below
+		var message = Text.empty().append(MessageHelper.toSuccess(size+" Action Inventories are loaded."));
+		//instead of
+		//var message = MessageHelper.toSuccess(size+" Action Inventories are loaded.");
+		
 		if (size>0) message.append(combined.toString());
 		context.getSource().sendFeedback(message, false);
 		return size;

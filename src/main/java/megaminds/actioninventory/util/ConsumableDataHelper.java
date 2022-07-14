@@ -5,8 +5,6 @@ import java.util.UUID;
 import eu.pb4.playerdata.api.PlayerDataApi;
 import eu.pb4.playerdata.api.storage.NbtDataStorage;
 import eu.pb4.playerdata.api.storage.PlayerDataStorage;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import megaminds.actioninventory.ActionInventoryMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -14,13 +12,14 @@ import net.minecraft.server.MinecraftServer;
 /**
  * This is just a helper class for consumables working with PlayerDataApi.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConsumableDataHelper {
 	private static final PlayerDataStorage<NbtCompound> CONSUMABLE_DATA = new NbtDataStorage(ActionInventoryMod.MOD_ID);
 
 	static {
 		PlayerDataApi.register(CONSUMABLE_DATA);
 	}
+	
+	private ConsumableDataHelper() {}
 
 	public static void setPlayer(MinecraftServer server, UUID player, NbtCompound value) {
 		PlayerDataApi.setCustomDataFor(server, player, CONSUMABLE_DATA, value);
