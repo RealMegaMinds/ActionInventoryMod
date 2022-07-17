@@ -74,7 +74,7 @@ public class Serializer {
 
 				.registerTypeAdapter(ClickCallback.class, delegate(BasicAction.class, ClickCallback.class::cast, BasicAction.class::cast))
 				.registerTypeAdapter(ItemStack.class, delegate(ItemStackish.class, ItemStackish::toStack, ItemStackish::new))
-				.registerTypeAdapter(Identifier.class, delegate(String.class, Identifier::new, Identifier::toString))
+				.registerTypeAdapter(Identifier.class, delegate(String.class, s->new Identifier(s.toLowerCase()), Identifier::toString))
 				.registerTypeAdapter(TriState.class, new TriStateAdapter())
 
 				.registerTypeAdapter(Item.class, registryDelegate(Registry.ITEM))
@@ -88,7 +88,6 @@ public class Serializer {
 				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registry.STATUS_EFFECT))
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registry.PARTICLE_TYPE))
 				.registerTypeAdapter(EntityPredicate.class, basic(EntityPredicate::fromJson, EntityPredicate::toJson))
-
 				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
 				.registerTypeAdapterFactory(new PolyAdapterFactory())
 				.registerTypeAdapterFactory(new OptionalAdapterFactory())

@@ -2,9 +2,6 @@ package megaminds.actioninventory.gui;
 
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.actions.EmptyAction;
 import net.minecraft.item.ItemStack;
@@ -15,8 +12,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-@Getter
-@Setter
 public class ActionInventoryGui extends BetterGui {
 	/**@since 3.1*/
 	private final BasicAction openAction;
@@ -27,10 +22,8 @@ public class ActionInventoryGui extends BetterGui {
 	/**@since 3.1*/
 	private final BasicAction recipeAction;
 	/**@since 3.1*/
-	@Setter(AccessLevel.NONE)
 	private ItemStack lastClicked;
 	/**@since 3.1*/
-	@Setter(AccessLevel.NONE)
 	private String lastAction;
 	
 	public ActionInventoryGui(ScreenHandlerType<?> type, ServerPlayerEntity player, boolean includePlayerInventorySlots, Identifier name) {
@@ -105,5 +98,21 @@ public class ActionInventoryGui extends BetterGui {
 		if (r!=null) return r.getStack().copy();
 
 		return ItemStack.EMPTY;
+	}
+
+	public BasicAction getOpenAction() {
+		return openAction;
+	}
+
+	public BasicAction getCloseAction() {
+		return closeAction;
+	}
+
+	public BasicAction getAnyClickAction() {
+		return anyClickAction;
+	}
+
+	public BasicAction getRecipeAction() {
+		return recipeAction;
 	}
 }

@@ -1,17 +1,11 @@
 package megaminds.actioninventory.actions;
 
 import eu.pb4.sgui.api.ClickType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -22,10 +16,6 @@ import net.minecraft.util.Identifier;
  * @see GiveAction
  * @see OpenActionInventoryAction
  */
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @PolyName("Command")
 public final class CommandAction extends BasicAction {
 	private String command;
@@ -35,6 +25,8 @@ public final class CommandAction extends BasicAction {
 	/**@since 3.1*/
 	private Integer higherLevel;
 
+	public CommandAction() {}
+	
 	public CommandAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe, Identifier requiredGuiName, String command, TriState fromServer, TriState silent, Integer higherLevel) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.command = command;
@@ -43,6 +35,13 @@ public final class CommandAction extends BasicAction {
 		this.higherLevel = higherLevel;
 	}
 
+	public CommandAction(String command, TriState fromServer, TriState silent, Integer higherLevel) {
+		this.command = command;
+		this.fromServer = fromServer;
+		this.silent = silent;
+		this.higherLevel = higherLevel;
+	}
+	
 	@Override
 	public void accept(ActionInventoryGui gui) {
 		var player = gui.getPlayer();
@@ -62,5 +61,37 @@ public final class CommandAction extends BasicAction {
 	@Override
 	public BasicAction copy() {
 		return new CommandAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), command, fromServer, silent, higherLevel);
+	}
+
+	public String getCommand() {
+		return command;
+	}
+
+	public void setCommand(String command) {
+		this.command = command;
+	}
+
+	public TriState getFromServer() {
+		return fromServer;
+	}
+
+	public void setFromServer(TriState fromServer) {
+		this.fromServer = fromServer;
+	}
+
+	public TriState getSilent() {
+		return silent;
+	}
+
+	public void setSilent(TriState silent) {
+		this.silent = silent;
+	}
+
+	public Integer getHigherLevel() {
+		return higherLevel;
+	}
+
+	public void setHigherLevel(Integer higherLevel) {
+		this.higherLevel = higherLevel;
 	}
 }

@@ -2,8 +2,6 @@ package megaminds.actioninventory.openers;
 
 import java.util.Set;
 
-import lombok.Setter;
-import lombok.Getter;
 import megaminds.actioninventory.util.annotations.PolyName;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.ActionInventoryMod;
@@ -15,8 +13,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 
-@Getter
-@Setter
 @PolyName("Item")
 public final class ItemOpener extends BasicOpener {
 	private static final Identifier TYPE = new Identifier(ActionInventoryMod.MOD_ID, "item");
@@ -60,5 +56,29 @@ public final class ItemOpener extends BasicOpener {
 	@Override
 	public Identifier getType() {
 		return TYPE;
+	}
+
+	public ItemStackish getStack() {
+		return stack;
+	}
+
+	public void setStack(ItemStackish stack) {
+		this.stack = stack;
+	}
+
+	public Set<Identifier> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Identifier> tags) {
+		this.tags = tags;
+	}
+
+	public TagOption getTagOption() {
+		return tagOption;
+	}
+
+	public void setTagOption(TagOption tagOption) {
+		this.tagOption = tagOption;
 	}
 }

@@ -13,13 +13,13 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.Text;
 
 public class VirtualPlayerInventory extends SimpleGui {
 	public VirtualPlayerInventory(ServerPlayerEntity player, boolean includePlayerInventorySlots, ServerPlayerEntity toLookAt) {
 		super(ScreenHandlerType.GENERIC_9X6, player, includePlayerInventorySlots);
 		PlayerInventory inv = toLookAt.getInventory();
-		setTitle(toLookAt.getName().copy().append(new LiteralTextContent("'s Inventory")));
+		setTitle(toLookAt.getName().copy().append(Text.of("'s Inventory")));
 
 		GuiElementBuilder builder = new GuiElementBuilder(Items.BLACK_STAINED_GLASS_PANE);
 		int i = 0;
@@ -29,16 +29,16 @@ public class VirtualPlayerInventory extends SimpleGui {
 		for (int j = 0; j < PlayerInventory.getHotbarSize(); j++, i++) {
 			this.setSlotRedirect(i, new Slot(inv, j, 0, 0));
 		}
-		this.setSlot(i, builder.setName(new LiteralTextContent("Armor")).build());
+		this.setSlot(i, builder.setName(Text.of("Armor")).build());
 		i++;
 		for (int j = PlayerInventory.MAIN_SIZE+PlayerInventory.ARMOR_SLOTS.length-1, k = 0; j>=PlayerInventory.MAIN_SIZE; j--, k++, i++) {
 			this.setSlotRedirect(i, new ArmorSlot(inv, j, k));
 		}
-		this.setSlot(i, builder.setName(new LiteralTextContent("Offhand")).build());
+		this.setSlot(i, builder.setName(Text.of("Offhand")).build());
 		i++;
 		this.setSlotRedirect(i, new Slot(inv, PlayerInventory.OFF_HAND_SLOT, 0, 0));
 		i++;
-		builder.setName(LiteralTextContent.EMPTY);
+		builder.setName(Text.empty());
 		for(; i < this.getSize(); i++) {
 			this.setSlot(i, builder.build());
 		}

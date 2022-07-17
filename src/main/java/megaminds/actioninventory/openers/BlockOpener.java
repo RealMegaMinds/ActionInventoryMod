@@ -3,9 +3,6 @@ package megaminds.actioninventory.openers;
 import java.util.Optional;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.util.Helper;
@@ -21,9 +18,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @PolyName("Block")
 public final class BlockOpener extends BasicOpener {
 	private static final Identifier TYPE = new Identifier(ActionInventoryMod.MOD_ID, "block");
@@ -33,6 +27,8 @@ public final class BlockOpener extends BasicOpener {
 	private Optional<BlockEntityType<?>> entityType;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
+
+	public BlockOpener() {}
 
 	public BlockOpener(Identifier guiName, Block block, BlockPos position, Optional<BlockEntityType<?>> entityType, Set<Identifier> tags, TagOption tagOption) {
 		super(guiName);
@@ -84,5 +80,45 @@ public final class BlockOpener extends BasicOpener {
 	@Override
 	public Identifier getType() {
 		return TYPE;
+	}
+
+	public Block getBlock() {
+		return block;
+	}
+
+	public void setBlock(Block block) {
+		this.block = block;
+	}
+
+	public BlockPos getPosition() {
+		return position;
+	}
+
+	public void setPosition(BlockPos position) {
+		this.position = position;
+	}
+
+	public Optional<BlockEntityType<?>> getEntityType() {
+		return entityType;
+	}
+
+	public void setEntityType(Optional<BlockEntityType<?>> entityType) {
+		this.entityType = entityType;
+	}
+
+	public Set<Identifier> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Identifier> tags) {
+		this.tags = tags;
+	}
+
+	public TagOption getTagOption() {
+		return tagOption;
+	}
+
+	public void setTagOption(TagOption tagOption) {
+		this.tagOption = tagOption;
 	}
 }

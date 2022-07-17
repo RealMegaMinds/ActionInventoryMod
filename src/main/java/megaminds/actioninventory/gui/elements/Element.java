@@ -1,10 +1,8 @@
 package megaminds.actioninventory.gui.elements;
 
 import eu.pb4.sgui.api.elements.GuiElementInterface;
-import lombok.Getter;
 import net.minecraft.screen.slot.Slot;
 
-@Getter
 public class Element {
 	private GuiElementInterface el;
 	private Slot redirect;
@@ -16,5 +14,11 @@ public class Element {
 	public void set(Element el) {
 		this.el = el.el;
 		this.redirect = el.redirect;
+	}
+	public GuiElementInterface getEl() {
+		return el;
+	}
+	public Slot getRedirect() {
+		return redirect;
 	}
 }

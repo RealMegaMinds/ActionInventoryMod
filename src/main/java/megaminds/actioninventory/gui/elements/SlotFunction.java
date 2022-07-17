@@ -2,9 +2,6 @@ package megaminds.actioninventory.gui.elements;
 
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.PolyName;
@@ -12,14 +9,13 @@ import megaminds.actioninventory.gui.ActionInventoryGui;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @PolyName("Redirect")
 public non-sealed class SlotFunction extends SlotElement implements Validated {	
 	private GuiType guiType;
 	private UUID name;
 	private int slotIndex;
+	
+	public SlotFunction() {}
 	
 	public SlotFunction(int index, GuiType guiType, UUID name, int slotIndex) {
 		super(index);
@@ -55,5 +51,29 @@ public non-sealed class SlotFunction extends SlotElement implements Validated {
 		copy.name = name;
 		copy.slotIndex = slotIndex;
 		return copy;
+	}
+
+	public GuiType getGuiType() {
+		return guiType;
+	}
+
+	public void setGuiType(GuiType guiType) {
+		this.guiType = guiType;
+	}
+
+	public UUID getName() {
+		return name;
+	}
+
+	public void setName(UUID name) {
+		this.name = name;
+	}
+
+	public int getSlotIndex() {
+		return slotIndex;
+	}
+
+	public void setSlotIndex(int slotIndex) {
+		this.slotIndex = slotIndex;
 	}
 }

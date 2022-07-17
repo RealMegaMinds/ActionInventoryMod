@@ -1,8 +1,6 @@
 package megaminds.actioninventory.loaders;
 
-import ;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +16,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ActionInventoryLoader implements SimpleSynchronousResourceReloadListener {
@@ -32,9 +29,9 @@ public class ActionInventoryLoader implements SimpleSynchronousResourceReloadLis
 		builders.clear();
 
 		var count = new int[2];
-		var paths = Set.copyOf(manager.findResources(ActionInventoryMod.MOD_ID+"/inventories", s->s.endsWith(".json")));
-		for (var path : paths) {
-			try (var res = manager.getResource(path).getInputStream()) {
+		var resources = Map.copyOf(manager.findResources(ActionInventoryMod.MOD_ID+"/inventories", s->s.getPath().endsWith(".json")));
+		for (var resource : resources.entrySet()) {
+			try (var res = resource.getValue().getInputStream()) {
 				var builder = Serializer.builderFromJson(new InputStreamReader(res));
 				addBuilder(builder);
 				count[0]++;	//success
@@ -42,7 +39,7 @@ public class ActionInventoryLoader implements SimpleSynchronousResourceReloadLis
 			} catch (ValidationException e) {
 				ActionInventoryMod.warn("Action Inventory Validation Exception: "+e.getMessage());
 			} catch (IOException e) {
-				ActionInventoryMod.warn("Failed to read Action Inventory from: "+path);
+				ActionInventoryMod.warn("Failed to read Action Inventory from: "+resource.getKey());
 			}
 			count[1]++;	//fail
 		}
@@ -56,7 +53,7 @@ public class ActionInventoryLoader implements SimpleSynchronousResourceReloadLis
 
 	public void openEnderChest(ServerPlayerEntity openFor, UUID toOpen) {
 		var p = openFor.getServer().getPlayerManager().getPlayer(toOpen);
-		openFor.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, p.getEnderChestInventory()), p.getName().copy().append(new LiteralTextContent("'s ").append(new TranslatableTextContent("container.enderchest")))));
+		openFor.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inventory, p.getEnderChestInventory()), p.getName().copy().append(Text.of("'s ")).append(Text.translatable("container.enderchest"))));
 	}
 
 	public void openInventory(ServerPlayerEntity openFor, UUID toOpen) {

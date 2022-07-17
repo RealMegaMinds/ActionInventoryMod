@@ -4,8 +4,6 @@ import java.util.Map;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import megaminds.actioninventory.gui.callback.CancellableCallback;
 import megaminds.actioninventory.gui.elements.DelegatedElement;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -13,24 +11,25 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemStack.TooltipSection;
 import net.minecraft.item.Items;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.Text;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ElementHelper {
 	public static final ClickCallback CLOSE = (i,t,a,g)->g.close();
+
+	private ElementHelper() {}
 
 	public static GuiElementInterface getLast(ClickCallback callback) {
 		return of(Items.ARROW, "Last", 1, true, callback);
 	}
-	
+
 	public static GuiElementInterface getFirst(ClickCallback callback) {
 		return of(Items.ARROW, "First", 1, true, callback);
 	}
-	
+
 	public static GuiElementInterface getNext(ClickCallback callback, int nextIndex) {
 		return of(Items.ARROW, "Next", nextIndex+1, callback);
 	}
-	
+
 	public static GuiElementInterface getPrevious(ClickCallback callback, int previousIndex) {
 		return previousIndex<0 ? null : of(Items.ARROW, "Previous",  previousIndex+1, callback);
 	}
@@ -42,7 +41,7 @@ public class ElementHelper {
 	public static GuiElementInterface getConfirm(ClickCallback callback) {
 		return getDone(callback, "Confirm");
 	}
-	
+
 	public static GuiElementInterface getDone(ClickCallback callback, String name) {
 		return of(Items.GREEN_WOOL, name, 1, combine(callback, CLOSE));
 	}
@@ -53,7 +52,7 @@ public class ElementHelper {
 
 	public static GuiElementInterface of(Item item, String name, int count, boolean glint, ClickCallback callback) {
 		ItemStack stack = new ItemStack(item, count);
-		stack.setCustomName(new LiteralTextContent(name));
+		stack.setCustomName(Text.of(name));
 		if (glint) addGlint(stack);
 		return new GuiElement(hideAllFlags(stack), callback);
 	}
@@ -85,9 +84,10 @@ public class ElementHelper {
 	}
 
 	public static ClickCallback combine(ClickCallback one, ClickCallback two) {
+		if (one==null && two==null) return GuiElementInterface.EMPTY_CALLBACK;
 		if (one!=null && two==null) return one;
-		if (two!=null && one==null) return two;
-		if (one==null && one==null) return GuiElement.EMPTY_CALLBACK;
+		if (one==null) return two;
+
 		if (one instanceof CancellableCallback c) {
 			return (CancellableCallback)(i,t,a,g) -> {
 				if (!c.cancellingClick(i,t,a,g)) {

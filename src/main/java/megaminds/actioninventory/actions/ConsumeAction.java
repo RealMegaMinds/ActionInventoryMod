@@ -2,17 +2,12 @@ package megaminds.actioninventory.actions;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
-import Z;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
 import eu.pb4.sgui.api.ClickType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.consumables.BasicConsumable;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.ConsumableDataHelper;
@@ -22,12 +17,8 @@ import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-@NoArgsConstructor
-@Getter
-@Setter
 @PolyName("Consume")
 public final class ConsumeAction extends GroupAction {
 	/**Consumables to consume*/
@@ -37,6 +28,8 @@ public final class ConsumeAction extends GroupAction {
 	/**True->Full amount is needed to consume any, false->will consume as much as possible*/
 	private TriState requireFull = TriState.DEFAULT;
 
+	public ConsumeAction() {}
+	
 	public ConsumeAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, BasicConsumable[] consumables, TriState singlePay, TriState requireFull) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.consumables = consumables;
@@ -122,5 +115,29 @@ public final class ConsumeAction extends GroupAction {
 	@Override
 	public BasicAction copy() {
 		return new ConsumeAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), Arrays.stream(consumables).map(BasicConsumable::copy).toArray(BasicConsumable[]::new), singlePay, requireFull);
+	}
+
+	public BasicConsumable[] getConsumables() {
+		return consumables;
+	}
+
+	public void setConsumables(BasicConsumable[] consumables) {
+		this.consumables = consumables;
+	}
+
+	public TriState getSinglePay() {
+		return singlePay;
+	}
+
+	public void setSinglePay(TriState singlePay) {
+		this.singlePay = singlePay;
+	}
+
+	public TriState getRequireFull() {
+		return requireFull;
+	}
+
+	public void setRequireFull(TriState requireFull) {
+		this.requireFull = requireFull;
 	}
 }

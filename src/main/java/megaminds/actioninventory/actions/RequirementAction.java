@@ -6,9 +6,6 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import eu.pb4.sgui.api.ClickType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
@@ -18,17 +15,17 @@ import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-@NoArgsConstructor
 @PolyName("Require")
 public final class RequirementAction extends GroupAction {	
-	@Getter @Setter private String entitySelector;
-	@Getter @Setter private EntityPredicate entityPredicate;
+	private String entitySelector;
+	private EntityPredicate entityPredicate;
 
 	@Exclude private EntitySelector selector;
 
+	public RequirementAction() {}
+	
 	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
@@ -81,5 +78,21 @@ public final class RequirementAction extends GroupAction {
 		var copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
 		copy.selector = selector;
 		return copy;
+	}
+
+	public String getEntitySelector() {
+		return entitySelector;
+	}
+
+	public void setEntitySelector(String entitySelector) {
+		this.entitySelector = entitySelector;
+	}
+
+	public EntityPredicate getEntityPredicate() {
+		return entityPredicate;
+	}
+
+	public void setEntityPredicate(EntityPredicate entityPredicate) {
+		this.entityPredicate = entityPredicate;
 	}
 }

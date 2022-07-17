@@ -1,20 +1,19 @@
 package megaminds.actioninventory.gui.elements;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.Poly;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 @Poly
 public abstract sealed class SlotElement permits SlotFunction, AccessableElement {
 	private int index;
 	
+	protected SlotElement() {}
+	
+	protected SlotElement(int index) {
+		this.index = index;
+	}
+
 	/**
 	 * Use {@link ActionInventoryGui#setSlot}
 	 */
@@ -30,5 +29,9 @@ public abstract sealed class SlotElement permits SlotFunction, AccessableElement
 		if (test<0) test = gui.getFirstEmptySlot();
 		if (test<0) throw new IllegalArgumentException("No more empty slots. Index must be specified.");
 		return test;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 }

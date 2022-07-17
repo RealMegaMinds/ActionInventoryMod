@@ -9,10 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.enchantment.Enchantment;
@@ -30,15 +26,10 @@ import net.minecraft.nbt.NbtEnd;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ItemStackish {
 	public static final ItemStackish MATCH_ALL = new ItemStackish() {
 		@Override public boolean specifiedEquals(ItemStack s) {return true;}
@@ -48,10 +39,10 @@ public class ItemStackish {
 		@Override public boolean specifiedEquals(ItemStack s) {return false;}
 		@Override public boolean specifiedEquals(ItemStackish s) {return false;}
 	};
-	
+
 	private static final String HIDE_FLAG_KEY = "HideFlags";
 	private static final String ATTRIBUTE_KEY = "AttributeModifiers";
-	
+
 	private Item item;
 	private Integer count;
 	private Integer damage; 
@@ -60,12 +51,27 @@ public class ItemStackish {
 	private Text[] lore;	//displayMatches
 	private Optional<Integer> color;//color in display
 	private Map<Enchantment, Integer> enchantments;	//enchantmentsMatch
-	private EnumSet<TooltipSection> hideFlags;	//displayMatches
+	private Set<TooltipSection> hideFlags;	//displayMatches
 	private Set<AttributeValues> attributes;	//attributesMatch
-	
+
+	public ItemStackish() {}
+
+	public ItemStackish(Item item, Integer count, Integer damage, Optional<NbtCompound> customNbt, Optional<Text> customName, Text[] lore, Optional<Integer> color, Map<Enchantment, Integer> enchantments, Set<TooltipSection> hideFlags, Set<AttributeValues> attributes) {
+		this.item = item;
+		this.count = count;
+		this.damage = damage;
+		this.customNbt = customNbt;
+		this.customName = customName;
+		this.lore = lore;
+		this.color = color;
+		this.enchantments = enchantments;
+		this.hideFlags = hideFlags;
+		this.attributes = attributes;
+	}
+
 	public ItemStackish(ItemStack i) {
 		if (ItemStack.EMPTY.equals(i)) return;
-		
+
 		item = i.getItem();
 		count = i.getCount();
 		damage = i.getDamage();
@@ -84,7 +90,7 @@ public class ItemStackish {
 			attributesFrom(nbt);
 		}
 	}
-	
+
 	public ItemStack toStack() {
 		ItemStack s = new ItemStack(Objects.requireNonNullElse(item, Items.AIR));
 		if (customNbt!=null) s.setNbt(customNbt.orElse(null));
@@ -98,7 +104,7 @@ public class ItemStackish {
 		if (attributes!=null) attributes.forEach(a->a.apply(s));
 		return s;
 	}
-	
+
 	public void setNbtDefaults() {
 		customNbt = Optional.empty();
 		color = Optional.empty();
@@ -108,21 +114,21 @@ public class ItemStackish {
 		hideFlags = EnumSet.noneOf(TooltipSection.class);
 		attributes = Set.of();
 	}
-	
+
 	private void nameFrom(ItemStack s) {
 		if (s.hasCustomName()) {
 			customName = Optional.of(s.getName());
 			s.getSubNbt(ItemStack.DISPLAY_KEY).remove(ItemStack.NAME_KEY);
 		}
 	}
-	
+
 	private void colorFrom(NbtCompound display) {
 		if (display.contains(ItemStack.COLOR_KEY)) {
 			color = Optional.of(display.getInt(ItemStack.COLOR_KEY));
 			display.remove(ItemStack.COLOR_KEY);
 		}
 	}
-	
+
 	private void flagsFrom(NbtCompound nbt) {
 		if (nbt.contains(HIDE_FLAG_KEY)) {
 			final int flags = nbt.getInt(HIDE_FLAG_KEY);
@@ -131,7 +137,7 @@ public class ItemStackish {
 			nbt.remove(HIDE_FLAG_KEY);
 		}
 	}
-	
+
 	private void attributesFrom(NbtCompound nbt) {
 		if (nbt.contains(ATTRIBUTE_KEY)) {
 			attributes = nbt.getList(ATTRIBUTE_KEY, NbtType.COMPOUND).stream()
@@ -141,7 +147,7 @@ public class ItemStackish {
 			nbt.remove(ATTRIBUTE_KEY);
 		}
 	}
-	
+
 	private void loreFrom(NbtCompound display) {
 		if (display.contains(ItemStack.LORE_KEY)) {
 			lore = display.getList(ItemStack.LORE_KEY, NbtType.STRING).stream()
@@ -154,13 +160,13 @@ public class ItemStackish {
 
 	private void addLore(ItemStack s) {
 		NbtList list = Arrays.stream(lore)
-				.map(l->l!=null?l:LiteralTextContent.EMPTY)
+				.map(l->l!=null?l:Text.empty())
 				.map(Text.Serializer::toJson)
 				.map(NbtString::of)
 				.collect(NbtList::new, NbtList::add, NbtList::addAll);
 		s.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, list);
 	}
-	
+
 	private void addColor(ItemStack s) {
 		NbtCompound el;
 		if ((el=s.getNbt())!=null && el.contains(ItemStack.DISPLAY_KEY)) {
@@ -180,7 +186,7 @@ public class ItemStackish {
 	public boolean specifiedEquals(ItemStackish i) {
 		if (this==i) return true;
 		if (i==null) return false;
-		
+
 		return nullOrEquals(item, i.item)
 				&& nullOrEquals(count, i.count)
 				&& nullOrEquals(damage, i.damage)
@@ -192,15 +198,15 @@ public class ItemStackish {
 				&& nullOrEquals(hideFlags, i.hideFlags)
 				&& nullOrEquals(attributes, i.attributes);
 	}
-	
+
 	private static <E> boolean nullOrEquals(E e, E other) {
 		return e==null || Objects.equals(e, other);
 	}
-	
+
 	public boolean specifiedEquals(ItemStack s) {
 		return this.specifiedEquals(new ItemStackish(s));
 	}
-	
+
 	private static boolean textEqual(Text t1, Text t2) {
 		return Objects.equals(t1, t2) || 
 				t1!=null && t2!=null && t1.getString().equals(t2.getString());
@@ -214,10 +220,86 @@ public class ItemStackish {
 		return true;
 	}
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
+	public Item getItem() {
+		return item;
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+	}
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
+	}
+
+	public Integer getDamage() {
+		return damage;
+	}
+
+	public void setDamage(Integer damage) {
+		this.damage = damage;
+	}
+
+	public Optional<NbtCompound> getCustomNbt() {
+		return customNbt;
+	}
+
+	public void setCustomNbt(Optional<NbtCompound> customNbt) {
+		this.customNbt = customNbt;
+	}
+
+	public Optional<Text> getCustomName() {
+		return customName;
+	}
+
+	public void setCustomName(Optional<Text> customName) {
+		this.customName = customName;
+	}
+
+	public Text[] getLore() {
+		return lore;
+	}
+
+	public void setLore(Text[] lore) {
+		this.lore = lore;
+	}
+
+	public Optional<Integer> getColor() {
+		return color;
+	}
+
+	public void setColor(Optional<Integer> color) {
+		this.color = color;
+	}
+
+	public Map<Enchantment, Integer> getEnchantments() {
+		return enchantments;
+	}
+
+	public void setEnchantments(Map<Enchantment, Integer> enchantments) {
+		this.enchantments = enchantments;
+	}
+
+	public Set<TooltipSection> getHideFlags() {
+		return hideFlags;
+	}
+
+	public void setHideFlags(Set<TooltipSection> hideFlags) {
+		this.hideFlags = hideFlags;
+	}
+
+	public Set<AttributeValues> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Set<AttributeValues> attributes) {
+		this.attributes = attributes;
+	}
+
 	public class AttributeValues implements Validated {
 		private EntityAttribute attribute;
 		private Operation operation;
@@ -225,13 +307,25 @@ public class ItemStackish {
 		private String name;
 		private UUID uuid;
 		private EquipmentSlot slot;
-		
+
+		public AttributeValues() {}
+
+		public AttributeValues(EntityAttribute attribute, Operation operation, double value, String name, UUID uuid, EquipmentSlot slot) {
+			this.attribute = attribute;
+			this.operation = operation;
+			this.value = value;
+			this.name = name;
+			this.uuid = uuid;
+			this.slot = slot;
+		}
+
 		@Override
 		public void validate() {
 			Validated.validate(attribute!=null, "Attribute modifiers need attribute to be non-null");
 			Validated.validate(name!=null, "Attribute modifiers need name to be non-null");
 			Validated.validate(operation!=null, "Attribute modifiers need operation to be non-null");
 		}
+
 		public AttributeValues(NbtCompound c) {
 			EntityAttributeModifier mod = EntityAttributeModifier.fromNbt(c);
 			attribute = Registry.ATTRIBUTE.get(new Identifier(c.getString("AttributeName")));
@@ -247,6 +341,54 @@ public class ItemStackish {
 			stack.addAttributeModifier(attribute, mod, slot);
 		}
 
+		public EntityAttribute getAttribute() {
+			return attribute;
+		}
+
+		public void setAttribute(EntityAttribute attribute) {
+			this.attribute = attribute;
+		}
+
+		public Operation getOperation() {
+			return operation;
+		}
+
+		public void setOperation(Operation operation) {
+			this.operation = operation;
+		}
+
+		public double getValue() {
+			return value;
+		}
+
+		public void setValue(double value) {
+			this.value = value;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public UUID getUuid() {
+			return uuid;
+		}
+
+		public void setUuid(UUID uuid) {
+			this.uuid = uuid;
+		}
+
+		public EquipmentSlot getSlot() {
+			return slot;
+		}
+
+		public void setSlot(EquipmentSlot slot) {
+			this.slot = slot;
+		}
+
 		@Override
 		public boolean equals(Object obj) {
 			if (this == obj) return true;
@@ -258,7 +400,7 @@ public class ItemStackish {
 					&& slot == other.slot
 					&& Objects.equals(uuid, other.uuid);
 		}
-		
+
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -267,6 +409,5 @@ public class ItemStackish {
 			result = prime * result + Objects.hash(attribute, name, operation, slot, uuid, value);
 			return result;
 		}
-
 	}
 }

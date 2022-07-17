@@ -2,30 +2,18 @@ package megaminds.actioninventory.consumables;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
-import ;
-import I;
-import Z;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.misc.Enums;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 @PolyName("Xp")
 public final class XpConsumable extends BasicConsumable {
 	private static final String LEVEL_KEY = "level";
@@ -33,6 +21,14 @@ public final class XpConsumable extends BasicConsumable {
 
 	private int level;
 	private int amount;
+
+	public XpConsumable() {}
+
+	public XpConsumable(int level, int amount) {
+		super();
+		this.level = level;
+		this.amount = amount;
+	}
 
 	@Override
 	public boolean canConsumeFull(MinecraftServer server, UUID player, @Nullable NbtCompound storage) {
@@ -111,5 +107,21 @@ public final class XpConsumable extends BasicConsumable {
 	@Override
 	public BasicConsumable copy() {
 		return new XpConsumable(level, amount);
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
 	}
 }

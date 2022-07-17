@@ -1,15 +1,12 @@
 package megaminds.actioninventory.loaders;
 
-import ;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.openers.BasicOpener;
 import megaminds.actioninventory.serialization.Serializer;
@@ -28,9 +25,9 @@ public class BasicOpenerLoader implements SimpleSynchronousResourceReloadListene
 		openers.clear();
 
 		var count = new int[2];
-		var paths = Set.copyOf(manager.findResources(ActionInventoryMod.MOD_ID+"/openers", s->s.endsWith(".json")));
-		for (var path : paths) {
-			try (var res = manager.getResource(path).getInputStream()) {
+		var resources = Map.copyOf(manager.findResources(ActionInventoryMod.MOD_ID+"/openers", s->s.getPath().endsWith(".json")));
+		for (var resource : resources.entrySet()) {
+			try (var res = resource.getValue().getInputStream()) {
 				var opener = Serializer.openerFromJson(new InputStreamReader(res));
 				addOpener(opener);
 				count[0]++;	//success
@@ -38,7 +35,7 @@ public class BasicOpenerLoader implements SimpleSynchronousResourceReloadListene
 			} catch (ValidationException e) {
 				ActionInventoryMod.warn("Opener Validation Exception: "+e.getMessage());
 			} catch (IOException e) {
-				ActionInventoryMod.warn("Failed to read Opener from: "+path);
+				ActionInventoryMod.warn("Failed to read Opener from: "+resource.getKey());
 			}
 			count[1]++;	//fail
 		}

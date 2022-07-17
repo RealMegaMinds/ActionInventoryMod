@@ -2,31 +2,26 @@ package megaminds.actioninventory.consumables;
 
 import static megaminds.actioninventory.misc.Enums.COMPLETE;
 
-import I;
-import Z;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.util.Helper;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 
 /**@since 3.1*/
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract sealed class IntConsumable extends BasicConsumable permits ItemConsumable {
 	private static final String AMOUNT_KEY = "amount";
 	/**This is the paid amount*/
 	private int amount;
+	
+	protected IntConsumable() {}
+
+	protected IntConsumable(int amount) {
+		this.amount = amount;
+	}
 
 	public boolean hasConsumedFull(@Nullable NbtCompound storage) {
 		return Helper.getBoolean(storage, COMPLETE);
@@ -66,4 +61,12 @@ public abstract sealed class IntConsumable extends BasicConsumable permits ItemC
 	 * Returns how much is left
 	 */
 	public abstract int consume(MinecraftServer server, UUID player, int leftToConsume);
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
 }

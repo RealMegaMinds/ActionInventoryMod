@@ -1,19 +1,13 @@
 package megaminds.actioninventory.gui;
 
 import eu.pb4.sgui.api.gui.SimpleGui;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-@Getter
-@Setter
 public class BetterGui extends SimpleGui implements BetterGuiI {
 	private Identifier id;
 
-	@Setter(AccessLevel.NONE)
 	/**
 	 * Note, this is set on open.
 	 */
@@ -39,5 +33,25 @@ public class BetterGui extends SimpleGui implements BetterGuiI {
 	public boolean reOpen() {
 		if (isOpen()) sendGui();
 		return false;
+	}
+
+	public Identifier getId() {
+		return id;
+	}
+
+	public void setId(Identifier id) {
+		this.id = id;
+	}
+
+	public BetterGuiI getPreviousGui() {
+		return previousGui;
+	}
+
+	public boolean isChained() {
+		return chained;
+	}
+
+	public void setChained(boolean chained) {
+		this.chained = chained;
 	}
 }

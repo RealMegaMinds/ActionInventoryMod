@@ -1,32 +1,28 @@
 package megaminds.actioninventory.consumables;
 
-import I;
 import java.util.Set;
 import java.util.UUID;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 @PolyName("Item")
 public final class ItemConsumable extends IntConsumable {
 	private ItemStackish stack;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
+
+	public ItemConsumable() {}
+	
+	public ItemConsumable(ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+		this.stack = stack;
+		this.tags = tags;
+		this.tagOption = tagOption;
+	}
 
 	public ItemConsumable(int amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
 		super(amount);
@@ -81,5 +77,29 @@ public final class ItemConsumable extends IntConsumable {
 	@Override
 	public BasicConsumable copy() {
 		return new ItemConsumable(stack, Set.copyOf(tags), tagOption);
+	}
+
+	public ItemStackish getStack() {
+		return stack;
+	}
+
+	public void setStack(ItemStackish stack) {
+		this.stack = stack;
+	}
+
+	public Set<Identifier> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Identifier> tags) {
+		this.tags = tags;
+	}
+
+	public TagOption getTagOption() {
+		return tagOption;
+	}
+
+	public void setTagOption(TagOption tagOption) {
+		this.tagOption = tagOption;
 	}
 }

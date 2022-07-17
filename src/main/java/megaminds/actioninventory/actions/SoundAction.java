@@ -3,17 +3,13 @@ package megaminds.actioninventory.actions;
 import java.util.Objects;
 
 import eu.pb4.sgui.api.ClickType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -23,10 +19,6 @@ import net.minecraft.util.math.Vec3d;
 /**
  * This plays a sound
  */
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 @PolyName("Sound")
 public final class SoundAction extends BasicAction {
 	private SoundEvent sound;
@@ -34,6 +26,16 @@ public final class SoundAction extends BasicAction {
 	private Vec3d position;
 	private Float volume;
 	private Float pitch;
+
+	public SoundAction() {}
+
+	public SoundAction(SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
+		this.sound = sound;
+		this.category = category;
+		this.position = position;
+		this.volume = volume;
+		this.pitch = pitch;
+	}
 
 	public SoundAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
@@ -47,8 +49,8 @@ public final class SoundAction extends BasicAction {
 	@Override
 	public void accept(ActionInventoryGui gui) {
 		var player = gui.getPlayer();
-
-		player.networkHandler.sendPacket(new PlaySoundIdS2CPacket(sound.getId(), category, Objects.requireNonNullElseGet(position, player::getPos), volume, pitch));
+		var pos = Objects.requireNonNullElseGet(position, player::getPos);
+		player.networkHandler.sendPacket(new PlaySoundS2CPacket(sound, category, pos.x, pos.y, pos.z, volume, pitch, ActionInventoryMod.RANDOM.nextLong()));
 	}
 
 	@Override
@@ -64,5 +66,45 @@ public final class SoundAction extends BasicAction {
 	@Override
 	public BasicAction copy() {
 		return new SoundAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), sound, category, position, volume, pitch);
+	}
+
+	public SoundEvent getSound() {
+		return sound;
+	}
+
+	public void setSound(SoundEvent sound) {
+		this.sound = sound;
+	}
+
+	public SoundCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(SoundCategory category) {
+		this.category = category;
+	}
+
+	public Vec3d getPosition() {
+		return position;
+	}
+
+	public void setPosition(Vec3d position) {
+		this.position = position;
+	}
+
+	public Float getVolume() {
+		return volume;
+	}
+
+	public void setVolume(Float volume) {
+		this.volume = volume;
+	}
+
+	public Float getPitch() {
+		return pitch;
+	}
+
+	public void setPitch(Float pitch) {
+		this.pitch = pitch;
 	}
 }

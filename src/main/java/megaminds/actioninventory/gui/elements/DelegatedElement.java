@@ -3,13 +3,9 @@ package megaminds.actioninventory.gui.elements;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import lombok.Getter;
-import lombok.Setter;
 import megaminds.actioninventory.util.ElementHelper;
 import net.minecraft.item.ItemStack;
 
-@Getter
-@Setter
 public class DelegatedElement implements GuiElementInterface {
     private ClickCallback guiCallback;
     private GuiElementInterface delegate;
@@ -40,5 +36,22 @@ public class DelegatedElement implements GuiElementInterface {
 	@Override
 	public void onRemoved(SlotGuiInterface gui) {
 		delegate.onRemoved(gui);
+	}
+
+	@Override
+	public ClickCallback getGuiCallback() {
+		return guiCallback;
+	}
+
+	public void setGuiCallback(ClickCallback guiCallback) {
+		this.guiCallback = guiCallback;
+	}
+
+	public GuiElementInterface getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(GuiElementInterface delegate) {
+		this.delegate = delegate;
 	}
 }

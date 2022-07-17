@@ -3,9 +3,6 @@ package megaminds.actioninventory.openers;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.Exclude;
@@ -20,16 +17,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 
-@NoArgsConstructor
 @PolyName("Entity")
 public final class EntityOpener extends BasicOpener {
 	private static final Identifier TYPE = new Identifier(ActionInventoryMod.MOD_ID, "entity");
 
-	@Getter @Setter private String entitySelector;	
-	@Getter @Setter private EntityPredicate entityPredicate;
+	private String entitySelector;	
+	private EntityPredicate entityPredicate;
 
 	@Exclude private EntitySelector selector;
 
+	public EntityOpener() {}
+	
 	public EntityOpener(Identifier guiName, String entitySelector, EntityPredicate entityPredicate) {
 		super(guiName);
 		this.entitySelector = entitySelector;
@@ -84,5 +82,21 @@ public final class EntityOpener extends BasicOpener {
 	@Override
 	public Identifier getType() {
 		return TYPE;
+	}
+
+	public String getEntitySelector() {
+		return entitySelector;
+	}
+
+	public void setEntitySelector(String entitySelector) {
+		this.entitySelector = entitySelector;
+	}
+
+	public EntityPredicate getEntityPredicate() {
+		return entityPredicate;
+	}
+
+	public void setEntityPredicate(EntityPredicate entityPredicate) {
+		this.entityPredicate = entityPredicate;
 	}
 }

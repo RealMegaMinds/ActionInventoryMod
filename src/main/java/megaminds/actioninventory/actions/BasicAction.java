@@ -5,10 +5,6 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 import eu.pb4.sgui.api.ClickType;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.gui.callback.ActionInventoryCallback;
 import megaminds.actioninventory.serialization.wrappers.Validated;
@@ -17,9 +13,6 @@ import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
-@Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Poly
 public abstract sealed class BasicAction implements ActionInventoryCallback, Validated, Consumer<ActionInventoryGui> permits EmptyAction, OpenGui, CloseAction, CommandAction, GiveAction, MessageAction, SendPropertyAction, SoundAction, GroupAction {
 	private Integer requiredIndex;
@@ -30,6 +23,8 @@ public abstract sealed class BasicAction implements ActionInventoryCallback, Val
 	/**@since 3.1*/
 	private Identifier requiredRecipe;
 	private Identifier requiredGuiName;
+	
+	protected BasicAction() {}
 	
 	protected BasicAction(Integer requiredIndex, ClickType requiredClickType, SlotActionType requiredSlotActionType, TriState requireShift, Identifier requiredRecipe, Identifier requiredGuiName) {
 		this.requiredIndex = requiredIndex;
@@ -67,5 +62,53 @@ public abstract sealed class BasicAction implements ActionInventoryCallback, Val
 
 	private static <E> boolean check(E o, E e) {
 		return o==null || o==e;
+	}
+
+	public Integer getRequiredIndex() {
+		return requiredIndex;
+	}
+
+	public void setRequiredIndex(Integer requiredIndex) {
+		this.requiredIndex = requiredIndex;
+	}
+
+	public ClickType getRequiredClickType() {
+		return requiredClickType;
+	}
+
+	public void setRequiredClickType(ClickType requiredClickType) {
+		this.requiredClickType = requiredClickType;
+	}
+
+	public SlotActionType getRequiredSlotActionType() {
+		return requiredSlotActionType;
+	}
+
+	public void setRequiredSlotActionType(SlotActionType requiredSlotActionType) {
+		this.requiredSlotActionType = requiredSlotActionType;
+	}
+
+	public TriState getRequireShift() {
+		return requireShift;
+	}
+
+	public void setRequireShift(TriState requireShift) {
+		this.requireShift = requireShift;
+	}
+
+	public Identifier getRequiredRecipe() {
+		return requiredRecipe;
+	}
+
+	public void setRequiredRecipe(Identifier requiredRecipe) {
+		this.requiredRecipe = requiredRecipe;
+	}
+
+	public Identifier getRequiredGuiName() {
+		return requiredGuiName;
+	}
+
+	public void setRequiredGuiName(Identifier requiredGuiName) {
+		this.requiredGuiName = requiredGuiName;
 	}
 }

@@ -3,29 +3,22 @@ package megaminds.actioninventory.actions;
 import java.util.UUID;
 
 import eu.pb4.sgui.api.ClickType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import megaminds.actioninventory.ActionInventoryMod;
-import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.misc.Enums.GuiType;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.MessageHelper;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
-@NoArgsConstructor
-@Getter
-@Setter
 public final class OpenGui extends BasicAction {
 	private GuiType guiType;
 	private Identifier guiName;
 	private UUID playerUUID;
 
+	public OpenGui() {}
+	
 	public OpenGui(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, GuiType guiType, Identifier guiName, UUID playerUUID) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.guiName = guiName;
@@ -60,7 +53,7 @@ public final class OpenGui extends BasicAction {
 			var b = ActionInventoryMod.INVENTORY_LOADER.getBuilder(guiName);
 			if (b==null) {
 				gui.close();
-				player.sendSystemMessage(MessageHelper.toError("No action inventory of name: "+guiName), Util.NIL_UUID);
+				player.sendMessage(MessageHelper.toError("No action inventory of name: "+guiName));
 			} else {
 				b.build(player).open(gui);
 			}
@@ -91,5 +84,29 @@ public final class OpenGui extends BasicAction {
 		var copy = new OpenGui(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), guiType, guiName, playerUUID);
 		copy.playerUUID = playerUUID;
 		return copy;
+	}
+
+	public GuiType getGuiType() {
+		return guiType;
+	}
+
+	public void setGuiType(GuiType guiType) {
+		this.guiType = guiType;
+	}
+
+	public Identifier getGuiName() {
+		return guiName;
+	}
+
+	public void setGuiName(Identifier guiName) {
+		this.guiName = guiName;
+	}
+
+	public UUID getPlayerUUID() {
+		return playerUUID;
+	}
+
+	public void setPlayerUUID(UUID playerUUID) {
+		this.playerUUID = playerUUID;
 	}
 }
