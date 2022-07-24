@@ -80,7 +80,7 @@ public class MessageHelper {
 	 * Executes the given command as the server.
 	 */
 	public static int executeCommand(MinecraftServer server, String command) {
-		return server.getCommandManager().execute(server.getCommandSource(), command);
+		return server.getCommandManager().execute(server.getCommandSource(), removeLeadingSlash(command));
 	}
 
 	/**
@@ -88,11 +88,15 @@ public class MessageHelper {
 	 * Command may fail if the player has incorrect permissions.
 	 */
 	public static int executeCommand(ServerPlayerEntity player, String command) {
-		return player.getServer().getCommandManager().execute(player.getCommandSource(), command);
+		return player.getServer().getCommandManager().execute(player.getCommandSource(), removeLeadingSlash(command));
 	}
 
 	public static int executeCommand(ServerCommandSource source, String command) {
-		return source.getServer().getCommandManager().execute(source, command);
+		return source.getServer().getCommandManager().execute(source, removeLeadingSlash(command));
+	}
+
+	private static String removeLeadingSlash(String s) {
+		return s.charAt(0)=='/' ? s.substring(1) : s;
 	}
 
 	/**
