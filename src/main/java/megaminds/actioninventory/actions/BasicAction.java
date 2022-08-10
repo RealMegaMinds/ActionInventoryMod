@@ -39,6 +39,7 @@ public abstract sealed class BasicAction implements ActionInventoryCallback, Val
 	 * Fields have been checked before calling this method.
 	 */
 	/**@since 3.1*/
+	@Override
 	public abstract void accept(@NotNull ActionInventoryGui gui);
 	public abstract BasicAction copy();
 	

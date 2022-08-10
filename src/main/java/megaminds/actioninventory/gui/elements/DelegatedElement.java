@@ -15,6 +15,7 @@ public class DelegatedElement implements GuiElementInterface {
     	this.guiCallback = callback;
 	}
 
+	@Override
 	public ItemStack getItemStack() {
 		return delegate.getItemStack();
 	}

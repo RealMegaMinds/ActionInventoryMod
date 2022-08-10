@@ -35,22 +35,27 @@ public class BetterGui extends SimpleGui implements BetterGuiI {
 		return false;
 	}
 
+	@Override
 	public Identifier getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(Identifier id) {
 		this.id = id;
 	}
 
+	@Override
 	public BetterGuiI getPreviousGui() {
 		return previousGui;
 	}
 
+	@Override
 	public boolean isChained() {
 		return chained;
 	}
 
+	@Override
 	public void setChained(boolean chained) {
 		this.chained = chained;
 	}
