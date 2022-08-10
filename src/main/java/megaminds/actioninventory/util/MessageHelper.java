@@ -1,12 +1,17 @@
 package megaminds.actioninventory.util;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.authlib.GameProfile;
+
+import net.minecraft.network.message.DecoratedContents;
+import net.minecraft.network.message.MessageMetadata;
 import net.minecraft.network.message.MessageType;
+import net.minecraft.network.message.SentMessage;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
@@ -39,33 +44,37 @@ public class MessageHelper {
 	 * Sends a message to the given players.
 	 */
 	public static void message(@Nullable UUID from, List<UUID> to, Text message, @Nullable Identifier type, MinecraftServer server) {
-		if (from==null) {
+		if (from == null) {
 			for (var uuid : to) {
-				getPlayer(server, uuid).sendMessage(message, type!=null?idToKey(type, server):MessageType.SYSTEM);
+				getPlayer(server, uuid).sendMessage(message);
 			}
 		} else {
-			var signed = SignedMessage.of(message);
-			var sender = getPlayer(server, from).asMessageSender();
-			var type2 = type!=null?idToKey(type, server):MessageType.CHAT;
 			for (var uuid : to) {
-				server.getPlayerManager().getPlayer(uuid).sendChatMessage(signed, sender, type2);
-			}	
-		}		
+				var msg = SentMessage.of(SignedMessage.ofUnsigned(MessageMetadata.of(from), new DecoratedContents(message.getString(), message)));
+				var source = getPlayer(server, from).getCommandSource();
+				var params = MessageType.params(idToKey(type, server).orElse(MessageType.CHAT), source);
+				var reciever = getPlayer(server, uuid);
+				reciever.sendChatMessage(msg, source.shouldFilterText(reciever), params);
+			}
+		}
 	}
 
-	private static RegistryKey<MessageType> idToKey(Identifier id, MinecraftServer server) {
+	private static Optional<RegistryKey<MessageType>> idToKey(Identifier id, MinecraftServer server) {
 		var reg = server.getRegistryManager().get(Registry.MESSAGE_TYPE_KEY);
-		return reg.getKey(reg.get(id)).orElseThrow();
+		return reg.getKey(reg.get(id));
 	}
 
 	/**
 	 * Broadcasts a message to all players.
 	 */
 	public static void broadcast(@Nullable UUID from, Text message, @Nullable Identifier type, MinecraftServer server) {
-		if (from==null) {
-			server.getPlayerManager().broadcast(message, type!=null ? idToKey(type, server) : MessageType.SYSTEM);
+		if (from == null) {
+			server.getPlayerManager().broadcast(message, false);
 		} else {
-			server.getPlayerManager().broadcast(SignedMessage.of(message), getPlayer(server, from).asMessageSender(), type!=null ? idToKey(type, server) : MessageType.CHAT);
+			var msg = SignedMessage.ofUnsigned(MessageMetadata.of(from), new DecoratedContents(message.getString(), message));
+			var source = getPlayer(server, from).getCommandSource();
+			var params = MessageType.params(idToKey(type, server).orElse(MessageType.CHAT), source);
+			server.getPlayerManager().broadcast(msg, source, params);
 		}
 	}
 
@@ -80,7 +89,7 @@ public class MessageHelper {
 	 * Executes the given command as the server.
 	 */
 	public static int executeCommand(MinecraftServer server, String command) {
-		return server.getCommandManager().execute(server.getCommandSource(), removeLeadingSlash(command));
+		return executeCommand(server.getCommandSource(), command);
 	}
 
 	/**
@@ -88,15 +97,11 @@ public class MessageHelper {
 	 * Command may fail if the player has incorrect permissions.
 	 */
 	public static int executeCommand(ServerPlayerEntity player, String command) {
-		return player.getServer().getCommandManager().execute(player.getCommandSource(), removeLeadingSlash(command));
+		return executeCommand(player.getCommandSource(), command);
 	}
 
 	public static int executeCommand(ServerCommandSource source, String command) {
-		return source.getServer().getCommandManager().execute(source, removeLeadingSlash(command));
-	}
-
-	private static String removeLeadingSlash(String s) {
-		return s.charAt(0)=='/' ? s.substring(1) : s;
+		return source.getServer().getCommandManager().executeWithPrefix(source, command);
 	}
 
 	/**
