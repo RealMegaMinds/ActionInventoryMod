@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import megaminds.actioninventory.serialization.wrappers.Validated;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
@@ -22,13 +21,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack.TooltipSection;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtEnd;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class ItemStackish {
 	public static final ItemStackish MATCH_ALL = new ItemStackish() {
@@ -56,6 +56,7 @@ public class ItemStackish {
 
 	public ItemStackish() {}
 
+	@SuppressWarnings("java:S107")
 	public ItemStackish(Item item, Integer count, Integer damage, Optional<NbtCompound> customNbt, Optional<Text> customName, Text[] lore, Optional<Integer> color, Map<Enchantment, Integer> enchantments, Set<TooltipSection> hideFlags, Set<AttributeValues> attributes) {
 		this.item = item;
 		this.count = count;
@@ -91,6 +92,7 @@ public class ItemStackish {
 		}
 	}
 
+	@SuppressWarnings("java:S2789")
 	public ItemStack toStack() {
 		ItemStack s = new ItemStack(Objects.requireNonNullElse(item, Items.AIR));
 		if (customNbt!=null) s.setNbt(customNbt.orElse(null));
@@ -140,7 +142,7 @@ public class ItemStackish {
 
 	private void attributesFrom(NbtCompound nbt) {
 		if (nbt.contains(ATTRIBUTE_KEY)) {
-			attributes = nbt.getList(ATTRIBUTE_KEY, NbtType.COMPOUND).stream()
+			attributes = nbt.getList(ATTRIBUTE_KEY, NbtElement.COMPOUND_TYPE).stream()
 					.map(NbtCompound.class::cast)
 					.map(AttributeValues::new)
 					.collect(HashSet::new, Set::add, Set::addAll);
@@ -150,7 +152,7 @@ public class ItemStackish {
 
 	private void loreFrom(NbtCompound display) {
 		if (display.contains(ItemStack.LORE_KEY)) {
-			lore = display.getList(ItemStack.LORE_KEY, NbtType.STRING).stream()
+			lore = display.getList(ItemStack.LORE_KEY, NbtElement.STRING_TYPE).stream()
 					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
 					.map(Text.Serializer::fromJson)
 					.toArray(Text[]::new);
@@ -183,6 +185,7 @@ public class ItemStackish {
 	 * Unspecified elements are not checked.<br>
 	 * o1.equals(o2) doesn't mean o2.equals(o1)
 	 */
+	@SuppressWarnings("java:S2789")
 	public boolean specifiedEquals(ItemStackish i) {
 		if (this==i) return true;
 		if (i==null) return false;
@@ -328,7 +331,7 @@ public class ItemStackish {
 
 		public AttributeValues(NbtCompound c) {
 			EntityAttributeModifier mod = EntityAttributeModifier.fromNbt(c);
-			attribute = Registry.ATTRIBUTE.get(new Identifier(c.getString("AttributeName")));
+			attribute = Registries.ATTRIBUTE.get(new Identifier(c.getString("AttributeName")));
 			operation = mod.getOperation();
 			value = mod.getValue();
 			name = mod.getName();

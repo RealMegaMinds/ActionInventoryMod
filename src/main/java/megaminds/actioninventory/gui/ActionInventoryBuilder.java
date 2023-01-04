@@ -9,11 +9,11 @@ import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.ValidationException;
 import megaminds.actioninventory.util.annotations.Exclude;
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 /**
  * Adapted from {@link eu.pb4.sgui.api.gui.SimpleGuiBuilder}.
@@ -60,12 +60,12 @@ public final class ActionInventoryBuilder implements Validated {
 			return;
 		}
 		var len = elements.length;
-		Validated.validate(len<=size, ()->"Too many elements. Screen handler type "+Registry.SCREEN_HANDLER.getId(type)+" requires there to be a maximum of "+size+" SlotElements");
+		Validated.validate(len<=size, ()->"Too many elements. Screen handler type "+Registries.SCREEN_HANDLER.getId(type)+" requires there to be a maximum of "+size+" SlotElements");
 		var test = new boolean[size];
 		for (var e : elements) {
 			if (e!=null) {
 				var i = e.getIndex();
-				Validated.validate(i<size, ()->"Screen handler type "+Registry.SCREEN_HANDLER.getId(type)+" requires SlotElements to have an index below "+size);
+				Validated.validate(i<size, ()->"Screen handler type "+Registries.SCREEN_HANDLER.getId(type)+" requires SlotElements to have an index below "+size);
 				if (i>=0) {
 					Validated.validate(!test[i], "A slot has declared an already used index: "+i);
 					test[i] = true;
@@ -92,6 +92,7 @@ public final class ActionInventoryBuilder implements Validated {
 	/**
 	 * {@link #validate()} is called when using this constructor
 	 */
+	@SuppressWarnings("java:S107")
 	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, Text title, TriState includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
 		this.type = type;
 		this.name = name;
@@ -144,6 +145,7 @@ public final class ActionInventoryBuilder implements Validated {
 		return builder;
 	}
 
+	@SuppressWarnings("java:S1452")//I don't know how to do this without wildcard
 	public ScreenHandlerType<?> getType() {
 		return type;
 	}

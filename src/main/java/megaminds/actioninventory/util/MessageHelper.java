@@ -8,11 +8,11 @@ import org.jetbrains.annotations.Nullable;
 
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.network.message.DecoratedContents;
-import net.minecraft.network.message.MessageMetadata;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SentMessage;
 import net.minecraft.network.message.SignedMessage;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -21,9 +21,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
-
 import static megaminds.actioninventory.util.Helper.getPlayer;
 
 public class MessageHelper {
@@ -50,7 +47,7 @@ public class MessageHelper {
 			}
 		} else {
 			for (var uuid : to) {
-				var msg = SentMessage.of(SignedMessage.ofUnsigned(MessageMetadata.of(from), new DecoratedContents(message.getString(), message)));
+				var msg = SentMessage.of(SignedMessage.ofUnsigned(from, "").withUnsignedContent(message));
 				var source = getPlayer(server, from).getCommandSource();
 				var params = MessageType.params(idToKey(type, server).orElse(MessageType.CHAT), source);
 				var reciever = getPlayer(server, uuid);
@@ -60,7 +57,7 @@ public class MessageHelper {
 	}
 
 	private static Optional<RegistryKey<MessageType>> idToKey(Identifier id, MinecraftServer server) {
-		var reg = server.getRegistryManager().get(Registry.MESSAGE_TYPE_KEY);
+		var reg = server.getRegistryManager().get(RegistryKeys.MESSAGE_TYPE);
 		return reg.getKey(reg.get(id));
 	}
 
@@ -71,7 +68,7 @@ public class MessageHelper {
 		if (from == null) {
 			server.getPlayerManager().broadcast(message, false);
 		} else {
-			var msg = SignedMessage.ofUnsigned(MessageMetadata.of(from), new DecoratedContents(message.getString(), message));
+			var msg = SignedMessage.ofUnsigned(from, "").withUnsignedContent(message);
 			var source = getPlayer(server, from).getCommandSource();
 			var params = MessageType.params(idToKey(type, server).orElse(MessageType.CHAT), source);
 			server.getPlayerManager().broadcast(msg, source, params);

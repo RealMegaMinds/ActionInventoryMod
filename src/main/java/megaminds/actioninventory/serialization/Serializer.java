@@ -35,11 +35,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class Serializer {
 	public static final Gson GSON;
@@ -77,16 +78,16 @@ public class Serializer {
 				.registerTypeAdapter(Identifier.class, delegate(String.class, s->new Identifier(s.toLowerCase()), Identifier::toString))
 				.registerTypeAdapter(TriState.class, new TriStateAdapter())
 
-				.registerTypeAdapter(Item.class, registryDelegate(Registry.ITEM))
-				.registerTypeAdapter(Enchantment.class, registryDelegate(Registry.ENCHANTMENT))
-				.registerTypeAdapter(EntityAttribute.class, registryDelegate(Registry.ATTRIBUTE))
-				.registerTypeAdapter(Block.class, registryDelegate(Registry.BLOCK))
-				.registerTypeAdapter(BlockEntity.class, registryDelegate(Registry.BLOCK_ENTITY_TYPE))
-				.registerTypeAdapter(EntityType.class, registryDelegate(Registry.ENTITY_TYPE))
-				.registerTypeAdapter(SoundEvent.class, registryDelegate(Registry.SOUND_EVENT))
-				.registerTypeAdapter(ScreenHandlerType.class, registryDelegate(Registry.SCREEN_HANDLER))
-				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registry.STATUS_EFFECT))
-				.registerTypeAdapter(ParticleType.class, registryDelegate(Registry.PARTICLE_TYPE))
+				.registerTypeAdapter(Item.class, registryDelegate(Registries.ITEM))
+				.registerTypeAdapter(Enchantment.class, registryDelegate(Registries.ENCHANTMENT))
+				.registerTypeAdapter(EntityAttribute.class, registryDelegate(Registries.ATTRIBUTE))
+				.registerTypeAdapter(Block.class, registryDelegate(Registries.BLOCK))
+				.registerTypeAdapter(BlockEntity.class, registryDelegate(Registries.BLOCK_ENTITY_TYPE))
+				.registerTypeAdapter(EntityType.class, registryDelegate(Registries.ENTITY_TYPE))
+				.registerTypeAdapter(SoundEvent.class, registryDelegate(Registries.SOUND_EVENT))
+				.registerTypeAdapter(ScreenHandlerType.class, registryDelegate(Registries.SCREEN_HANDLER))
+				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registries.STATUS_EFFECT))
+				.registerTypeAdapter(ParticleType.class, registryDelegate(Registries.PARTICLE_TYPE))
 				.registerTypeAdapter(EntityPredicate.class, basic(EntityPredicate::fromJson, EntityPredicate::toJson))
 				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
 				.registerTypeAdapterFactory(new PolyAdapterFactory())

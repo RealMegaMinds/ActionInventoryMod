@@ -9,6 +9,7 @@ import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -37,6 +38,7 @@ public final class SoundAction extends BasicAction {
 		this.pitch = pitch;
 	}
 
+	@SuppressWarnings("java:S107")
 	public SoundAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, SoundEvent sound, SoundCategory category, Vec3d position, Float volume, Float pitch) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName);
 		this.sound = sound;
@@ -50,12 +52,13 @@ public final class SoundAction extends BasicAction {
 	public void accept(ActionInventoryGui gui) {
 		var player = gui.getPlayer();
 		var pos = Objects.requireNonNullElseGet(position, player::getPos);
-		player.networkHandler.sendPacket(new PlaySoundS2CPacket(sound, category, pos.x, pos.y, pos.z, volume, pitch, ActionInventoryMod.RANDOM.nextLong()));
+		player.networkHandler.sendPacket(new PlaySoundS2CPacket(Registries.SOUND_EVENT.getEntry(sound), category, pos.x, pos.y, pos.z, volume, pitch, ActionInventoryMod.RANDOM.nextLong()));
 	}
 
 	@Override
 	public void validate() {
-		if (sound==null) sound = SoundEvents.UI_BUTTON_CLICK;
+		SoundEvents.PARTICLE_SOUL_ESCAPE.getId();
+		if (sound==null) sound = Registries.SOUND_EVENT.get(SoundEvents.UI_BUTTON_CLICK.registryKey());
 		if (category==null) category = SoundCategory.MASTER;
 		if (volume==null) volume = 1f;
 		if (pitch==null) pitch = 1f;

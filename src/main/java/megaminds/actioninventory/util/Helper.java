@@ -62,6 +62,7 @@ public class Helper {
 	@NotNull
 	public static ServerPlayerEntity getPlayer(MinecraftServer server, UUID playerUuid) {
 		var player = server.getPlayerManager().getPlayer(playerUuid);
+		//TODO add toggle for this error
 		Objects.requireNonNull(player, ()->"No Player Exists for UUID: "+playerUuid);
 		return player;
 	}
