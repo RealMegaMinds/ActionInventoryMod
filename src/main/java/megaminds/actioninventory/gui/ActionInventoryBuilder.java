@@ -1,6 +1,9 @@
 package megaminds.actioninventory.gui;
 
 import java.util.Arrays;
+
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.sgui.api.GuiHelpers;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.actions.EmptyAction;
@@ -111,7 +114,7 @@ public final class ActionInventoryBuilder implements Validated {
 
 	public ActionInventoryGui build(ServerPlayerEntity player) {
 		var gui = new ActionInventoryGui(type, player, includePlayer.orElse(false), name, openAction, closeAction, anyClickAction, recipeAction);
-		gui.setTitle(title);
+		gui.setTitle(Placeholders.parseText(title, PlaceholderContext.of(player)));
 		gui.setLockPlayerInventory(lockPlayerInventory.orElse(false));
 		gui.setChained(chained.orElse(false));
 

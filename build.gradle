@@ -31,6 +31,7 @@ dependencies {
 	
 	modImplementation include("eu.pb4:sgui:${project.sgui_version}")
 	modImplementation include("eu.pb4:player-data-api:${project.playerdata_version}")
+	modImplementation include("eu.pb4:placeholder-api:${project.placeholder_version}")
 	modCompileOnly "me.lucko:fabric-permissions-api:${project.permissions_version}"
 }
 

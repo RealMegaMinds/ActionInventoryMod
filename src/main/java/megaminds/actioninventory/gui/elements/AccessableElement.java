@@ -5,10 +5,14 @@ import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.actions.EmptyAction;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.util.annotations.Exclude;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public abstract sealed class AccessableElement extends SlotElement implements GuiElementInterface, Validated permits AccessableGuiElement, AccessableAnimatedGuiElement {
 	private BasicAction action;
+	@Exclude
+	protected ItemStack lastDisplayed;
 
 	protected AccessableElement() {}
 
@@ -34,5 +38,10 @@ public abstract sealed class AccessableElement extends SlotElement implements Gu
 
 	public void setAction(BasicAction action) {
 		this.action = action;
+	}
+
+	@Override
+	public ItemStack getItemStack() {
+		return lastDisplayed;
 	}
 }

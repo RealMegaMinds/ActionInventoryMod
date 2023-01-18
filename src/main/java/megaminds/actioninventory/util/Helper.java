@@ -20,7 +20,11 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 import megaminds.actioninventory.ActionInventoryMod;
+import megaminds.actioninventory.misc.ItemStackish;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.MinecraftServer;
@@ -34,6 +38,20 @@ public class Helper {
 	private static final String WORLD = "WORLD";
 
 	private Helper() {}
+
+	/**
+	 * Parses the name and lore of the item stack. The same stack is returned with the changes.
+	 */
+	public static ItemStack parseItemStack(ItemStack stack, PlaceholderContext context) {
+		if (stack.hasCustomName()) {
+			var parsedName = Placeholders.parseText(stack.getName(), context);
+			var parsedLore = ItemStackish.loreFrom(stack).stream().map(l->Placeholders.parseText(l, context)).toList();
+			stack.setCustomName(parsedName);
+			ItemStackish.setLore(stack, parsedLore);
+		}
+
+		return stack;
+	}
 
 	/**
 	 * False if compound==null

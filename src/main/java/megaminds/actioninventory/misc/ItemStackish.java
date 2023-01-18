@@ -1,8 +1,10 @@
 package megaminds.actioninventory.misc;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +29,7 @@ import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -156,8 +159,19 @@ public class ItemStackish {
 					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
 					.map(Text.Serializer::fromJson)
 					.toArray(Text[]::new);
-			display.remove(ItemStack.LORE_KEY);
+			display.remove(ItemStack.LORE_KEY);	//TODO is there a reason for doing this?
 		}
+	}
+
+	public static List<MutableText> loreFrom(ItemStack stack) {
+		var display = stack.getSubNbt(ItemStack.DISPLAY_KEY);
+		if (display !=null && display.contains(ItemStack.LORE_KEY)) {
+			return display.getList(ItemStack.LORE_KEY, NbtElement.STRING_TYPE).stream()
+					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
+					.map(Text.Serializer::fromJson)
+					.toList();
+		}
+		return Collections.emptyList();
 	}
 
 	private void addLore(ItemStack s) {
@@ -167,6 +181,15 @@ public class ItemStackish {
 				.map(NbtString::of)
 				.collect(NbtList::new, NbtList::add, NbtList::addAll);
 		s.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, list);
+	}
+
+	public static void setLore(ItemStack stack, List<Text> lore) {
+		var list = lore.stream()
+				.map(l->l!=null?l:Text.empty())
+				.map(Text.Serializer::toJson)
+				.map(NbtString::of)
+				.collect(NbtList::new, NbtList::add, NbtList::addAll);
+		stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, list);
 	}
 
 	private void addColor(ItemStack s) {

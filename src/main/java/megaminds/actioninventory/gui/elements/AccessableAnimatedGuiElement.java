@@ -2,11 +2,12 @@ package megaminds.actioninventory.gui.elements;
 
 import java.util.Arrays;
 
-import org.jetbrains.annotations.NotNull;
+import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.sgui.api.gui.GuiInterface;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.Exclude;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
@@ -42,12 +43,6 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 		if (items==null) items = EMPTY;
 	}
 
-	@NotNull
-	@Override
-	public ItemStack getItemStack() {
-		return this.items[frame].copy();
-	}
-
 	@Override
 	public ItemStack getItemStackForDisplay(GuiInterface gui) {
 		if (items.length==1) return items[0];
@@ -65,7 +60,9 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 			}
 		}
 
-		return this.items[cFrame].copy();
+		var stack = Helper.parseItemStack(this.items[cFrame].copy(), PlaceholderContext.of(gui.getPlayer()));
+		lastDisplayed = stack;
+		return stack;
 	}
 
 	@Override

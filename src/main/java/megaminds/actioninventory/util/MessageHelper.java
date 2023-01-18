@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 import com.mojang.authlib.GameProfile;
 
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SentMessage;
 import net.minecraft.network.message.SignedMessage;
@@ -42,13 +45,17 @@ public class MessageHelper {
 	 */
 	public static void message(@Nullable UUID from, List<UUID> to, Text message, @Nullable Identifier type, MinecraftServer server) {
 		if (from == null) {
+			message = Placeholders.parseText(message, PlaceholderContext.of(server));
 			for (var uuid : to) {
 				getPlayer(server, uuid).sendMessage(message);
 			}
 		} else {
 			for (var uuid : to) {
+				var p = getPlayer(server, from);
+				message = Placeholders.parseText(message, PlaceholderContext.of(p));
+
 				var msg = SentMessage.of(SignedMessage.ofUnsigned(from, "").withUnsignedContent(message));
-				var source = getPlayer(server, from).getCommandSource();
+				var source = p.getCommandSource();
 				var params = MessageType.params(idToKey(type, server).orElse(MessageType.CHAT), source);
 				var reciever = getPlayer(server, uuid);
 				reciever.sendChatMessage(msg, source.shouldFilterText(reciever), params);
@@ -66,10 +73,14 @@ public class MessageHelper {
 	 */
 	public static void broadcast(@Nullable UUID from, Text message, @Nullable Identifier type, MinecraftServer server) {
 		if (from == null) {
+			message = Placeholders.parseText(message, PlaceholderContext.of(server));
 			server.getPlayerManager().broadcast(message, false);
 		} else {
+			var p = getPlayer(server, from);
+			message = Placeholders.parseText(message, PlaceholderContext.of(p));
+
 			var msg = SignedMessage.ofUnsigned(from, "").withUnsignedContent(message);
-			var source = getPlayer(server, from).getCommandSource();
+			var source = p.getCommandSource();
 			var params = MessageType.params(idToKey(type, server).orElse(MessageType.CHAT), source);
 			server.getPlayerManager().broadcast(msg, source, params);
 		}
@@ -79,7 +90,7 @@ public class MessageHelper {
 	 * Logs a message to the server.
 	 */
 	public static void log(Text message, MinecraftServer server) {
-		server.sendMessage(message);
+		server.sendMessage(Placeholders.parseText(message, PlaceholderContext.of(server)));
 	}
 
 	/**
@@ -98,7 +109,7 @@ public class MessageHelper {
 	}
 
 	public static int executeCommand(ServerCommandSource source, String command) {
-		return source.getServer().getCommandManager().executeWithPrefix(source, command);
+		return source.getServer().getCommandManager().executeWithPrefix(source, Placeholders.parseText(TextNode.of(command), PlaceholderContext.of(source)).getString());
 	}
 
 	/**

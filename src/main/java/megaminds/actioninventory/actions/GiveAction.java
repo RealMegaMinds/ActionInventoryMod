@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.ActionInventoryGui;
+import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.ItemStack;
@@ -58,6 +60,7 @@ public final class GiveAction extends BasicAction {
 		.map(id->p.server.getLootManager().getTable(id).generateLoot(lootContext))
 		.<ItemStack>mapMulti(List::forEach)
 		.filter(Objects::nonNull)
+		.map(s->Helper.parseItemStack(s, PlaceholderContext.of(p)))
 		.forEach(p.getInventory()::offerOrDrop);
 
 		p.currentScreenHandler.sendContentUpdates();

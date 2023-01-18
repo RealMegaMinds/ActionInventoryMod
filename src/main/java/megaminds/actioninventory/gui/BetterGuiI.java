@@ -51,7 +51,6 @@ public interface BetterGuiI extends SlotGuiInterface {
 		if (isChained() && lastGui!=null) {
 			clearPrevious();
 			lastGui.reOpen();
-			lastGui = null;
 		}
 	}
 }
