@@ -83,9 +83,10 @@ public class ItemStackish {
 		if (i.hasNbt()) {
 			NbtCompound nbt = i.getNbt().copy();
 			customNbt = Optional.of(nbt);
+			//All of the found values are removed from the NbtCompound so only custom info stays. ** The ItemStack itself should NOT be modified. **
 			if (nbt.contains(ItemStack.DISPLAY_KEY)) {
 				NbtCompound display = nbt.getCompound(ItemStack.DISPLAY_KEY);
-				nameFrom(i);
+				nameFrom(display);
 				loreFrom(display);
 				colorFrom(display);
 			}
@@ -120,10 +121,10 @@ public class ItemStackish {
 		attributes = Set.of();
 	}
 
-	private void nameFrom(ItemStack s) {
-		if (s.hasCustomName()) {
-			customName = Optional.of(s.getName());
-			s.getSubNbt(ItemStack.DISPLAY_KEY).remove(ItemStack.NAME_KEY);
+	private void nameFrom(NbtCompound display) {
+		if (display.contains(ItemStack.NAME_KEY)) {
+			customName = Optional.of(Text.Serializer.fromJson(display.getString(ItemStack.NAME_KEY)));
+			display.remove(ItemStack.NAME_KEY);
 		}
 	}
 
@@ -159,7 +160,7 @@ public class ItemStackish {
 					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
 					.map(Text.Serializer::fromJson)
 					.toArray(Text[]::new);
-			display.remove(ItemStack.LORE_KEY);	//TODO is there a reason for doing this?
+			display.remove(ItemStack.LORE_KEY);
 		}
 	}
 
