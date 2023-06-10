@@ -42,7 +42,7 @@ public class OpenCommand {
 		for (var target : targets) {
 			if (builder.build(target).open()) {
 				success++;
-				if (!silent) context.getSource().sendFeedback(Text.literal("Opened "+name+" for ").append(target.getName()), false);
+				if (!silent) context.getSource().sendFeedback(() -> Text.literal("Opened "+name+" for ").append(target.getName()), false);
 			} else if (!silent) {
 				context.getSource().sendError(Text.literal("Failed to open "+name+" for ").append(target.getName()));
 			}

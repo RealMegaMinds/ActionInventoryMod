@@ -41,7 +41,7 @@ public class LoadCommand {
 		try (var br = Files.newBufferedReader(p)) {
 			var opener = Serializer.openerFromJson(br);
 			ActionInventoryMod.OPENER_LOADER.addOpener(opener);
-			context.getSource().sendFeedback(Text.of("Loaded opener."), false);
+			context.getSource().sendFeedback(() -> Text.of("Loaded opener."), false);
 			return 1;
 		} catch (IOException e) {
 			var msg = e.getMessage();
@@ -61,7 +61,7 @@ public class LoadCommand {
 			var builder = Serializer.builderFromJson(br);
 			if (override || !ActionInventoryMod.INVENTORY_LOADER.hasBuilder(builder.getName())) {
 				ActionInventoryMod.INVENTORY_LOADER.addBuilder(builder);
-				context.getSource().sendFeedback(Text.of("Loaded action inventory: "+builder.getName()), false);
+				context.getSource().sendFeedback(() -> Text.of("Loaded action inventory: "+builder.getName()), false);
 				return 1;
 			} else {
 				context.getSource().sendError(Text.of("A loaded action inventory already has this name."));

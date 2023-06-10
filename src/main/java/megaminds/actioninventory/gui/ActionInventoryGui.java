@@ -5,7 +5,6 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.actions.EmptyAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -68,7 +67,8 @@ public class ActionInventoryGui extends BetterGui {
 	/**@since 3.1*/
 	@Override
 	public void onCraftRequest(Identifier recipe, boolean shift) {
-		lastClicked = player.getServer().getRecipeManager().get(recipe).map(Recipe::getOutput).orElse(ItemStack.EMPTY).copy();
+		var server = player.getServer();
+		lastClicked = server.getRecipeManager().get(recipe).map(r -> r.getOutput(server.getRegistryManager())).orElse(ItemStack.EMPTY).copy();
 		lastAction = "onCraft";
 		recipeAction.onRecipe(recipe, shift, this);
 	}

@@ -12,6 +12,7 @@ import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.screen.slot.SlotActionType;
@@ -49,15 +50,15 @@ public final class GiveAction extends BasicAction {
 			if (current!=null) p.getInventory().offerOrDrop(current);
 		}
 
-		var lootContext = new LootContext.Builder(p.getWorld())
-				.parameter(LootContextParameters.THIS_ENTITY, p)
-				.parameter(LootContextParameters.ORIGIN, p.getPos())
-				.random(p.getRandom())
+		var lootContext = new LootContextParameterSet.Builder(p.getServerWorld())
+				.add(LootContextParameters.THIS_ENTITY, p)
+				.add(LootContextParameters.ORIGIN, p.getPos())
+//TODO Needed?	.random(p.getRandom())
 				.luck(p.getLuck())
 				.build(LootContextTypes.ADVANCEMENT_REWARD);
 
 		Arrays.stream(lootTables)
-		.map(id->p.server.getLootManager().getTable(id).generateLoot(lootContext))
+		.map(id->p.server.getLootManager().getLootTable(id).generateLoot(lootContext))
 		.<ItemStack>mapMulti(List::forEach)
 		.filter(Objects::nonNull)
 		.map(s->Helper.parseItemStack(s, PlaceholderContext.of(p)))

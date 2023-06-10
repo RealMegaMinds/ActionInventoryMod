@@ -43,7 +43,7 @@ public class Commands {
 		//var message = MessageHelper.toSuccess(size+" Action Inventories are loaded.");
 		
 		if (size>0) message.append(combined.toString());
-		context.getSource().sendFeedback(message, false);
+		context.getSource().sendFeedback(() -> message, false);
 		return size;
 	}
 }

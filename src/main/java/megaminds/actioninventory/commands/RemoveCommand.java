@@ -32,7 +32,7 @@ public class RemoveCommand {
 		}
 
 		ActionInventoryMod.INVENTORY_LOADER.removeBuilder(name);
-		context.getSource().sendFeedback(Text.of("Removed Action Inventory with name: "+name), false);
+		context.getSource().sendFeedback(() -> Text.of("Removed Action Inventory with name: "+name), false);
 		return 1;
 	}
 }
