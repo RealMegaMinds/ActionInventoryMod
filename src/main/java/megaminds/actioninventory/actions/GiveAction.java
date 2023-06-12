@@ -11,7 +11,6 @@ import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
@@ -53,7 +52,6 @@ public final class GiveAction extends BasicAction {
 		var lootContext = new LootContextParameterSet.Builder(p.getServerWorld())
 				.add(LootContextParameters.THIS_ENTITY, p)
 				.add(LootContextParameters.ORIGIN, p.getPos())
-//TODO Needed?	.random(p.getRandom())
 				.luck(p.getLuck())
 				.build(LootContextTypes.ADVANCEMENT_REWARD);
 
