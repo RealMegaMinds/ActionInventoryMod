@@ -67,12 +67,7 @@ public final class AccessableAnimatedGuiElement extends AccessableElement {
 
 	@Override
 	public SlotElement copy() {
-		var copy = new AccessableAnimatedGuiElement();
-		copy.setAction(getGuiCallback().copy());
-		copy.items = Arrays.stream(items).map(ItemStack::copy).toArray(ItemStack[]::new);
-		copy.interval = interval;
-		copy.random = random;
-		return copy;
+		return new AccessableAnimatedGuiElement(getIndex(), getGuiCallback().copy(), Arrays.stream(items).map(ItemStack::copy).toArray(ItemStack[]::new), interval, random);
 	}
 
 	public ItemStack[] getItems() {

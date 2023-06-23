@@ -80,7 +80,7 @@ public final class MessageAction extends BasicAction {
 
 	@Override
 	public BasicAction copy() {
-		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), message.copy(), sender, new ArrayList<>(receivers), messageType);
+		return new MessageAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), message.copy(), sender, receivers == null ? null : new ArrayList<>(receivers), messageType);
 	}
 
 	public Text getMessage() {

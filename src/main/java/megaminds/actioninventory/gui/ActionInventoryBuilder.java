@@ -120,7 +120,7 @@ public final class ActionInventoryBuilder implements Validated {
 
 		for (var element : elements) {
 			if (element != null) {
-				element.apply(gui, player);
+				element.copy().apply(gui, player);
 			}
 		}
 

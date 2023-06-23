@@ -36,10 +36,7 @@ public final class AccessableGuiElement extends AccessableElement {
 
 	@Override
 	public SlotElement copy() {
-		AccessableGuiElement copy = new AccessableGuiElement();
-		copy.item = item.copy();
-		copy.setAction(getGuiCallback().copy());
-		return copy;
+		return new AccessableGuiElement(getIndex(), getGuiCallback().copy(), item.copy());
 	}
 
 	public void setItem(ItemStack item) {
