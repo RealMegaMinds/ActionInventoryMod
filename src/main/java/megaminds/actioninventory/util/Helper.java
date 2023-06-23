@@ -46,7 +46,7 @@ public class Helper {
 	 * Parses the name and lore of the item stack. The same stack is returned with the changes.
 	 */
 	public static ItemStack parseItemStack(ItemStack stack, PlaceholderContext context) {
-		if (stack.hasCustomName()) {
+		if (stack.hasNbt()) {
 			try {
 				stack.setNbt(StringNbtReader.parse(Placeholders.parseText(Text.of(stack.getNbt().toString()), context).getString()));
 			} catch (CommandSyntaxException e) {
