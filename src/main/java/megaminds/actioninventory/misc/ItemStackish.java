@@ -99,7 +99,14 @@ public class ItemStackish {
 	@SuppressWarnings("java:S2789")
 	public ItemStack toStack() {
 		ItemStack s = new ItemStack(Objects.requireNonNullElse(item, Items.AIR));
-		if (customNbt!=null) s.setNbt(customNbt.orElse(null));
+		if (customNbt!=null) {
+			if (customNbt.isEmpty()) {
+				s.setNbt(null);
+			} else {
+				s.setNbt(new NbtCompound());
+				s.getNbt().copyFrom(customNbt.orElseThrow());
+			}
+		}
 		if (count!=null) s.setCount(count);
 		if (damage!=null) s.setDamage(damage);
 		if (customName!=null) s.setCustomName(customName.orElse(null));

@@ -20,18 +20,13 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
 import megaminds.actioninventory.ActionInventoryMod;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 
 /**
  * Just some random helper methods.
@@ -43,15 +38,12 @@ public class Helper {
 	private Helper() {}
 
 	/**
-	 * Parses the name and lore of the item stack. The same stack is returned with the changes.
+	 * Parses nbt of the item stack. The same stack is returned with the changes.
 	 */
 	public static ItemStack parseItemStack(ItemStack stack, PlaceholderContext context) {
 		if (stack.hasNbt()) {
-			try {
-				stack.setNbt(StringNbtReader.parse(Placeholders.parseText(Text.of(stack.getNbt().toString()), context).getString()));
-			} catch (CommandSyntaxException e) {
-				e.printStackTrace();
-			}
+			NbtPlaceholderParser.replaceCompound(context, stack.getNbt());
+			stack.getItem().postProcessNbt(stack.getNbt());
 		}
 
 		return stack;

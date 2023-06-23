@@ -23,9 +23,8 @@ public final class AccessableGuiElement extends AccessableElement {
 
 	@Override
 	public ItemStack getItemStackForDisplay(GuiInterface gui) {
-		var stack = Helper.parseItemStack(item.copy(), PlaceholderContext.of(gui.getPlayer()));
-		lastDisplayed = stack;
-		return stack;
+		lastDisplayed = Helper.parseItemStack(item.copy(), PlaceholderContext.of(gui.getPlayer()));
+		return lastDisplayed;
 	}
 
 	@Override
