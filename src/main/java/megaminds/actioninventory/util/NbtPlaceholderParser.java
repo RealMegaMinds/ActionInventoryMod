@@ -9,6 +9,8 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.text.Text;
 
 public class NbtPlaceholderParser {
+	private NbtPlaceholderParser() {}
+
 	public static void replaceCompound(PlaceholderContext context, NbtCompound compound) {
 		for (var key : compound.getKeys()) {
 			var type = compound.getType(key);

@@ -89,11 +89,11 @@ public class JsonHelper {
 		if (notNull(e)) {
 			if (e.isJsonArray()) {
 				return e.getAsJsonArray();
-			} else {
-				JsonArray arr = new JsonArray(1);
-				arr.add(e);
-				return arr;
 			}
+			
+			JsonArray arr = new JsonArray(1);
+			arr.add(e);
+			return arr;
 		}
 		return def.get();
 	}

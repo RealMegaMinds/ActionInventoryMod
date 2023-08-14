@@ -19,7 +19,8 @@ public abstract sealed class BasicOpener implements Validated permits BlockOpene
 	/**
 	 * Returns true if the action inventory should have opened; this may not be the case if the builder for it doesn't exist.
 	 */
-	public boolean open(ServerPlayerEntity player, Object... context) {	//NOSONAR Used by subclasses
+	@SuppressWarnings("unused") //Used by subclasses
+	public boolean open(ServerPlayerEntity player, Object... context) {
 		var b = ActionInventoryMod.INVENTORY_LOADER.getBuilder(guiName);
 		if (b==null) {
 			player.sendMessage(MessageHelper.toError("No action inventory of name: "+guiName));

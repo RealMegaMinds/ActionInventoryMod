@@ -21,6 +21,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+/**@since 3.6*/
 @PolyName("AnvilStore")
 public final class AnvilStoreAction extends BasicAction {
 	private String storageId;

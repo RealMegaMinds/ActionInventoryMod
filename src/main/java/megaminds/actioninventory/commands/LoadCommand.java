@@ -63,9 +63,9 @@ public class LoadCommand {
 				ActionInventoryMod.INVENTORY_LOADER.addBuilder(builder);
 				context.getSource().sendFeedback(() -> Text.of("Loaded action inventory: "+builder.getName()), false);
 				return 1;
-			} else {
-				context.getSource().sendError(Text.of("A loaded action inventory already has this name."));
 			}
+			
+			context.getSource().sendError(Text.of("A loaded action inventory already has this name."));
 		} catch (IOException e) {
 			var msg = e.getMessage();
 			context.getSource().sendError(Text.of("Unable to read file: "+p+". "+(msg!=null&&!msg.equals(p.toString())?msg:"")));

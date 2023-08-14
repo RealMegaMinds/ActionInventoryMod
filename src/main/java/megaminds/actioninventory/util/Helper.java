@@ -95,11 +95,11 @@ public class Helper {
 	public static <R extends NbtElement> R computeIfAbsent(NbtCompound holder, Function<String, R> creator, String key) {
 		if (holder.contains(key)) {
 			return (R) holder.get(key);
-		} else {
-			var r = creator.apply(key);
-			holder.put(key, r);
-			return r;
 		}
+
+		var r = creator.apply(key);
+		holder.put(key, r);
+		return r;
 	}
 
 	public static <E> boolean containsAny(Collection<E> col, Predicate<E> tester) {
