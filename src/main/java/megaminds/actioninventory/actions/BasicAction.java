@@ -14,7 +14,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
 @Poly
-public abstract sealed class BasicAction implements ActionInventoryCallback, Validated, Consumer<ActionInventoryGui> permits EmptyAction, OpenGui, CloseAction, CommandAction, GiveAction, MessageAction, SendPropertyAction, SoundAction, GroupAction {
+public abstract sealed class BasicAction implements ActionInventoryCallback, Validated, Consumer<ActionInventoryGui> permits EmptyAction, OpenGui, CloseAction, CommandAction, GiveAction, MessageAction, SendPropertyAction, SoundAction, GroupAction, AnvilStoreAction {
 	private Integer requiredIndex;
 	private ClickType requiredClickType;
 	private SlotActionType requiredSlotActionType;
