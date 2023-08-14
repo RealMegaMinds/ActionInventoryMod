@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.ActionInventoryGui;
@@ -41,7 +43,7 @@ public final class GiveAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		var p = gui.getPlayer();
 
 		if (giveClicked.orElse(false)) {

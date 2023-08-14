@@ -2,6 +2,8 @@ package megaminds.actioninventory.actions;
 
 import java.util.function.Consumer;
 
+import org.jetbrains.annotations.NotNull;
+
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.Instanced;
 import megaminds.actioninventory.util.annotations.PolyName;
@@ -19,7 +21,7 @@ public non-sealed class EmptyAction extends BasicAction {
 	}
 	
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		//Unused
 	}
 
@@ -31,7 +33,7 @@ public non-sealed class EmptyAction extends BasicAction {
 	public static EmptyAction getNew(Consumer<ActionInventoryGui> consumer) {
 		return new EmptyAction() {
 			@Override
-			public void accept(ActionInventoryGui gui) {
+			public void accept(@NotNull ActionInventoryGui gui) {
 				consumer.accept(gui);
 			}
 		};

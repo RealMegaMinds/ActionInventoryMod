@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
@@ -43,7 +45,7 @@ public final class CommandAction extends BasicAction {
 	}
 	
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		var player = gui.getPlayer();
 
 		var source = fromServer.orElse(false) ? player.getServer().getCommandSource() : player.getCommandSource();

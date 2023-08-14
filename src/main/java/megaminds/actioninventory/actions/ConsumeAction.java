@@ -45,7 +45,7 @@ public final class ConsumeAction extends GroupAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		if (consumables==null) {
 			super.accept(gui);
 			return;

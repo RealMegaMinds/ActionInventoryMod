@@ -1,5 +1,7 @@
 package megaminds.actioninventory.actions;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.ScreenProperty;
 import megaminds.actioninventory.gui.ActionInventoryGui;
@@ -27,7 +29,7 @@ public final class SendPropertyAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		gui.sendProperty(property, value);
 	}
 

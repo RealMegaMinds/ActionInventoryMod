@@ -2,6 +2,8 @@ package megaminds.actioninventory.actions;
 
 import java.util.Arrays;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -39,7 +41,7 @@ public final class RequirementAction extends GroupAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		var p = gui.getPlayer();
 		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
 			super.accept(gui);

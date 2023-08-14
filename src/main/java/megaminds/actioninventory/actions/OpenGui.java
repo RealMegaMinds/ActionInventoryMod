@@ -2,6 +2,8 @@ package megaminds.actioninventory.actions;
 
 import java.util.UUID;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.gui.ActionInventoryGui;
@@ -37,7 +39,7 @@ public final class OpenGui extends BasicAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		if (guiType==null) {
 			gui.close();
 			return;

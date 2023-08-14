@@ -2,6 +2,8 @@ package megaminds.actioninventory.actions;
 
 import java.util.Arrays;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.annotations.PolyName;
@@ -32,7 +34,7 @@ public sealed class GroupAction extends BasicAction permits RequirementAction, C
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		for (var a : actions) {
 			a.accept(gui);
 		}

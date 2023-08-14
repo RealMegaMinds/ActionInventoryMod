@@ -2,6 +2,8 @@ package megaminds.actioninventory.actions;
 
 import java.util.Objects;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.gui.ActionInventoryGui;
@@ -49,7 +51,7 @@ public final class SoundAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		var player = gui.getPlayer();
 		var pos = Objects.requireNonNullElseGet(position, player::getPos);
 		player.networkHandler.sendPacket(new PlaySoundS2CPacket(Registries.SOUND_EVENT.getEntry(sound), category, pos.x, pos.y, pos.z, volume, pitch, ActionInventoryMod.RANDOM.nextLong()));
@@ -57,7 +59,6 @@ public final class SoundAction extends BasicAction {
 
 	@Override
 	public void validate() {
-		SoundEvents.PARTICLE_SOUL_ESCAPE.getId();
 		if (sound==null) sound = Registries.SOUND_EVENT.get(SoundEvents.UI_BUTTON_CLICK.registryKey());
 		if (category==null) category = SoundCategory.MASTER;
 		if (volume==null) volume = 1f;

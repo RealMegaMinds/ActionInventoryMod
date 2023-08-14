@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.jetbrains.annotations.NotNull;
+
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.gui.ActionInventoryGui;
 import megaminds.actioninventory.util.MessageHelper;
@@ -52,7 +54,7 @@ public final class MessageAction extends BasicAction {
 	}
 
 	@Override
-	public void accept(ActionInventoryGui gui) {
+	public void accept(@NotNull ActionInventoryGui gui) {
 		var player = gui.getPlayer();
 		var server = player.getServer();
 		if (sender==null) sender = player.getUuid();

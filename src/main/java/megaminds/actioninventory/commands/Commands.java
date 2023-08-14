@@ -20,7 +20,8 @@ public class Commands {
 
 	private Commands() {}
 	
-	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, RegistrationEnvironment environment) { //NOSONAR
+	@SuppressWarnings("unused")	//Used as CommandRegistrationCallback
+	public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, RegistrationEnvironment environment) {
 		LiteralArgumentBuilder<ServerCommandSource> root = literal(ActionInventoryMod.MOD_ID);
 
 		root.then(literal("list").requires(CommandPermissions.requires(root.getLiteral()+".list", 2)).executes(Commands::list));
@@ -37,10 +38,8 @@ public class Commands {
 		var combined = new StringBuilder(size*10);
 		names.forEach(i->combined.append("\n"+i.toString()));
 		
-		//TODO Figure out if there is a reason for below
+		//Append to empty Text so success formatting doesn't carry to other appended texts
 		var message = Text.empty().append(MessageHelper.toSuccess(size+" Action Inventories are loaded."));
-		//instead of
-		//var message = MessageHelper.toSuccess(size+" Action Inventories are loaded.");
 		
 		if (size>0) message.append(combined.toString());
 		context.getSource().sendFeedback(() -> message, false);
