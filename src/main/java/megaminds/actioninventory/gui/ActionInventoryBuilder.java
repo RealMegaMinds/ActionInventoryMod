@@ -113,7 +113,12 @@ public final class ActionInventoryBuilder implements Validated {
 	}
 
 	public ActionInventoryGui build(ServerPlayerEntity player) {
-		var gui = new ActionInventoryGui(type, player, includePlayer.orElse(false), name, openAction, closeAction, anyClickAction, recipeAction);
+		ActionInventoryGui gui;
+		if (ScreenHandlerType.ANVIL.equals(type)) {
+			gui = new AnvilActionInventoryGui(player, includePlayer.orElse(false), name, openAction, closeAction, anyClickAction, recipeAction);
+		} else {
+			gui = new SimpleActionInventoryGui(type, player, includePlayer.orElse(false), name, openAction, closeAction, anyClickAction, recipeAction);
+		}
 		gui.setTitle(Placeholders.parseText(title, PlaceholderContext.of(player)));
 		gui.setLockPlayerInventory(lockPlayerInventory.orElse(false));
 		gui.setChained(chained.orElse(false));

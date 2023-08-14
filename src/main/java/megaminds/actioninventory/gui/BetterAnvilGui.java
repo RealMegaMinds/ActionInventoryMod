@@ -6,7 +6,6 @@ import java.util.function.UnaryOperator;
 
 import eu.pb4.sgui.api.gui.AnvilInputGui;
 import megaminds.actioninventory.gui.callback.BetterClickCallback;
-import megaminds.actioninventory.util.ElementHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
@@ -29,8 +28,8 @@ public class BetterAnvilGui extends AnvilInputGui implements BetterGuiI {
 
 	public BetterAnvilGui(ServerPlayerEntity player, boolean includePlayerInventorySlots) {
 		super(player, includePlayerInventorySlots);
-		setSlot(1, ElementHelper.getCancel(null));
-		setSlot(2, ElementHelper.getConfirm(CONFIRM));
+		//setSlot(1, ElementHelper.getCancel(null));
+		//setSlot(2, ElementHelper.getConfirm(CONFIRM));
 	}
 
 	private static final BetterClickCallback CONFIRM = (i,t,a,g)->{
