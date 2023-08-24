@@ -19,7 +19,7 @@ public class OpenCommand {
 	
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
-				.requires(CommandPermissions.requires(root.getLiteral()+".open", 3))
+				.requires(CommandPermissions.requires(root.getLiteral()+".open", 2))
 				.then(argument("targets", EntityArgumentType.players())
 						.then(argument("guiName", IdentifierArgumentType.identifier())
 								.suggests(Commands.NAME_SUGGESTIONS)
