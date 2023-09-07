@@ -3,6 +3,9 @@ package megaminds.actioninventory.commands;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -12,24 +15,43 @@ import megaminds.actioninventory.util.CommandPermissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class OpenCommand {
 	private OpenCommand() {}
-	
+
+	private static final String SILENT_ARG = "silent";
+
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
-				.requires(CommandPermissions.requires(root.getLiteral()+".open", 2))
-				.then(argument("targets", EntityArgumentType.players())
-						.then(argument("guiName", IdentifierArgumentType.identifier())
-								.suggests(Commands.NAME_SUGGESTIONS)
-								.executes(c->open(c, false))
-								.then(argument("silent", BoolArgumentType.bool())
-										.executes(c->open(c, BoolArgumentType.getBool(c, "silent")))))));
+				.then(argument("guiName", IdentifierArgumentType.identifier())
+						.suggests(Commands.NAME_SUGGESTIONS)
+						.executes(OpenCommand::open)
+						.then(argument(SILENT_ARG, BoolArgumentType.bool())
+								.executes(OpenCommand::open))
+						.then(argument("targets", EntityArgumentType.players())
+								.requires(CommandPermissions.requires(root.getLiteral()+".open", 2))
+								.executes(OpenCommand::open)
+								.then(argument(SILENT_ARG, BoolArgumentType.bool())
+										.executes(OpenCommand::open)))));
 	}
 
-	private static int open(CommandContext<ServerCommandSource> context, boolean silent) throws CommandSyntaxException {
-		var targets = EntityArgumentType.getOptionalPlayers(context, "targets");
+	private static int open(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+		Collection<ServerPlayerEntity> targets;
+		try {
+			targets = EntityArgumentType.getOptionalPlayers(context, "targets");
+		} catch (IllegalArgumentException e) {
+			targets = List.of(context.getSource().getPlayerOrThrow());
+		}
+
+		boolean silent = false;
+		try {
+			silent = BoolArgumentType.getBool(context, SILENT_ARG);
+		} catch (IllegalArgumentException e) {
+			//default
+		}
+
 		var name = IdentifierArgumentType.getIdentifier(context, "guiName");
 		var builder = ActionInventoryMod.INVENTORY_LOADER.getBuilder(name);
 
