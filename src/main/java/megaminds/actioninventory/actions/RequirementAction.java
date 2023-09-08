@@ -43,14 +43,14 @@ public final class RequirementAction extends GroupAction {
 	@Override
 	public void accept(@NotNull ActionInventoryGui gui) {
 		var p = gui.getPlayer();
-		if (selector==null || entityPredicate.test(p, p) && matches(p)) {
+		if (entityPredicate.test(p, p) && matchesSelector(p)) {
 			super.accept(gui);
 		}
 	}
 
-	private boolean matches(Entity e) {
+	private boolean matchesSelector(Entity e) {
 		try {
-			return e.equals(selector.getEntity(e.getCommandSource().withMaxLevel(2)));
+			return selector == null || e.equals(selector.getEntity(e.getCommandSource().withMaxLevel(2)));
 		} catch (CommandSyntaxException e1) {
 			return false;
 		}
