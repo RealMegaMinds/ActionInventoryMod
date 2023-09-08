@@ -17,6 +17,7 @@ import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
 import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 @PolyName("Require")
@@ -45,10 +46,13 @@ public final class RequirementAction extends GroupAction {
 
 	@Override
 	public void accept(@NotNull ActionInventoryGui gui) {
-		var p = gui.getPlayer();
-		if (p.hasPermissionLevel(opLevel) && entityPredicate.test(p, p) && matchesSelector(p)) {
+		if (test(gui.getPlayer())) {
 			super.accept(gui);
 		}
+	}
+
+	public boolean test(ServerPlayerEntity player) {
+		return player.hasPermissionLevel(opLevel) && entityPredicate.test(player, player) && matchesSelector(player);
 	}
 
 	private boolean matchesSelector(Entity e) {

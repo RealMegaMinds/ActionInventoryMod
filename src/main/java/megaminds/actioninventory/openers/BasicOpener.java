@@ -25,7 +25,7 @@ public abstract sealed class BasicOpener implements Validated permits BlockOpene
 		if (b==null) {
 			player.sendMessage(MessageHelper.toError("No action inventory of name: "+guiName));
 		} else {
-			b.build(player).open();
+			b.buildAndOpen(player);
 		}
 		return true;
 	}

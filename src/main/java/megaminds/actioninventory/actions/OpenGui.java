@@ -56,8 +56,8 @@ public final class OpenGui extends BasicAction {
 			if (b==null) {
 				gui.close();
 				player.sendMessage(MessageHelper.toError("No action inventory of name: "+guiName));
-			} else {
-				b.build(player).open(gui);
+			} else if (!b.buildAndOpen(player)) {
+				gui.close();
 			}
 		}
 		case PLAYER -> {

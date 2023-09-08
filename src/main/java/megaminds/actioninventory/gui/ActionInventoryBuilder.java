@@ -7,8 +7,10 @@ import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.sgui.api.GuiHelpers;
 import megaminds.actioninventory.actions.BasicAction;
 import megaminds.actioninventory.actions.EmptyAction;
+import megaminds.actioninventory.actions.RequirementAction;
 import megaminds.actioninventory.gui.elements.SlotElement;
 import megaminds.actioninventory.serialization.wrappers.Validated;
+import megaminds.actioninventory.util.MessageHelper;
 import megaminds.actioninventory.util.ValidationException;
 import megaminds.actioninventory.util.annotations.Exclude;
 import net.fabricmc.fabric.api.util.TriState;
@@ -39,6 +41,8 @@ public final class ActionInventoryBuilder implements Validated {
 	private BasicAction anyClickAction;
 	/**@since 3.1*/
 	private BasicAction recipeAction;
+	/**@since 3.6.3*/
+	private RequirementAction checkOpenAction;
 	/**@since 3.2*/
 	private TriState chained = TriState.DEFAULT;
 
@@ -96,7 +100,7 @@ public final class ActionInventoryBuilder implements Validated {
 	 * {@link #validate()} is called when using this constructor
 	 */
 	@SuppressWarnings("java:S107")
-	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, Text title, TriState includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction) throws ValidationException {
+	public ActionInventoryBuilder(ScreenHandlerType<?> type, Identifier name, Text title, TriState includePlayerInventorySlots, SlotElement[] elements, BasicAction openAction, BasicAction closeAction, BasicAction anyClickAction, RequirementAction checkOpenAction) throws ValidationException {
 		this.type = type;
 		this.name = name;
 		this.title = title;
@@ -106,13 +110,14 @@ public final class ActionInventoryBuilder implements Validated {
 		this.closeAction = closeAction;
 		this.openAction = openAction;
 		this.anyClickAction = anyClickAction;
+		this.checkOpenAction = checkOpenAction;
 
 		this.size = GuiHelpers.getHeight(type)*GuiHelpers.getWidth(type) + (includePlayer.orElse(false) ? 36 : 0);
 
 		validate();
 	}
 
-	public ActionInventoryGui build(ServerPlayerEntity player) {
+	public ActionInventoryGui forceBuild(ServerPlayerEntity player) {
 		ActionInventoryGui gui;
 		if (ScreenHandlerType.ANVIL.equals(type)) {
 			gui = new AnvilActionInventoryGui(player, includePlayer.orElse(false), name, openAction, closeAction, anyClickAction, recipeAction);
@@ -130,6 +135,19 @@ public final class ActionInventoryBuilder implements Validated {
 		}
 
 		return gui;
+	}
+
+	public boolean buildAndOpen(ServerPlayerEntity player) {
+		if (!canOpen(player)) {
+			player.sendMessage(MessageHelper.toError("You don't meet the requirements to open action inventory of name: "+name));
+			return false;
+		}
+
+		return forceBuild(player).open();
+	}
+
+	public boolean canOpen(ServerPlayerEntity player) {
+		return checkOpenAction == null || checkOpenAction.test(player);
 	}
 
 	public void setLockPlayerInventory(TriState lockPlayerInventory) {
