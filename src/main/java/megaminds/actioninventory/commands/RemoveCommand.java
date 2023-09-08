@@ -5,21 +5,25 @@ import static net.minecraft.server.command.CommandManager.argument;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.CommandPermissions;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 public class RemoveCommand {
+	private static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b)->CommandSource.suggestIdentifiers(ActionInventoryMod.INVENTORY_LOADER.builderNames(), b);
+
 	private RemoveCommand() {}
-	
+
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("remove")
 				.requires(CommandPermissions.requires(root.getLiteral()+".remove", 4))
 				.then(argument("guiName", IdentifierArgumentType.identifier())
-						.suggests(Commands.NAME_SUGGESTIONS)
+						.suggests(NAME_SUGGESTIONS)
 						.executes(RemoveCommand::remove)));
 	}
 

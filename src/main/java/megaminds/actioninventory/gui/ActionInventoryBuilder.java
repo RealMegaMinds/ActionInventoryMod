@@ -147,7 +147,7 @@ public final class ActionInventoryBuilder implements Validated {
 	}
 
 	public boolean canOpen(ServerPlayerEntity player) {
-		return checkOpenAction == null || checkOpenAction.test(player);
+		return player == null || checkOpenAction == null || checkOpenAction.test(player);
 	}
 
 	public void setLockPlayerInventory(TriState lockPlayerInventory) {

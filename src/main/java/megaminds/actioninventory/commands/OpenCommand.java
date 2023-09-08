@@ -10,8 +10,11 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.CommandPermissions;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -19,6 +22,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class OpenCommand {
+	private static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b) -> CommandSource.suggestIdentifiers(ActionInventoryMod.INVENTORY_LOADER.builderNames(builder -> builder.canOpen(c.getSource().getPlayer())), b);;
+
 	private OpenCommand() {}
 
 	private static final String SILENT_ARG = "silent";
@@ -26,7 +31,7 @@ public class OpenCommand {
 	public static void register(LiteralArgumentBuilder<ServerCommandSource> root) {
 		root.then(literal("open")
 				.then(argument("guiName", IdentifierArgumentType.identifier())
-						.suggests(Commands.NAME_SUGGESTIONS)
+						.suggests(NAME_SUGGESTIONS)
 						.executes(OpenCommand::open)
 						.then(argument(SILENT_ARG, BoolArgumentType.bool())
 								.executes(OpenCommand::open))

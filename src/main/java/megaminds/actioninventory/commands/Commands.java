@@ -5,19 +5,15 @@ import static net.minecraft.server.command.CommandManager.literal;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.util.CommandPermissions;
 import megaminds.actioninventory.util.MessageHelper;
 import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 
 public class Commands {
-	static final SuggestionProvider<ServerCommandSource> NAME_SUGGESTIONS = (c, b)->CommandSource.suggestIdentifiers(ActionInventoryMod.INVENTORY_LOADER.builderNames(), b);
-
 	private Commands() {}
 	
 	@SuppressWarnings("unused")	//Used as CommandRegistrationCallback

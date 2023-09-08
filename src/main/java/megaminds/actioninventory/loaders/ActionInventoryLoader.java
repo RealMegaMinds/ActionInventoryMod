@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.gui.ActionInventoryBuilder;
 import megaminds.actioninventory.gui.VirtualPlayerInventory;
@@ -79,5 +83,9 @@ public class ActionInventoryLoader implements SimpleSynchronousResourceReloadLis
 
 	public Set<Identifier> builderNames() {
 		return Set.copyOf(builders.keySet());
+	}
+
+	public Set<Identifier> builderNames(Predicate<ActionInventoryBuilder> filter) {
+		return builders.entrySet().stream().filter(e -> filter.test(e.getValue())).map(Entry::getKey).collect(Collectors.toUnmodifiableSet());
 	}
 }
