@@ -23,27 +23,30 @@ import net.minecraft.util.Identifier;
 public final class RequirementAction extends GroupAction {	
 	private String entitySelector;
 	private EntityPredicate entityPredicate;
+	private int opLevel;
 
 	@Exclude private EntitySelector selector;
 
 	public RequirementAction() {}
-	
-	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
+
+	public RequirementAction(Integer requiredIndex, ClickType clicktype, SlotActionType actionType, TriState requireShift, Identifier requiredRecipe,  Identifier requiredGuiName, BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate, int opLevel) {
 		super(requiredIndex, clicktype, actionType, requireShift, requiredRecipe, requiredGuiName, actions);
 		this.entitySelector = entitySelector;
 		this.entityPredicate = entityPredicate;
+		this.opLevel = opLevel;
 	}
 
-	public RequirementAction(BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate) {
+	public RequirementAction(BasicAction[] actions, String entitySelector, EntityPredicate entityPredicate, int opLevel) {
 		super(actions);
 		this.entitySelector = entitySelector;
 		this.entityPredicate = entityPredicate;
+		this.opLevel = opLevel;
 	}
 
 	@Override
 	public void accept(@NotNull ActionInventoryGui gui) {
 		var p = gui.getPlayer();
-		if (entityPredicate.test(p, p) && matchesSelector(p)) {
+		if (p.hasPermissionLevel(opLevel) && entityPredicate.test(p, p) && matchesSelector(p)) {
 			super.accept(gui);
 		}
 	}
@@ -77,7 +80,7 @@ public final class RequirementAction extends GroupAction {
 
 	@Override
 	public BasicAction copy() {
-		var copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate);
+		var copy = new RequirementAction(getRequiredIndex(), getRequiredClickType(), getRequiredSlotActionType(), getRequireShift(), getRequiredRecipe(), getRequiredGuiName(), Arrays.stream(getActions()).map(BasicAction::copy).toArray(BasicAction[]::new), entitySelector, entityPredicate, opLevel);
 		copy.selector = selector;
 		return copy;
 	}
@@ -96,5 +99,13 @@ public final class RequirementAction extends GroupAction {
 
 	public void setEntityPredicate(EntityPredicate entityPredicate) {
 		this.entityPredicate = entityPredicate;
+	}
+
+	public int getOpLevel() {
+		return opLevel;
+	}
+
+	public void setOpLevel(int opLevel) {
+		this.opLevel = opLevel;
 	}
 }
