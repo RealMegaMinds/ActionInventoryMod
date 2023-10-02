@@ -88,7 +88,7 @@ public class Serializer {
 				.registerTypeAdapter(ScreenHandlerType.class, registryDelegate(Registries.SCREEN_HANDLER))
 				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registries.STATUS_EFFECT))
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registries.PARTICLE_TYPE))
-				.registerTypeAdapter(EntityPredicate.class, basic(EntityPredicate::fromJson, EntityPredicate::toJson))
+				.registerTypeAdapter(EntityPredicate.class, basic(j -> EntityPredicate.fromJson(j).orElse(null), EntityPredicate::toJson))
 				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
 				.registerTypeAdapterFactory(new PolyAdapterFactory())
 				.registerTypeAdapterFactory(new OptionalAdapterFactory())

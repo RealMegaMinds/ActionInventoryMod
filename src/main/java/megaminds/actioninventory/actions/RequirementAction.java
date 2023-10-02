@@ -52,7 +52,7 @@ public final class RequirementAction extends GroupAction {
 	}
 
 	public boolean test(ServerPlayerEntity player) {
-		return player.hasPermissionLevel(opLevel) && entityPredicate.test(player, player) && matchesSelector(player);
+		return player.hasPermissionLevel(opLevel) && (entityPredicate == null || entityPredicate.test(player, player)) && matchesSelector(player);
 	}
 
 	private boolean matchesSelector(Entity e) {
@@ -79,7 +79,6 @@ public final class RequirementAction extends GroupAction {
 	public void validate() {
 		super.validate();
 		validateSelector();
-		if (entityPredicate==null) entityPredicate = EntityPredicate.ANY;
 	}
 
 	@Override

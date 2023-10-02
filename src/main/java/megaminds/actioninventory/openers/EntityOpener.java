@@ -37,7 +37,7 @@ public final class EntityOpener extends BasicOpener {
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
 		var e = (Entity) context[0];
-		if (selector==null || entityPredicate.test(player, e) && matches(e)) {
+		if ((entityPredicate==null || entityPredicate.test(player, e)) && (selector==null || matches(e))) {
 			return super.open(player, context);
 		}
 		return false;
@@ -76,7 +76,6 @@ public final class EntityOpener extends BasicOpener {
 	public void validate() {
 		super.validate();
 		validateSelector();
-		if (entityPredicate==null) entityPredicate = EntityPredicate.ANY;
 	}
 
 	@Override

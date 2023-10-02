@@ -3,6 +3,7 @@ package megaminds.actioninventory.gui;
 import eu.pb4.sgui.api.ClickType;
 import megaminds.actioninventory.actions.BasicAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
@@ -49,7 +50,7 @@ public interface ActionInventoryGui extends BetterGuiI {
 	/**@since 3.1*/
 	default void onCraftRequest(Identifier recipe, boolean shift) {
 		var server = getPlayer().getServer();
-		setLastClicked(server.getRecipeManager().get(recipe).map(r -> r.getOutput(server.getRegistryManager())).orElse(ItemStack.EMPTY));
+		setLastClicked(server.getRecipeManager().get(recipe).map(RecipeEntry::value).map(r -> r.getResult(server.getRegistryManager())).orElse(ItemStack.EMPTY));
 		setLastAction("onCraft");
 		getRecipeAction().onRecipe(recipe, shift, this);
 	}
