@@ -130,7 +130,7 @@ public class ItemStackish {
 
 	private void nameFrom(NbtCompound display) {
 		if (display.contains(ItemStack.NAME_KEY)) {
-			customName = Optional.of(Text.Serializer.fromJson(display.getString(ItemStack.NAME_KEY)));
+			customName = Optional.of(Text.Serialization.fromJson(display.getString(ItemStack.NAME_KEY)));
 			display.remove(ItemStack.NAME_KEY);
 		}
 	}
@@ -165,7 +165,7 @@ public class ItemStackish {
 		if (display.contains(ItemStack.LORE_KEY)) {
 			lore = display.getList(ItemStack.LORE_KEY, NbtElement.STRING_TYPE).stream()
 					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
-					.map(Text.Serializer::fromJson)
+					.map(Text.Serialization::fromJson)
 					.toArray(Text[]::new);
 			display.remove(ItemStack.LORE_KEY);
 		}
@@ -176,7 +176,7 @@ public class ItemStackish {
 		if (display !=null && display.contains(ItemStack.LORE_KEY)) {
 			return display.getList(ItemStack.LORE_KEY, NbtElement.STRING_TYPE).stream()
 					.map(l->l==null||l==NbtEnd.INSTANCE?"":l.asString())
-					.map(Text.Serializer::fromJson)
+					.map(Text.Serialization::fromJson)
 					.toList();
 		}
 		return Collections.emptyList();
@@ -185,7 +185,7 @@ public class ItemStackish {
 	private void addLore(ItemStack s) {
 		NbtList list = Arrays.stream(lore)
 				.map(l->l!=null?l:Text.empty())
-				.map(Text.Serializer::toJson)
+				.map(Text.Serialization::toJsonString)
 				.map(NbtString::of)
 				.collect(NbtList::new, NbtList::add, NbtList::addAll);
 		s.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, list);
@@ -194,7 +194,7 @@ public class ItemStackish {
 	public static void setLore(ItemStack stack, List<Text> lore) {
 		var list = lore.stream()
 				.map(l->l!=null?l:Text.empty())
-				.map(Text.Serializer::toJson)
+				.map(Text.Serialization::toJsonString)
 				.map(NbtString::of)
 				.collect(NbtList::new, NbtList::add, NbtList::addAll);
 		stack.getOrCreateSubNbt(ItemStack.DISPLAY_KEY).put(ItemStack.LORE_KEY, list);
@@ -365,7 +365,7 @@ public class ItemStackish {
 			attribute = Registries.ATTRIBUTE.get(new Identifier(c.getString("AttributeName")));
 			operation = mod.getOperation();
 			value = mod.getValue();
-			name = mod.getName();
+			name = c.getString("Name");
 			uuid = mod.getId();
 			slot = EquipmentSlot.valueOf(c.getString("Slot"));			
 		}

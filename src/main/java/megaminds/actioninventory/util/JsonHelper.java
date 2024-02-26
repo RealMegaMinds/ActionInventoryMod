@@ -175,7 +175,7 @@ public class JsonHelper {
 	}
 
 	public static Text text(JsonElement e, Text def) {
-		return notNull(e) ? notNull(Text.Serializer.fromJson(e), def) : def;
+		return notNull(e) ? notNull(Text.Serialization.fromJsonTree(e), def) : def;
 	}
 
 	/**

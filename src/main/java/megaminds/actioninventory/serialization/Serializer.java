@@ -13,6 +13,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.mojang.serialization.JsonOps;
 
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
 import megaminds.actioninventory.actions.BasicAction;
@@ -71,7 +72,7 @@ public class Serializer {
 				.setExclusionStrategies(new ExcludeStrategy())
 
 				.registerTypeHierarchyAdapter(NbtElement.class, new NbtElementAdapter().nullSafe())
-				.registerTypeHierarchyAdapter(Text.class, basic(Text.Serializer::fromJson, Text.Serializer::toJsonTree))
+				.registerTypeHierarchyAdapter(Text.class, basic(Text.Serialization::fromJsonTree, Text.Serialization::toJsonTree))
 
 				.registerTypeAdapter(ClickCallback.class, delegate(BasicAction.class, ClickCallback.class::cast, BasicAction.class::cast))
 				.registerTypeAdapter(ItemStack.class, delegate(ItemStackish.class, ItemStackish::toStack, ItemStackish::new))
@@ -88,7 +89,7 @@ public class Serializer {
 				.registerTypeAdapter(ScreenHandlerType.class, registryDelegate(Registries.SCREEN_HANDLER))
 				.registerTypeAdapter(StatusEffect.class, registryDelegate(Registries.STATUS_EFFECT))
 				.registerTypeAdapter(ParticleType.class, registryDelegate(Registries.PARTICLE_TYPE))
-				.registerTypeAdapter(EntityPredicate.class, basic(j -> EntityPredicate.fromJson(j).orElse(null), EntityPredicate::toJson))
+				.registerTypeAdapter(EntityPredicate.class, basic(j -> EntityPredicate.CODEC.parse(JsonOps.INSTANCE, j).result().orElse(null), p -> EntityPredicate.CODEC.encodeStart(JsonOps.INSTANCE, p).result().orElse(null)))
 				.registerTypeAdapterFactory(new WrapperAdapterFactory(new InstancedAdapterWrapper(), new ValidatedAdapterWrapper()))
 				.registerTypeAdapterFactory(new PolyAdapterFactory())
 				.registerTypeAdapterFactory(new OptionalAdapterFactory())

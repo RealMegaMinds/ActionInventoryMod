@@ -96,35 +96,33 @@ public class MessageHelper {
 	/**
 	 * Executes the given command as the server.
 	 */
-	public static int executeCommand(MinecraftServer server, String command) {
-		return executeCommand(server.getCommandSource(), command);
+	public static void executeCommand(MinecraftServer server, String command) {
+		executeCommand(server.getCommandSource(), command);
 	}
 
 	/**
 	 * Executes the given command as the player.<br>
 	 * Command may fail if the player has incorrect permissions.
 	 */
-	public static int executeCommand(ServerPlayerEntity player, String command) {
-		return executeCommand(player.getCommandSource(), command);
+	public static void executeCommand(ServerPlayerEntity player, String command) {
+		executeCommand(player.getCommandSource(), command);
 	}
 
-	public static int executeCommand(ServerCommandSource source, String command) {
-		return source.getServer().getCommandManager().executeWithPrefix(source, Placeholders.parseText(TextNode.of(command), PlaceholderContext.of(source)).getString());
+	public static void executeCommand(ServerCommandSource source, String command) {
+		source.getServer().getCommandManager().executeWithPrefix(source, Placeholders.parseText(TextNode.of(command), PlaceholderContext.of(source)).getString());
 	}
 
 	/**
 	 * Executes the given command as the given player.<br>
 	 * If the player was not already an op, they made an op before executing the command and deopped after completing the command.
 	 */
-	public static int executeOppedCommand(ServerPlayerEntity player, String command) {
+	public static void executeOppedCommand(ServerPlayerEntity player, String command) {
 		PlayerManager manager = player.getServer().getPlayerManager();
 		GameProfile profile = player.getGameProfile();
 		boolean wasOp = manager.isOperator(profile);
 
 		if (!wasOp) manager.addToOperators(profile);
-		int result = executeCommand(player, command);
+		executeCommand(player, command);
 		if (!wasOp) manager.removeFromOperators(profile);
-
-		return result;
 	}
 }
