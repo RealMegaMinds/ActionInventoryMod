@@ -32,7 +32,7 @@ public interface BetterGuiI extends SlotGuiInterface {
 	 * Should set previous to null.
 	 */
 	void clearPrevious();
-	
+
 	/**
 	 * Resends the gui if it is already open, otherwise nothing.
 	 * <br>

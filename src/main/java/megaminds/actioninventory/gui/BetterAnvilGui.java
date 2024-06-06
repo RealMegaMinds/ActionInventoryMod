@@ -7,7 +7,7 @@ import eu.pb4.sgui.api.gui.AnvilInputGui;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import megaminds.actioninventory.gui.callback.BetterClickCallback;
+import megaminds.actioninventory.gui.callback.BetterAnvilCallback;
 import megaminds.actioninventory.util.ElementHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -21,53 +21,35 @@ public class BetterAnvilGui extends AnvilInputGui implements BetterGuiI {
 	 */
 	@Setter(AccessLevel.NONE) private BetterGuiI previousGui;
 	private boolean chained;
-	/**
-	 * Happens every character.
-	 */
+
 	private Function<String, String> filter;
-	/**
-	 * Happens before finishing.
-	 */
 	private Function<String, String> postFilter;
 	private Consumer<String> onFinish;
 
 	public BetterAnvilGui(ServerPlayerEntity player, boolean includePlayerInventorySlots) {
 		super(player, includePlayerInventorySlots);
-		setSlot(1, ElementHelper.getCancel(null));
+		setSlot(1, ElementHelper.getCancel());
 		setSlot(2, ElementHelper.getConfirm(CONFIRM));
 	}
-	
-	private static final BetterClickCallback CONFIRM = (i,t,a,g)->{
-		if (g instanceof BetterAnvilGui v) {
-			if (v.doFilter(v.getInput(), v.postFilter)) {
-				if (v.onFinish!=null) v.onFinish.accept(v.getInput());
-			} else {
-				return true;
-			}
+
+	private static final BetterAnvilCallback CONFIRM = (i,t,a,g) -> {
+		String filtered = g.doFilter(true);
+		if (filtered!=null) {
+			g.onFinish.accept(filtered);
+			return false;
+		} else {
+			return true;
 		}
-		return false;
 	};
 
 	@Override
 	public void onInput(String input) {
-		doFilter(input, filter);
-	}
-	
-	/**
-	 * True if input passed the filter.
-	 */
-	private boolean doFilter(String input, Function<String, String> filter) {
-		String filtered;
-		if (filter!=null && !input.equals(filtered = filter.apply(input))) {
-			setDefaultInputValue(filtered);
-			return false;
-		}
-		return true;
+		doFilter(false);
 	}
 
 	@Override
 	public boolean reOpen() {
-		if (isOpen()) sendGui();
+		if (isOpen()) return sendGui();
 		return false;
 	}
 
@@ -80,5 +62,17 @@ public class BetterAnvilGui extends AnvilInputGui implements BetterGuiI {
 	@Override
 	public void clearPrevious() {
 		previousGui = null;
+	}
+
+	private String doFilter(boolean post) {
+		String input = getInput();
+		String filtered = (post ? postFilter : filter).apply(input).toString();
+		if (input.equals(filtered)) {
+			return filtered;
+		} else {
+			setDefaultInputValue(filtered);
+			sendGui();
+			return null;
+		}
 	}
 }
