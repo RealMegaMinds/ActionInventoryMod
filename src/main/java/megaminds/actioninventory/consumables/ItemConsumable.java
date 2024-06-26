@@ -76,7 +76,7 @@ public final class ItemConsumable extends IntConsumable {
 
 	@Override
 	public BasicConsumable copy() {
-		return new ItemConsumable(stack, Set.copyOf(tags), tagOption);
+		return new ItemConsumable(stack, tags == null ? null : Set.copyOf(tags), tagOption);
 	}
 
 	public ItemStackish getStack() {
