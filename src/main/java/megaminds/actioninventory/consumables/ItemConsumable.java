@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.misc.Enums.TagOption;
+import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
 import megaminds.actioninventory.util.annotations.PolyName;
 import net.minecraft.server.MinecraftServer;
@@ -65,6 +66,7 @@ public final class ItemConsumable extends IntConsumable {
 
 	@Override
 	public void validate() {
+		Validated.validate(getAmount()>=0, "Item consumable requires amount to be 0 or above, but it is: "+getAmount());
 		if (stack==null) stack = ItemStackish.MATCH_ALL;
 		if (tagOption==null) tagOption = TagOption.ANY;
 	}
@@ -76,7 +78,7 @@ public final class ItemConsumable extends IntConsumable {
 
 	@Override
 	public BasicConsumable copy() {
-		return new ItemConsumable(stack, tags == null ? null : Set.copyOf(tags), tagOption);
+		return new ItemConsumable(getAmount(), stack, tags == null ? null : Set.copyOf(tags), tagOption);
 	}
 
 	public ItemStackish getStack() {
