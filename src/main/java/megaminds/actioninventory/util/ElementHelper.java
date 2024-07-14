@@ -1,17 +1,18 @@
 package megaminds.actioninventory.util;
 
-import java.util.Map;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.elements.GuiElementInterface.ClickCallback;
 import megaminds.actioninventory.gui.callback.CancellableCallback;
 import megaminds.actioninventory.gui.elements.DelegatedElement;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemStack.TooltipSection;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import net.minecraft.util.Unit;
 
 public class ElementHelper {
 	public static final ClickCallback CLOSE = (i,t,a,g)->g.close();
@@ -52,7 +53,7 @@ public class ElementHelper {
 
 	public static GuiElementInterface of(Item item, String name, int count, boolean glint, ClickCallback callback) {
 		ItemStack stack = new ItemStack(item, count);
-		stack.setCustomName(Text.of(name));
+		stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(name));
 		if (glint) addGlint(stack);
 		return new GuiElement(hideAllFlags(stack), callback);
 	}
@@ -72,14 +73,12 @@ public class ElementHelper {
 	}
 
 	public static ItemStack removeEnchants(ItemStack stack) {
-		EnchantmentHelper.set(Map.of(), stack);
+		EnchantmentHelper.set(stack, ItemEnchantmentsComponent.DEFAULT);
 		return stack;
 	}
 
 	public static ItemStack hideAllFlags(ItemStack stack) {
-		for (TooltipSection f : TooltipSection.values()) {
-			stack.addHideFlag(f);
-		}
+		stack.set(DataComponentTypes.HIDE_TOOLTIP, Unit.INSTANCE);
 		return stack;
 	}
 

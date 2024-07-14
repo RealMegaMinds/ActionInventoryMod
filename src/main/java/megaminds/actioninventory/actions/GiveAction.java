@@ -16,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 
@@ -58,7 +60,7 @@ public final class GiveAction extends BasicAction {
 				.build(LootContextTypes.ADVANCEMENT_REWARD);
 
 		Arrays.stream(lootTables)
-		.map(id->p.server.getLootManager().getLootTable(id).generateLoot(lootContext))
+		.map(id->p.server.getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, id)).generateLoot(lootContext))
 		.<ItemStack>mapMulti(List::forEach)
 		.filter(Objects::nonNull)
 		.map(s->Helper.parseItemStack(s, PlaceholderContext.of(p)))

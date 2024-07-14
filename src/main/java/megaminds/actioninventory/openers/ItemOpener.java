@@ -2,12 +2,12 @@ package megaminds.actioninventory.openers;
 
 import java.util.Set;
 
-import megaminds.actioninventory.util.annotations.PolyName;
-import megaminds.actioninventory.misc.ItemStackish;
 import megaminds.actioninventory.ActionInventoryMod;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.util.Helper;
+import megaminds.actioninventory.util.annotations.PolyName;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -17,13 +17,13 @@ import net.minecraft.util.TypedActionResult;
 public final class ItemOpener extends BasicOpener {
 	private static final Identifier TYPE = new Identifier(ActionInventoryMod.MOD_ID, "item");
 
-	private ItemStackish stack;
+	private ItemPredicate itemPredicate;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
 
-	public ItemOpener(Identifier guiName, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+	public ItemOpener(Identifier guiName, ItemPredicate itemPredicate, Set<Identifier> tags, TagOption tagOption) {
 		super(guiName);
-		this.stack = stack;
+		this.itemPredicate = itemPredicate;
 		this.tags = tags;
 		this.tagOption = tagOption;
 	}
@@ -31,7 +31,9 @@ public final class ItemOpener extends BasicOpener {
 	@Override
 	public boolean open(ServerPlayerEntity player, Object... context) {
 		var s = (ItemStack) context[0];
-		if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
+		System.out.println(s.getItem());
+		System.out.println(itemPredicate.items());
+		if (itemPredicate.test(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
 			return super.open(player, context);
 		}
 		return false;
@@ -49,7 +51,7 @@ public final class ItemOpener extends BasicOpener {
 	@Override
 	public void validate() {
 		super.validate();
-		if (stack==null) stack = ItemStackish.MATCH_ALL;
+		if (itemPredicate==null) itemPredicate = Helper.ANY_ITEM;
 		if (tagOption==null) tagOption = TagOption.ALL;
 	}
 
@@ -58,12 +60,12 @@ public final class ItemOpener extends BasicOpener {
 		return TYPE;
 	}
 
-	public ItemStackish getStack() {
-		return stack;
+	public ItemPredicate getItemPredicate() {
+		return itemPredicate;
 	}
 
-	public void setStack(ItemStackish stack) {
-		this.stack = stack;
+	public void setItemPredicate(ItemPredicate itemPredicate) {
+		this.itemPredicate = itemPredicate;
 	}
 
 	public Set<Identifier> getTags() {

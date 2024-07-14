@@ -14,15 +14,20 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
+
+import megaminds.actioninventory.ActionInventoryMod;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class JsonHelper {
+	public static final Gson DEFAULT_GSON = new Gson();
+
 	private JsonHelper() {}
 
 	public static boolean isNull(JsonElement e) {
@@ -175,7 +180,7 @@ public class JsonHelper {
 	}
 
 	public static Text text(JsonElement e, Text def) {
-		return notNull(e) ? notNull(Text.Serialization.fromJsonTree(e), def) : def;
+		return notNull(e) ? notNull(Text.Serialization.fromJsonTree(e, ActionInventoryMod.getServer().getRegistryManager()), def) : def;
 	}
 
 	/**

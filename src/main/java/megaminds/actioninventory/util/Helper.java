@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -21,12 +22,22 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 import megaminds.actioninventory.ActionInventoryMod;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.component.type.WritableBookContentComponent;
+import net.minecraft.component.type.WrittenBookContentComponent;
+import net.minecraft.inventory.ContainerLock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.predicate.item.ItemPredicate;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.RawFilteredPair;
+import net.minecraft.text.Text;
 
 /**
  * Just some random helper methods.
@@ -35,18 +46,60 @@ public class Helper {
 	private static final String GLOBAL = "GLOBAL";
 	private static final String WORLD = "WORLD";
 
+	public static final ItemPredicate ANY_ITEM = ItemPredicate.Builder.create().build();
+
 	private Helper() {}
 
 	/**
 	 * Parses nbt of the item stack. The same stack is returned with the changes.
 	 */
 	public static ItemStack parseItemStack(ItemStack stack, PlaceholderContext context) {
-		if (stack.hasNbt()) {
-			NbtPlaceholderParser.replaceCompound(context, stack.getNbt());
-			stack.getItem().postProcessNbt(stack.getNbt());
+		if (stack.contains(DataComponentTypes.CUSTOM_NAME)) {
+			stack.set(DataComponentTypes.CUSTOM_NAME, Placeholders.parseText(stack.get(DataComponentTypes.CUSTOM_NAME), context));
 		}
-
+		if (stack.contains(DataComponentTypes.ITEM_NAME)) {
+			stack.set(DataComponentTypes.ITEM_NAME, Placeholders.parseText(stack.get(DataComponentTypes.ITEM_NAME), context));
+		}
+		if (stack.contains(DataComponentTypes.LORE)) {
+			var lore = stack.get(DataComponentTypes.LORE);
+			var lines = lore.lines().stream().map(l -> Placeholders.parseText(l, context)).toList();
+			var styled = lore.styledLines().stream().map(l -> Placeholders.parseText(l, context)).toList();
+			stack.set(DataComponentTypes.LORE, new LoreComponent(lines, styled));
+		}
+		if (stack.contains(DataComponentTypes.WRITABLE_BOOK_CONTENT)) {
+			var content = stack.get(DataComponentTypes.WRITABLE_BOOK_CONTENT);
+			var pages = parsePages(content.pages(), Helper::parseString, context);
+			stack.set(DataComponentTypes.WRITABLE_BOOK_CONTENT, new WritableBookContentComponent(pages));
+		}
+		if (stack.contains(DataComponentTypes.WRITTEN_BOOK_CONTENT)) {
+			var content = stack.get(DataComponentTypes.WRITTEN_BOOK_CONTENT);
+			var author = parseString(content.author(), context);
+			var title = parseFilteredPair(content.title(), Helper::parseString, context);
+			var pages = parsePages(content.pages(), Placeholders::parseText, context);
+			stack.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, new WrittenBookContentComponent(title, author, content.generation(), pages, content.resolved()));
+		}
+		if (stack.contains(DataComponentTypes.PROFILE)) {
+			var profile = stack.get(DataComponentTypes.PROFILE);
+			stack.set(DataComponentTypes.PROFILE, new ProfileComponent(profile.name().map(name -> parseString(name, context)), profile.id(), profile.properties()));
+		}
+		if (stack.contains(DataComponentTypes.LOCK)) {
+			stack.set(DataComponentTypes.LOCK, new ContainerLock(parseString(stack.get(DataComponentTypes.LOCK).key(), context)));
+		}
 		return stack;
+	}
+
+	public static <T> List<RawFilteredPair<T>> parsePages(List<RawFilteredPair<T>> pages, BiFunction<T, PlaceholderContext, T> parser, PlaceholderContext context) {
+		return pages.stream()
+				.map(pair -> parseFilteredPair(pair, parser, context))
+				.toList();
+	}
+	
+	public static <T> RawFilteredPair<T> parseFilteredPair(RawFilteredPair<T> pair, BiFunction<T, PlaceholderContext, T> parser, PlaceholderContext context) {
+		return new RawFilteredPair<>(parser.apply(pair.raw(), context), pair.filtered().map(f -> parser.apply(f, context)));
+	}
+	
+	public static String parseString(String string, PlaceholderContext context) {
+		return Placeholders.parseText(Text.of(string), context).getString();
 	}
 
 	/**
@@ -178,7 +231,7 @@ public class Helper {
 	@SuppressWarnings("unchecked")
 	public static <V extends NbtElement> Map<String, V> compoundToMap(NbtCompound c) {
 		Set<String> keys = c.getKeys();
-		Map<String, V> map =  new HashMap<>(keys.size());
+		Map<String, V> map =  HashMap.newHashMap(keys.size());
 		for (String s : keys) {
 			map.put(s, (V)c.get(s));
 		}

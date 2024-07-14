@@ -3,7 +3,7 @@ package megaminds.actioninventory.consumables;
 import java.util.Set;
 import java.util.UUID;
 
-import megaminds.actioninventory.misc.ItemStackish;
+import net.minecraft.predicate.item.ItemPredicate;
 import megaminds.actioninventory.misc.Enums.TagOption;
 import megaminds.actioninventory.serialization.wrappers.Validated;
 import megaminds.actioninventory.util.Helper;
@@ -13,23 +13,23 @@ import net.minecraft.util.Identifier;
 
 @PolyName("Item")
 public final class ItemConsumable extends IntConsumable {
-	private ItemStackish stack;
+	private ItemPredicate itemPredicate;
 	private Set<Identifier> tags;
 	private TagOption tagOption;
 
 	public ItemConsumable() {}
-	
-	public ItemConsumable(ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
-		this.stack = stack;
+
+	public ItemConsumable(ItemPredicate itemPredicate, Set<Identifier> tags, TagOption tagOption) {
+		this.itemPredicate = itemPredicate;
 		this.tags = tags;
 		this.tagOption = tagOption;
 	}
 
-	public ItemConsumable(int amount, ItemStackish stack, Set<Identifier> tags, TagOption tagOption) {
+	public ItemConsumable(int amount, ItemPredicate itemPredicate, Set<Identifier> tags, TagOption tagOption) {
 		super(amount);
-		this.stack = stack!=null ? stack : ItemStackish.MATCH_ALL;
+		this.itemPredicate = itemPredicate;
 		this.tags = tags;
-		this.tagOption = tagOption!=null ? tagOption : TagOption.ANY;
+		this.tagOption = tagOption;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public final class ItemConsumable extends IntConsumable {
 
 		for (int i = 0, size = inv.size(); i < size; i++) {
 			var s = inv.getStack(i);
-			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
+			if (itemPredicate.test(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
 				left -= s.getCount();
 				if (left<=0) return true;
 			}
@@ -54,7 +54,7 @@ public final class ItemConsumable extends IntConsumable {
 
 		for (int i = 0, size = inv.size(); i < size; i++) {
 			var s = inv.getStack(i);
-			if (stack.specifiedEquals(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
+			if (itemPredicate.test(s) && (tags==null || tagOption.matches(tags, s.streamTags()))) {
 				var count = Math.min(s.getCount(), left);
 				left -= count;
 				s.setCount(s.getCount()-count);
@@ -67,7 +67,7 @@ public final class ItemConsumable extends IntConsumable {
 	@Override
 	public void validate() {
 		Validated.validate(getAmount()>=0, "Item consumable requires amount to be 0 or above, but it is: "+getAmount());
-		if (stack==null) stack = ItemStackish.MATCH_ALL;
+		if (itemPredicate==null) itemPredicate = Helper.ANY_ITEM;
 		if (tagOption==null) tagOption = TagOption.ANY;
 	}
 
@@ -78,15 +78,15 @@ public final class ItemConsumable extends IntConsumable {
 
 	@Override
 	public BasicConsumable copy() {
-		return new ItemConsumable(getAmount(), stack, tags == null ? null : Set.copyOf(tags), tagOption);
+		return new ItemConsumable(getAmount(), itemPredicate, tags == null ? null : Set.copyOf(tags), tagOption);
 	}
 
-	public ItemStackish getStack() {
-		return stack;
+	public ItemPredicate getItemPredicate() {
+		return itemPredicate;
 	}
 
-	public void setStack(ItemStackish stack) {
-		this.stack = stack;
+	public void setItemPredicate(ItemPredicate itemPredicate) {
+		this.itemPredicate = itemPredicate;
 	}
 
 	public Set<Identifier> getTags() {
